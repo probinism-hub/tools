@@ -1,0 +1,819 @@
+<!-- ===== PX ⇄ REM ⇄ EM CONVERTER — START ===== -->
+<div class="pxc-tool" id="pxcTool">
+  <div class="pxc-shell">
+
+    <div class="pxc-head">
+      <span class="pxc-pill">CSS Unit Converter</span>
+      <h2 class="pxc-title">PX ⇄ REM ⇄ EM Converter</h2>
+      <p class="pxc-sub">Enter a value, pick its unit, and get instant conversions for pixels, rem and em.</p>
+    </div>
+
+    <div class="pxc-controls">
+
+      <div class="pxc-col">
+        <div class="pxc-field">
+          <label class="pxc-label" for="pxcValue">Value</label>
+          <div class="pxc-input-wrap">
+            <input id="pxcValue" class="pxc-input" type="text" inputmode="decimal"
+                   autocomplete="off" spellcheck="false" value="16">
+            <span class="pxc-suffix" id="pxcSuffix">px</span>
+          </div>
+        </div>
+
+        <div class="pxc-field">
+          <span class="pxc-label">Convert from</span>
+          <div class="pxc-seg" role="group" aria-label="Unit to convert from">
+            <button type="button" class="pxc-seg-btn is-active" data-unit="px" aria-pressed="true">PX</button>
+            <button type="button" class="pxc-seg-btn" data-unit="rem" aria-pressed="false">REM</button>
+            <button type="button" class="pxc-seg-btn" data-unit="em" aria-pressed="false">EM</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pxc-col">
+        <div class="pxc-field">
+          <label class="pxc-label" for="pxcBase">Root font size <span class="pxc-hint">(html)</span></label>
+          <div class="pxc-base-row">
+            <button type="button" class="pxc-round" data-step="-1" aria-label="Decrease root font size">−</button>
+            <div class="pxc-base-input">
+              <input id="pxcBase" type="text" inputmode="decimal" autocomplete="off" value="16">
+              <span>px</span>
+            </div>
+            <button type="button" class="pxc-round" data-step="1" aria-label="Increase root font size">+</button>
+          </div>
+          <div class="pxc-presets" role="group" aria-label="Root font size presets">
+            <button type="button" data-base="10" aria-pressed="false">10</button>
+            <button type="button" data-base="12" aria-pressed="false">12</button>
+            <button type="button" data-base="16" class="is-active" aria-pressed="true">16</button>
+            <button type="button" data-base="18" aria-pressed="false">18</button>
+            <button type="button" data-base="20" aria-pressed="false">20</button>
+            <button type="button" data-base="24" aria-pressed="false">24</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="pxc-results">
+
+      <div class="pxc-res" data-unit="px">
+        <div class="pxc-res-top">
+          <span class="pxc-res-label">Pixels</span>
+          <button type="button" class="pxc-copy" data-copy="px" data-label="Copy">Copy</button>
+        </div>
+        <div class="pxc-res-num">
+          <span class="pxc-res-val" data-out="px">16</span>
+          <span class="pxc-res-unit">px</span>
+        </div>
+      </div>
+
+      <div class="pxc-res" data-unit="rem">
+        <div class="pxc-res-top">
+          <span class="pxc-res-label">REM</span>
+          <button type="button" class="pxc-copy" data-copy="rem" data-label="Copy">Copy</button>
+        </div>
+        <div class="pxc-res-num">
+          <span class="pxc-res-val" data-out="rem">1</span>
+          <span class="pxc-res-unit">rem</span>
+        </div>
+      </div>
+
+      <div class="pxc-res" data-unit="em">
+        <div class="pxc-res-top">
+          <span class="pxc-res-label">EM</span>
+          <button type="button" class="pxc-copy" data-copy="em" data-label="Copy">Copy</button>
+        </div>
+        <div class="pxc-res-num">
+          <span class="pxc-res-val" data-out="em">1</span>
+          <span class="pxc-res-unit">em</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Screen-reader announcement, updated once per change -->
+    <div class="pxc-sr" id="pxcLive" role="status" aria-live="polite"></div>
+
+    <div class="pxc-info" id="pxcInfo">1 rem = 16px · 1 em = 16px</div>
+
+    <div class="pxc-ref">
+      <div class="pxc-ref-head">
+        <h3>Quick reference</h3>
+        <span class="pxc-ref-sub" id="pxcRefSub">at 16px root — click any value to copy</span>
+      </div>
+      <div class="pxc-chips" id="pxcChips"></div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+/* ============ PX ⇄ REM ⇄ EM CONVERTER — STYLES ============ */
+.pxc-tool{
+  --pxc-ink:#0f172a;
+  --pxc-muted:#64748b;
+  --pxc-line:#e2e8f0;
+  --pxc-soft:#f8fafc;
+  --pxc-accent:#6366f1;
+  --pxc-accent-dark:#4f46e5;
+  --pxc-accent-soft:#eef2ff;
+  width:100%;
+  max-width:1140px;
+  margin:0 auto;
+  box-sizing:border-box;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:16px;
+  line-height:1.5;
+  color:var(--pxc-ink);
+  text-align:left;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+.pxc-tool *,
+.pxc-tool *::before,
+.pxc-tool *::after{ box-sizing:border-box; }
+.pxc-tool h2,
+.pxc-tool h3,
+.pxc-tool p{ margin:0; padding:0; }
+.pxc-tool button{
+  font-family:inherit;
+  text-transform:none;
+  letter-spacing:normal;
+  cursor:pointer;
+  -webkit-appearance:none;
+  appearance:none;
+}
+.pxc-tool input{
+  font-family:inherit;
+  -webkit-appearance:none;
+  appearance:none;
+  border-radius:0;
+  margin:0;
+}
+.pxc-tool button:focus-visible,
+.pxc-tool input:focus-visible{
+  outline:2px solid var(--pxc-accent);
+  outline-offset:2px;
+}
+/* inputs sit inside a wrapper that draws its own focus ring */
+.pxc-tool .pxc-input:focus-visible,
+.pxc-tool .pxc-base-input input:focus-visible{ outline:0; }
+
+/* visually hidden, still announced */
+.pxc-sr{
+  position:absolute;
+  width:1px; height:1px;
+  margin:-1px; padding:0;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0;
+}
+
+/* ---------- Shell ---------- */
+.pxc-shell{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(180deg,#ffffff 0%,#fbfcff 100%);
+  border:1px solid var(--pxc-line);
+  border-radius:22px;
+  padding:clamp(18px,3vw,36px);
+  box-shadow:0 22px 50px -30px rgba(15,23,42,.45);
+}
+.pxc-shell::before{
+  content:"";
+  position:absolute;
+  top:0; left:0; right:0;
+  height:6px;
+  background:linear-gradient(90deg,#6366f1,#8b5cf6,#ec4899);
+}
+
+/* ---------- Head ---------- */
+.pxc-head{ margin-bottom:24px; }
+.pxc-pill{
+  display:inline-block;
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:.02em;
+  color:var(--pxc-accent-dark);
+  background:var(--pxc-accent-soft);
+  border-radius:999px;
+  padding:6px 14px;
+}
+.pxc-title{
+  font-size:clamp(22px,3.2vw,30px);
+  font-weight:800;
+  letter-spacing:-.02em;
+  line-height:1.2;
+  margin-top:12px !important;
+}
+.pxc-sub{
+  font-size:15px;
+  color:var(--pxc-muted);
+  margin-top:8px !important;
+  max-width:640px;
+}
+
+/* ---------- Controls ---------- */
+.pxc-controls{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:22px;
+}
+@media (min-width:820px){
+  .pxc-controls{ grid-template-columns:1fr 1fr; gap:26px; }
+}
+.pxc-col{ min-width:0; }
+.pxc-field{ margin-bottom:18px; }
+.pxc-field:last-child{ margin-bottom:0; }
+
+.pxc-label{
+  display:block;
+  font-size:15px;
+  font-weight:700;
+  color:#334155;
+  margin-bottom:9px;
+}
+.pxc-hint{
+  font-weight:600;
+  color:var(--pxc-muted);
+}
+
+/* Value input */
+.pxc-input-wrap{
+  display:flex;
+  align-items:center;
+  background:#fff;
+  border:1.5px solid var(--pxc-line);
+  border-radius:14px;
+  padding:0 16px;
+  transition:border-color .18s ease, box-shadow .18s ease;
+}
+.pxc-input-wrap:focus-within{
+  border-color:var(--pxc-accent);
+  box-shadow:0 0 0 4px rgba(99,102,241,.14);
+}
+.pxc-input{
+  flex:1 1 auto;
+  min-width:0;
+  width:100%;
+  border:0;
+  outline:0;
+  background:transparent;
+  font-size:22px;
+  font-weight:800;
+  color:var(--pxc-ink);
+  padding:14px 0;
+  line-height:1.2;
+}
+.pxc-suffix{
+  flex:0 0 auto;
+  font-size:15px;
+  font-weight:800;
+  color:var(--pxc-accent-dark);
+  background:var(--pxc-accent-soft);
+  border-radius:8px;
+  padding:4px 9px;
+  margin-left:10px;
+}
+
+/* Segmented control */
+.pxc-seg{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:6px;
+  background:#f1f5f9;
+  padding:6px;
+  border-radius:14px;
+}
+.pxc-seg-btn{
+  border:0;
+  background:transparent;
+  border-radius:10px;
+  padding:11px 6px;
+  font-size:15px;
+  font-weight:800;
+  color:var(--pxc-muted);
+  transition:background .18s ease, color .18s ease, box-shadow .18s ease;
+}
+.pxc-seg-btn:hover{ color:var(--pxc-accent-dark); }
+.pxc-seg-btn.is-active{
+  background:#fff;
+  color:var(--pxc-accent-dark);
+  box-shadow:0 6px 14px -8px rgba(15,23,42,.55);
+}
+
+/* Base font size */
+.pxc-base-row{
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+.pxc-round{
+  flex:0 0 46px;
+  width:46px;
+  height:46px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1.5px solid var(--pxc-line);
+  background:#fff;
+  border-radius:12px;
+  font-size:20px;
+  font-weight:800;
+  color:#475569;
+  line-height:1;
+  transition:border-color .18s ease, color .18s ease, background .18s ease;
+}
+.pxc-round:hover{
+  border-color:var(--pxc-accent);
+  color:var(--pxc-accent-dark);
+  background:var(--pxc-accent-soft);
+}
+.pxc-base-input{
+  flex:1 1 auto;
+  min-width:0;
+  display:flex;
+  align-items:center;
+  border:1.5px solid var(--pxc-line);
+  background:#fff;
+  border-radius:12px;
+  padding:0 14px;
+  transition:border-color .18s ease, box-shadow .18s ease;
+}
+.pxc-base-input:focus-within{
+  border-color:var(--pxc-accent);
+  box-shadow:0 0 0 4px rgba(99,102,241,.14);
+}
+.pxc-base-input input{
+  flex:1 1 auto;
+  min-width:0;
+  width:100%;
+  border:0;
+  outline:0;
+  background:transparent;
+  font-size:17px;
+  font-weight:800;
+  color:var(--pxc-ink);
+  padding:11px 0;
+  line-height:1.2;
+}
+.pxc-base-input span{
+  flex:0 0 auto;
+  font-size:15px;
+  font-weight:800;
+  color:var(--pxc-muted);
+  padding-left:8px;
+}
+.pxc-presets{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:12px;
+}
+.pxc-presets button{
+  border:1.5px solid var(--pxc-line);
+  background:#fff;
+  border-radius:999px;
+  padding:7px 15px;
+  font-size:15px;
+  font-weight:700;
+  color:#475569;
+  transition:border-color .18s ease, color .18s ease, background .18s ease;
+}
+.pxc-presets button:hover{
+  border-color:var(--pxc-accent);
+  color:var(--pxc-accent-dark);
+  background:var(--pxc-accent-soft);
+}
+.pxc-presets button.is-active{
+  border-color:var(--pxc-accent);
+  background:var(--pxc-accent-soft);
+  color:var(--pxc-accent-dark);
+}
+
+/* ---------- Results ---------- */
+.pxc-results{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+  margin-top:26px;
+}
+@media (min-width:640px){
+  .pxc-results{ grid-template-columns:repeat(3,1fr); }
+}
+.pxc-res{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  background:#fff;
+  border:1.5px solid var(--pxc-line);
+  border-radius:16px;
+  padding:16px 16px 18px;
+  transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+.pxc-res.is-source{
+  border-color:#c7d2fe;
+  background:linear-gradient(180deg,#f5f3ff 0%,#ffffff 100%);
+  box-shadow:0 16px 34px -26px rgba(99,102,241,.95);
+}
+.pxc-res-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.pxc-res-label{
+  font-size:15px;
+  font-weight:800;
+  letter-spacing:.02em;
+  color:var(--pxc-muted);
+}
+.pxc-res.is-source .pxc-res-label{ color:var(--pxc-accent-dark); }
+.pxc-copy{
+  flex:0 0 auto;
+  border:1.5px solid var(--pxc-line);
+  background:#fff;
+  border-radius:9px;
+  padding:6px 11px;
+  font-size:15px;
+  font-weight:700;
+  color:#475569;
+  line-height:1.2;
+  transition:border-color .18s ease, color .18s ease, background .18s ease;
+}
+.pxc-copy:hover{
+  border-color:var(--pxc-accent);
+  color:var(--pxc-accent-dark);
+  background:var(--pxc-accent-soft);
+}
+.pxc-copy.is-done{
+  border-color:#86efac;
+  background:#dcfce7;
+  color:#15803d;
+}
+.pxc-copy.is-fail{
+  border-color:#fca5a5;
+  background:#fee2e2;
+  color:#b91c1c;
+}
+.pxc-res-num{
+  display:flex;
+  align-items:baseline;
+  flex-wrap:wrap;
+  gap:4px;
+  min-width:0;
+}
+.pxc-res-val{
+  font-size:clamp(24px,4.2vw,32px);
+  font-weight:800;
+  letter-spacing:-.02em;
+  line-height:1.1;
+  color:var(--pxc-ink);
+  word-break:break-all;
+}
+.pxc-res-unit{
+  font-size:15px;
+  font-weight:800;
+  color:#94a3b8;
+}
+
+/* ---------- Info ---------- */
+.pxc-info{
+  margin-top:18px;
+  background:var(--pxc-soft);
+  border:1px dashed var(--pxc-line);
+  border-radius:12px;
+  padding:12px 15px;
+  font-size:15px;
+  font-weight:600;
+  color:#475569;
+  line-height:1.5;
+}
+
+/* ---------- Quick reference ---------- */
+.pxc-ref{
+  margin-top:26px;
+  padding-top:22px;
+  border-top:1px solid var(--pxc-line);
+}
+.pxc-ref-head{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:baseline;
+  gap:10px;
+  margin-bottom:14px;
+}
+.pxc-ref-head h3{
+  font-size:17px;
+  font-weight:800;
+  letter-spacing:-.01em;
+}
+.pxc-ref-sub{
+  font-size:15px;
+  font-weight:600;
+  color:var(--pxc-muted);
+}
+.pxc-chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.pxc-chip{
+  border:1.5px solid var(--pxc-line);
+  background:#fff;
+  border-radius:10px;
+  padding:8px 13px;
+  font-size:15px;
+  font-weight:600;
+  color:#475569;
+  line-height:1.3;
+  transition:border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
+}
+.pxc-chip b{
+  color:var(--pxc-ink);
+  font-weight:800;
+}
+.pxc-chip:hover{
+  border-color:var(--pxc-accent);
+  background:var(--pxc-accent-soft);
+  transform:translateY(-1px);
+}
+.pxc-chip.is-done{
+  border-color:#86efac;
+  background:#dcfce7;
+  color:#15803d;
+}
+.pxc-chip.is-done b{ color:#15803d; }
+
+/* ---------- Small screens ---------- */
+@media (max-width:480px){
+  .pxc-shell{ border-radius:18px; }
+  .pxc-input{ font-size:20px; padding:12px 0; }
+  .pxc-round{ flex-basis:42px; width:42px; height:42px; font-size:19px; }
+  .pxc-copy{ padding:6px 9px; }
+  .pxc-res{ padding:14px; }
+}
+</style>
+
+<script>
+(function () {
+  "use strict";
+
+  var root = document.getElementById('pxcTool');
+  if (!root || root.getAttribute('data-pxc-ready') === '1') return;
+  root.setAttribute('data-pxc-ready', '1');
+
+  var valInput   = root.querySelector('#pxcValue');
+  var baseInput  = root.querySelector('#pxcBase');
+  var suffix     = root.querySelector('#pxcSuffix');
+  var segBtns    = root.querySelectorAll('.pxc-seg-btn');
+  var stepBtns   = root.querySelectorAll('.pxc-round');
+  var presetBtns = root.querySelectorAll('.pxc-presets button');
+  var cards      = root.querySelectorAll('.pxc-res');
+  var copyBtns   = root.querySelectorAll('.pxc-copy');
+  var outPx      = root.querySelector('[data-out="px"]');
+  var outRem     = root.querySelector('[data-out="rem"]');
+  var outEm      = root.querySelector('[data-out="em"]');
+  var infoEl     = root.querySelector('#pxcInfo');
+  var liveEl     = root.querySelector('#pxcLive');
+  var chipsWrap  = root.querySelector('#pxcChips');
+  var refSub     = root.querySelector('#pxcRefSub');
+
+  var UNITS = ['px', 'rem', 'em'];
+  var BASE_MIN = 1;
+  var BASE_MAX = 200;
+  var CHIP_VALUES = [1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 80, 96];
+
+  var state = { unit: 'px', base: 16 };
+
+  /* ---------- helpers ---------- */
+
+  // NodeList.forEach is not available in very old browsers, so go through Array.
+  function each(list, fn) {
+    Array.prototype.forEach.call(list, fn);
+  }
+
+  function setActive(btn, active) {
+    btn.classList.toggle('is-active', active);
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+  }
+
+  function clampBase(n) {
+    return Math.min(BASE_MAX, Math.max(BASE_MIN, n));
+  }
+
+  function parseNum(raw) {
+    var s = String(raw == null ? '' : raw).trim().replace(',', '.');
+    s = s.replace(/[^0-9.\-]/g, '');
+    if (s === '' || s === '-' || s === '.' || s === '-.') return NaN;
+    var n = parseFloat(s);
+    return isFinite(n) ? n : NaN;
+  }
+
+  function fmt(n) {
+    if (!isFinite(n)) return '—';
+    var r = Math.round(n * 10000) / 10000;
+    if (Object.is(r, -0)) r = 0;
+    return String(r);
+  }
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '-1000px';
+      ta.style.left = '-1000px';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, ta.value.length);
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      document.body.removeChild(ta);
+      ok ? resolve() : reject(new Error('copy failed'));
+    });
+  }
+
+  // The async Clipboard API can be blocked (iframes, permissions policy);
+  // fall back to execCommand when it rejects, not only when it is missing.
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text).catch(function () {
+        return legacyCopy(text);
+      });
+    }
+    return legacyCopy(text);
+  }
+
+  function flashText(btn, label, ok) {
+    btn.textContent = label;
+    btn.classList.toggle('is-done', ok);
+    btn.classList.toggle('is-fail', !ok);
+    clearTimeout(btn._pxcTimer);
+    btn._pxcTimer = setTimeout(function () {
+      btn.textContent = btn.getAttribute('data-label') || 'Copy';
+      btn.classList.remove('is-done', 'is-fail');
+    }, 1100);
+  }
+
+  function flashClass(el) {
+    el.classList.add('is-done');
+    clearTimeout(el._pxcTimer);
+    el._pxcTimer = setTimeout(function () {
+      el.classList.remove('is-done');
+    }, 900);
+  }
+
+  /* ---------- quick reference chips ---------- */
+
+  function buildChips() {
+    var frag = document.createDocumentFragment();
+    CHIP_VALUES.forEach(function (px) {
+      var chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'pxc-chip';
+      chip.setAttribute('data-px', px);
+      chip.appendChild(document.createElement('b'));
+      chip.appendChild(document.createTextNode(''));
+      frag.appendChild(chip);
+    });
+    chipsWrap.appendChild(frag);
+  }
+
+  function updateChips() {
+    var base = state.base;
+    each(chipsWrap.children, function (chip) {
+      var px = parseFloat(chip.getAttribute('data-px'));
+      var rem = fmt(px / base);
+      chip.firstChild.textContent = px + 'px';
+      chip.lastChild.nodeValue = ' = ' + rem + 'rem';
+      chip.setAttribute('data-copy', rem + 'rem');
+    });
+  }
+
+  /* ---------- render ---------- */
+
+  function render() {
+    var typedBase = parseNum(baseInput.value);
+    if (isFinite(typedBase) && typedBase > 0) state.base = clampBase(typedBase);
+
+    var base = state.base;
+    var v = parseNum(valInput.value);
+
+    var px, rem, em;
+    if (isFinite(v)) {
+      px = (state.unit === 'px') ? v : v * base;
+      rem = px / base;
+      em = px / base;
+    } else {
+      px = rem = em = NaN;
+    }
+
+    outPx.textContent = fmt(px);
+    outRem.textContent = fmt(rem);
+    outEm.textContent = fmt(em);
+
+    each(cards, function (card) {
+      card.classList.toggle('is-source', card.getAttribute('data-unit') === state.unit);
+    });
+
+    var baseStr = fmt(base);
+    infoEl.textContent = '1 rem = ' + baseStr + 'px  ·  1 em = ' + baseStr +
+      'px  ·  em assumes the element inherits the root font size.';
+    refSub.textContent = 'at ' + baseStr + 'px root — click any value to copy';
+    liveEl.textContent = isFinite(px)
+      ? fmt(px) + ' pixels equals ' + fmt(rem) + ' rem and ' + fmt(em) + ' em at a ' + baseStr + ' pixel root.'
+      : 'Enter a number to convert.';
+
+    each(presetBtns, function (btn) {
+      setActive(btn, parseFloat(btn.getAttribute('data-base')) === base);
+    });
+
+    updateChips();
+  }
+
+  /* ---------- events ---------- */
+
+  function setUnit(unit) {
+    if (UNITS.indexOf(unit) === -1 || unit === state.unit) return;
+    state.unit = unit;
+    each(segBtns, function (b) {
+      setActive(b, b.getAttribute('data-unit') === unit);
+    });
+    suffix.textContent = unit;
+    render();
+  }
+
+  function setBase(b) {
+    b = clampBase(b);
+    baseInput.value = fmt(b);
+    state.base = b;
+    render();
+  }
+
+  valInput.addEventListener('input', render);
+
+  baseInput.addEventListener('input', render);
+  baseInput.addEventListener('blur', function () {
+    var b = parseNum(baseInput.value);
+    setBase(isFinite(b) && b > 0 ? b : state.base);
+  });
+
+  each(segBtns, function (btn) {
+    btn.addEventListener('click', function () {
+      setUnit(btn.getAttribute('data-unit'));
+    });
+  });
+
+  each(stepBtns, function (btn) {
+    btn.addEventListener('click', function () {
+      var delta = parseFloat(btn.getAttribute('data-step'));
+      var b = parseNum(baseInput.value);
+      if (!isFinite(b)) b = state.base;
+      setBase(Math.round((b + delta) * 100) / 100);
+    });
+  });
+
+  each(presetBtns, function (btn) {
+    btn.addEventListener('click', function () {
+      var b = parseFloat(btn.getAttribute('data-base'));
+      if (isFinite(b)) setBase(b);
+    });
+  });
+
+  each(copyBtns, function (btn) {
+    btn.addEventListener('click', function () {
+      var unit = btn.getAttribute('data-copy');
+      var el = root.querySelector('[data-out="' + unit + '"]');
+      var txt = el ? el.textContent : '';
+      if (!txt || txt === '—') return;
+      copyText(txt + unit).then(function () {
+        flashText(btn, 'Copied!', true);
+      }, function () {
+        flashText(btn, 'Press Ctrl+C', false);
+      });
+    });
+  });
+
+  chipsWrap.addEventListener('click', function (e) {
+    var chip = e.target.closest ? e.target.closest('.pxc-chip') : null;
+    if (!chip) return;
+    var txt = chip.getAttribute('data-copy');
+    if (!txt) return;
+    copyText(txt).then(function () {
+      flashClass(chip);
+    }, function () {});
+  });
+
+  /* ---------- init ---------- */
+  buildChips();
+  suffix.textContent = state.unit;
+  render();
+
+})();
+</script>
+<!-- ===== PX ⇄ REM ⇄ EM CONVERTER — END ===== -->
