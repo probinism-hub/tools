@@ -67,16 +67,16 @@ box-sizing:border-box;width:100%;max-width:1140px;margin:0 auto;padding:0;color:
   <div class="pxr-body">
 
     <div class="pxr-card pxr-full">
-      <h3>1. Base font size</h3>
-      <label for="pxr-base">1rem equals (px)</label>
+      <h3>1. Base font size (this is the number we divide by)</h3>
+      <label for="pxr-base">Type your base: 1rem equals how many px?</label>
       <input id="pxr-base" type="number" min="1" step="any" value="16" inputmode="decimal" style="max-width:240px">
       <div class="pxr-presets" id="pxr-presets">
-        <button type="button" data-b="10">10px</button>
-        <button type="button" data-b="12">12px</button>
-        <button type="button" data-b="14">14px</button>
-        <button type="button" data-b="16">16px</button>
-        <button type="button" data-b="18">18px</button>
-        <button type="button" data-b="20">20px</button>
+        <button type="button" data-b="10">Base 10px</button>
+        <button type="button" data-b="12">Base 12px</button>
+        <button type="button" data-b="14">Base 14px</button>
+        <button type="button" data-b="16">Base 16px</button>
+        <button type="button" data-b="18">Base 18px</button>
+        <button type="button" data-b="20">Base 20px</button>
       </div>
       <p class="pxr-hint">Most browsers use 16px by default. Change this only if your site sets a different root font size.</p>
     </div>
@@ -92,6 +92,7 @@ box-sizing:border-box;width:100%;max-width:1140px;margin:0 auto;padding:0;color:
         <strong id="pxr-out">Type a value above</strong>
         <button type="button" class="pxr-primary" id="pxr-copy">Copy result</button>
       </div>
+      <p class="pxr-hint" id="pxr-note"></p>
     </div>
 
     <div class="pxr-card">
@@ -128,7 +129,7 @@ box-sizing:border-box;width:100%;max-width:1140px;margin:0 auto;padding:0;color:
   var last='px',toastT;
   function base(){var b=parseFloat(baseEl.value);return b>0?b:16;}
   function fmt(n){return String(parseFloat(n.toFixed(4)));}
-  function show(p,r){outEl.textContent=(p===''?'Type a value above':p+'px = '+r+'rem');}
+  function show(p,r){var b=base();outEl.textContent=(p===''?'Type a value above':p+'px = '+r+'rem');$('pxr-note').textContent=(p===''?'':(last==='px'?p+'px \u00f7 '+b+' = '+r+'rem  (base: 1rem = '+b+'px)':r+'rem \u00d7 '+b+' = '+p+'px  (base: 1rem = '+b+'px)'));}
   function fromPx(){last='px';var v=parseFloat(pxEl.value);if(isNaN(v)){remEl.value='';return show('','');}var r=fmt(v/base());remEl.value=r;show(fmt(v),r);}
   function fromRem(){last='rem';var v=parseFloat(remEl.value);if(isNaN(v)){pxEl.value='';return show('','');}var p=fmt(v*base());pxEl.value=p;show(p,fmt(v));}
   function bulk(){
