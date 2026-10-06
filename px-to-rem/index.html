@@ -1,192 +1,172 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PX to REM Converter</title>
+<!-- PX to REM Converter | paste this whole block into an Elementor "HTML" widget -->
+<div id="pxr-app">
 <style>
-  :root {
-    --bg: #f6f7f9; --card: #fff; --text: #1b1f24; --muted: #667085;
-    --border: #d9dde3; --accent: #2563eb; --accent-text: #fff; --code: #eef1f5;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0f1216; --card: #181c22; --text: #e8eaed; --muted: #9aa3af;
-      --border: #2d333b; --accent: #4f8cff; --accent-text: #0b0f14; --code: #20262e;
-    }
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; padding: 24px 16px 48px; background: var(--bg); color: var(--text);
-    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  }
-  main { max-width: 760px; margin: 0 auto; }
-  h1 { font-size: 1.6rem; margin: 0 0 4px; }
-  p.sub { color: var(--muted); margin: 0 0 20px; }
-  .card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; padding: 18px; margin-bottom: 16px;
-  }
-  h2 { font-size: 1rem; margin: 0 0 12px; }
-  .row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: end; }
-  .base { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  label { display: block; font-size: .8rem; color: var(--muted); margin-bottom: 4px; }
-  input, textarea {
-    width: 100%; padding: 10px 12px; font: inherit; color: var(--text);
-    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
-  }
-  input:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-  textarea { min-height: 150px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9rem; resize: vertical; }
-  .eq { padding-bottom: 10px; color: var(--muted); font-size: 1.2rem; }
-  button {
-    font: inherit; cursor: pointer; padding: 8px 14px; border-radius: 8px;
-    border: 1px solid var(--border); background: var(--card); color: var(--text);
-  }
-  button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
-  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-  .presets button { padding: 4px 10px; font-size: .85rem; }
-  .result { margin-top: 12px; font-family: ui-monospace, Menlo, monospace; background: var(--code); border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; gap: 8px; }
-  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); font-size: .9rem; }
-  th { color: var(--muted); font-weight: 600; }
-  tr.clickable { cursor: pointer; }
-  tr.clickable:hover { background: var(--code); }
-  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .opts { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; font-size: .9rem; }
-  .opts label { display: inline-flex; align-items: center; gap: 6px; color: var(--text); font-size: .9rem; margin: 0; }
-  .opts input { width: auto; }
-  @media (max-width: 560px) {
-    .row { grid-template-columns: 1fr; }
-    .eq { display: none; }
-    .two { grid-template-columns: 1fr; }
-  }
+#pxr-app{--bg:#f4f6fb;--card:#ffffff;--ink:#16192c;--muted:#5b6178;--line:#e2e6f0;--brand:#5b5bf0;--brand2:#8a5cf6;--brand-soft:#eceeff;--ok:#12a36b;--code:#f1f3f9;
+box-sizing:border-box;width:100%;max-width:1140px;margin:0 auto;padding:0;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;text-align:left}
+#pxr-app *,#pxr-app *::before,#pxr-app *::after{box-sizing:border-box}
+#pxr-app .pxr-wrap{background:var(--bg);border-radius:20px;overflow:hidden;border:1px solid var(--line)}
+#pxr-app .pxr-head{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:34px 36px}
+#pxr-app .pxr-head h2{margin:0 0 6px;padding:0;font-size:32px;line-height:1.2;font-weight:800;color:#fff;letter-spacing:-.5px}
+#pxr-app .pxr-head p{margin:0;font-size:17px;line-height:1.5;color:#fff;opacity:.92}
+#pxr-app .pxr-body{padding:28px 36px 36px;display:grid;grid-template-columns:1fr 1fr;gap:22px}
+#pxr-app .pxr-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 2px 10px rgba(30,40,90,.05);min-width:0}
+#pxr-app .pxr-full{grid-column:1 / -1}
+#pxr-app .pxr-card h3{margin:0 0 16px;padding:0;font-size:19px;line-height:1.3;font-weight:700;color:var(--ink)}
+#pxr-app label{display:block;margin:0 0 6px;padding:0;font-size:15px;font-weight:600;color:var(--muted)}
+#pxr-app input[type=number],#pxr-app textarea{display:block;width:100%;margin:0;padding:13px 14px;font-family:inherit;font-size:18px;line-height:1.4;color:var(--ink);background:#fff;border:2px solid var(--line);border-radius:12px;box-shadow:none;outline:none;transition:border-color .15s,box-shadow .15s}
+#pxr-app input[type=number]:focus,#pxr-app textarea:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(91,91,240,.15)}
+#pxr-app input::placeholder,#pxr-app textarea::placeholder{color:#8a90a6;opacity:1;font-size:15px}
+#pxr-app textarea{min-height:190px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:15px;line-height:1.6}
+#pxr-app .pxr-conv{display:grid;grid-template-columns:1fr 52px 1fr;gap:12px;align-items:end}
+#pxr-app .pxr-unit{position:relative}
+#pxr-app .pxr-unit input{padding-right:58px}
+#pxr-app .pxr-unit span{position:absolute;right:14px;bottom:15px;font-size:15px;font-weight:700;color:var(--brand);pointer-events:none}
+#pxr-app button{font-family:inherit;font-size:15px;line-height:1.2;font-weight:600;margin:0;cursor:pointer;border-radius:12px;border:2px solid var(--line);background:#fff;color:var(--ink);padding:11px 16px;text-transform:none;letter-spacing:0;box-shadow:none;transition:background .15s,border-color .15s,color .15s,transform .05s}
+#pxr-app button:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-soft)}
+#pxr-app button:active{transform:scale(.97)}
+#pxr-app button:focus-visible{outline:3px solid rgba(91,91,240,.45);outline-offset:2px}
+#pxr-app button.pxr-primary{background:linear-gradient(135deg,var(--brand),var(--brand2));border-color:transparent;color:#fff}
+#pxr-app button.pxr-primary:hover{color:#fff;background:linear-gradient(135deg,#4a4ae0,#7a4ce6);border-color:transparent}
+#pxr-app .pxr-swap{width:52px;height:52px;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--brand);background:var(--brand-soft);border-radius:50%}
+#pxr-app .pxr-presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+#pxr-app .pxr-presets button{padding:9px 14px}
+#pxr-app .pxr-presets button.pxr-on{background:var(--brand);border-color:var(--brand);color:#fff}
+#pxr-app .pxr-result{margin-top:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--brand-soft);border-radius:12px;padding:14px 16px}
+#pxr-app .pxr-result strong{font-size:20px;font-weight:800;color:var(--brand);word-break:break-word}
+#pxr-app .pxr-hint{margin:12px 0 0;font-size:15px;color:var(--muted)}
+#pxr-app .pxr-opts{display:flex;flex-wrap:wrap;gap:8px 20px;margin:0 0 14px}
+#pxr-app .pxr-opts label{display:inline-flex;align-items:center;gap:8px;margin:0;font-size:15px;font-weight:600;color:var(--ink);cursor:pointer}
+#pxr-app .pxr-opts input{width:20px;height:20px;margin:0;accent-color:var(--brand)}
+#pxr-app .pxr-two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+#pxr-app .pxr-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+#pxr-app .pxr-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+#pxr-app .pxr-grid button{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;text-align:left;padding:12px 14px;font-weight:600}
+#pxr-app .pxr-grid button small{font-size:15px;font-weight:700;color:var(--brand)}
+#pxr-app .pxr-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:#16192c;color:#fff;font-size:15px;font-weight:600;padding:12px 20px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:99999}
+#pxr-app .pxr-toast.pxr-show{opacity:1;transform:translate(-50%,0)}
+@media (max-width:900px){
+#pxr-app .pxr-body{grid-template-columns:1fr;padding:22px 20px 26px}
+#pxr-app .pxr-head{padding:26px 22px}
+#pxr-app .pxr-head h2{font-size:27px}
+#pxr-app .pxr-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media (max-width:600px){
+#pxr-app .pxr-card{padding:18px}
+#pxr-app .pxr-conv{grid-template-columns:1fr;gap:10px}
+#pxr-app .pxr-swap{width:100%;height:36px;border-radius:12px;font-size:20px;transform:rotate(90deg);width:36px;margin:0 auto}
+#pxr-app .pxr-two{grid-template-columns:1fr}
+#pxr-app .pxr-grid{grid-template-columns:repeat(2,1fr)}
+#pxr-app .pxr-actions button{flex:1 1 auto}
+}
 </style>
-</head>
-<body>
-<main>
-  <h1>PX ⇄ REM Converter</h1>
-  <p class="sub">Convert pixels to rem and back, or batch-convert a CSS snippet.</p>
+<div class="pxr-wrap">
+  <div class="pxr-head">
+    <h2>PX to REM Converter</h2>
+    <p>Convert pixels to rem and rem to pixels instantly, or convert a whole block of CSS at once.</p>
+  </div>
+  <div class="pxr-body">
 
-  <section class="card">
-    <h2>Base font size</h2>
-    <div class="base">
-      <input id="base" type="number" min="1" step="any" value="16" style="width:100px" aria-label="Base font size in px">
-      <span>px = 1rem</span>
-      <span class="presets">
-        <button data-base="10">10</button>
-        <button data-base="14">14</button>
-        <button data-base="16">16</button>
-        <button data-base="18">18</button>
-      </span>
+    <div class="pxr-card pxr-full">
+      <h3>1. Base font size</h3>
+      <label for="pxr-base">1rem equals (px)</label>
+      <input id="pxr-base" type="number" min="1" step="any" value="16" inputmode="decimal" style="max-width:240px">
+      <div class="pxr-presets" id="pxr-presets">
+        <button type="button" data-b="10">10px</button>
+        <button type="button" data-b="12">12px</button>
+        <button type="button" data-b="14">14px</button>
+        <button type="button" data-b="16">16px</button>
+        <button type="button" data-b="18">18px</button>
+        <button type="button" data-b="20">20px</button>
+      </div>
+      <p class="pxr-hint">Most browsers use 16px by default. Change this only if your site sets a different root font size.</p>
     </div>
-  </section>
 
-  <section class="card">
-    <h2>Quick convert</h2>
-    <div class="row">
-      <div><label for="px">Pixels (px)</label><input id="px" type="number" step="any" placeholder="e.g. 24"></div>
-      <div class="eq">⇄</div>
-      <div><label for="rem">Rem (rem)</label><input id="rem" type="number" step="any" placeholder="e.g. 1.5"></div>
+    <div class="pxr-card">
+      <h3>2. Quick converter</h3>
+      <div class="pxr-conv">
+        <div><label for="pxr-px">Pixels</label><div class="pxr-unit"><input id="pxr-px" type="number" step="any" inputmode="decimal" placeholder="e.g. 24"><span>px</span></div></div>
+        <div class="pxr-swap" aria-hidden="true">&#8646;</div>
+        <div><label for="pxr-rem">Rem</label><div class="pxr-unit"><input id="pxr-rem" type="number" step="any" inputmode="decimal" placeholder="e.g. 1.5"><span>rem</span></div></div>
+      </div>
+      <div class="pxr-result">
+        <strong id="pxr-out">Type a value above</strong>
+        <button type="button" class="pxr-primary" id="pxr-copy">Copy result</button>
+      </div>
     </div>
-    <div class="result"><span id="out">—</span><button id="copy">Copy</button></div>
-  </section>
 
-  <section class="card">
-    <h2>Batch convert CSS</h2>
-    <div class="opts">
-      <label><input type="radio" name="dir" value="px2rem" checked> px → rem</label>
-      <label><input type="radio" name="dir" value="rem2px"> rem → px</label>
-      <label><input type="checkbox" id="comment"> Keep original in comment</label>
+    <div class="pxr-card">
+      <h3>3. Convert CSS in bulk</h3>
+      <div class="pxr-opts">
+        <label><input type="radio" name="pxr-dir" value="p2r" checked> PX &rarr; REM</label>
+        <label><input type="radio" name="pxr-dir" value="r2p"> REM &rarr; PX</label>
+        <label><input type="checkbox" id="pxr-keep"> Keep original as comment</label>
+      </div>
+      <div class="pxr-two">
+        <div><label for="pxr-in">Paste your CSS</label><textarea id="pxr-in" spellcheck="false" placeholder="font-size: 18px;&#10;padding: 16px 24px;&#10;margin: -8px 0 0;"></textarea></div>
+        <div><label for="pxr-css">Converted result</label><textarea id="pxr-css" spellcheck="false" readonly placeholder="Result appears here"></textarea></div>
+      </div>
+      <div class="pxr-actions">
+        <button type="button" class="pxr-primary" id="pxr-copycss">Copy CSS</button>
+        <button type="button" id="pxr-clear">Clear</button>
+      </div>
     </div>
-    <div class="two">
-      <div><label for="in">Input</label><textarea id="in" placeholder="padding: 16px 24px;&#10;font-size: 14px;&#10;margin: -8px 0 0.5px;"></textarea></div>
-      <div><label for="outcss">Output</label><textarea id="outcss" readonly></textarea></div>
+
+    <div class="pxr-card pxr-full">
+      <h3>4. Common sizes <span style="font-weight:500;color:var(--muted)">(tap one to convert it)</span></h3>
+      <div class="pxr-grid" id="pxr-grid"></div>
     </div>
-    <div class="actions"><button class="primary" id="copycss">Copy output</button><button id="clear">Clear</button></div>
-  </section>
 
-  <section class="card">
-    <h2>Common sizes <small style="color:var(--muted);font-weight:400">(click a row to load it)</small></h2>
-    <table>
-      <thead><tr><th>px</th><th>rem</th><th>px</th><th>rem</th></tr></thead>
-      <tbody id="table"></tbody>
-    </table>
-  </section>
-</main>
-
+  </div>
+</div>
+<div class="pxr-toast" id="pxr-toast">Copied!</div>
 <script>
-(function () {
-  const $ = id => document.getElementById(id);
-  const base = () => { const b = parseFloat($('base').value); return b > 0 ? b : 16; };
-  const fmt = n => String(parseFloat(n.toFixed(4)));
-  const sizes = [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72];
-
-  function setOut(px, rem) {
-    $('out').textContent = px === '' ? '—' : px + 'px = ' + rem + 'rem';
-  }
-  function fromPx() {
-    const v = parseFloat($('px').value);
-    if (isNaN(v)) { $('rem').value = ''; return setOut('', ''); }
-    const r = fmt(v / base()); $('rem').value = r; setOut(fmt(v), r);
-  }
-  function fromRem() {
-    const v = parseFloat($('rem').value);
-    if (isNaN(v)) { $('px').value = ''; return setOut('', ''); }
-    const p = fmt(v * base()); $('px').value = p; setOut(p, fmt(v));
-  }
-
-  function batch() {
-    const toRem = document.querySelector('input[name=dir]:checked').value === 'px2rem';
-    const keep = $('comment').checked;
-    const re = toRem ? /(-?\d*\.?\d+)px\b/gi : /(-?\d*\.?\d+)rem\b/gi;
-    $('outcss').value = $('in').value.split('\n').map(line => {
-      let changed = false;
-      const out = line.replace(re, (m, n) => {
-        changed = true;
-        const x = parseFloat(n);
-        if (x === 0) return '0';
-        return toRem ? fmt(x / base()) + 'rem' : fmt(x * base()) + 'px';
-      });
-      return keep && changed ? out + ' /* ' + line.trim() + ' */' : out;
+(function(){
+  var root=document.getElementById('pxr-app');
+  function $(id){return document.getElementById(id);}
+  var sizes=[8,10,12,13,14,15,16,18,20,22,24,26,28,32,36,40,44,48,56,64];
+  var baseEl=$('pxr-base'),pxEl=$('pxr-px'),remEl=$('pxr-rem'),outEl=$('pxr-out');
+  var last='px',toastT;
+  function base(){var b=parseFloat(baseEl.value);return b>0?b:16;}
+  function fmt(n){return String(parseFloat(n.toFixed(4)));}
+  function show(p,r){outEl.textContent=(p===''?'Type a value above':p+'px = '+r+'rem');}
+  function fromPx(){last='px';var v=parseFloat(pxEl.value);if(isNaN(v)){remEl.value='';return show('','');}var r=fmt(v/base());remEl.value=r;show(fmt(v),r);}
+  function fromRem(){last='rem';var v=parseFloat(remEl.value);if(isNaN(v)){pxEl.value='';return show('','');}var p=fmt(v*base());pxEl.value=p;show(p,fmt(v));}
+  function bulk(){
+    var toRem=root.querySelector('input[name=pxr-dir]:checked').value==='p2r';
+    var keep=$('pxr-keep').checked;
+    var re=toRem?/(-?\d*\.?\d+)px\b/gi:/(-?\d*\.?\d+)rem\b/gi;
+    $('pxr-css').value=$('pxr-in').value.split('\n').map(function(line){
+      var changed=false;
+      var out=line.replace(re,function(m,n){changed=true;var x=parseFloat(n);if(x===0){return '0';}return toRem?fmt(x/base())+'rem':fmt(x*base())+'px';});
+      return keep&&changed?out+' /* '+line.trim()+' */':out;
     }).join('\n');
   }
-
-  function buildTable() {
-    const rows = [];
-    for (let i = 0; i < sizes.length; i += 2) {
-      const cells = [sizes[i], sizes[i + 1]].map(p =>
-        p === undefined ? '<td></td><td></td>' : '<td>' + p + '</td><td>' + fmt(p / base()) + '</td>');
-      rows.push('<tr class="clickable">' + cells.join('') + '</tr>');
-    }
-    $('table').innerHTML = rows.join('');
+  function grid(){
+    $('pxr-grid').innerHTML=sizes.map(function(p){return '<button type="button" data-px="'+p+'">'+p+'px <small>'+fmt(p/base())+'rem</small></button>';}).join('');
   }
-  $('table').addEventListener('click', e => {
-    const td = e.target.closest('td'); if (!td) return;
-    const idx = [...td.parentNode.children].indexOf(td) & ~1;
-    const px = td.parentNode.children[idx].textContent;
-    if (px) { $('px').value = px; fromPx(); }
-  });
-
-  function copy(text, btn) {
-    const done = () => { const t = btn.textContent; btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = t, 1200); };
-    if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, () => {});
+  function marks(){
+    var b=base();
+    Array.prototype.forEach.call($('pxr-presets').children,function(btn){btn.className=(parseFloat(btn.getAttribute('data-b'))===b)?'pxr-on':'';});
   }
-
-  function refresh() { buildTable(); $('px').value ? fromPx() : fromRem(); batch(); }
-
-  $('px').addEventListener('input', fromPx);
-  $('rem').addEventListener('input', fromRem);
-  $('base').addEventListener('input', refresh);
-  $('in').addEventListener('input', batch);
-  $('comment').addEventListener('change', batch);
-  document.querySelectorAll('input[name=dir]').forEach(r => r.addEventListener('change', batch));
-  document.querySelectorAll('[data-base]').forEach(b => b.addEventListener('click', () => { $('base').value = b.dataset.base; refresh(); }));
-  $('copy').addEventListener('click', e => copy($('out').textContent, e.target));
-  $('copycss').addEventListener('click', e => copy($('outcss').value, e.target));
-  $('clear').addEventListener('click', () => { $('in').value = ''; batch(); });
-
-  buildTable();
+  function refresh(){grid();marks();if(last==='px'){fromPx();}else{fromRem();}bulk();}
+  function toast(msg){var t=$('pxr-toast');t.textContent=msg;t.className='pxr-toast pxr-show';clearTimeout(toastT);toastT=setTimeout(function(){t.className='pxr-toast';},1500);}
+  function copy(text){
+    if(!text){toast('Nothing to copy yet');return;}
+    function fallback(){var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Copied!');}catch(e){toast('Press Ctrl+C to copy');}document.body.removeChild(ta);}
+    if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).then(function(){toast('Copied!');},fallback);}else{fallback();}
+  }
+  pxEl.addEventListener('input',fromPx);
+  remEl.addEventListener('input',fromRem);
+  baseEl.addEventListener('input',refresh);
+  $('pxr-in').addEventListener('input',bulk);
+  $('pxr-keep').addEventListener('change',bulk);
+  Array.prototype.forEach.call(root.querySelectorAll('input[name=pxr-dir]'),function(r){r.addEventListener('change',bulk);});
+  $('pxr-presets').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;baseEl.value=b.getAttribute('data-b');refresh();});
+  $('pxr-grid').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;pxEl.value=b.getAttribute('data-px');fromPx();pxEl.focus();});
+  $('pxr-copy').addEventListener('click',function(){copy(outEl.textContent.indexOf('=')>-1?outEl.textContent:'');});
+  $('pxr-copycss').addEventListener('click',function(){copy($('pxr-css').value);});
+  $('pxr-clear').addEventListener('click',function(){$('pxr-in').value='';bulk();});
+  refresh();
 })();
 </script>
-</body>
-</html>
+</div>
