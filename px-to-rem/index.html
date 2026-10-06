@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PX to REM Converter</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #fff; --text: #1b1f24; --muted: #667085;
+    --border: #d9dde3; --accent: #2563eb; --accent-text: #fff; --code: #eef1f5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1216; --card: #181c22; --text: #e8eaed; --muted: #9aa3af;
+      --border: #2d333b; --accent: #4f8cff; --accent-text: #0b0f14; --code: #20262e;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px 16px 48px; background: var(--bg); color: var(--text);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  p.sub { color: var(--muted); margin: 0 0 20px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px; margin-bottom: 16px;
+  }
+  h2 { font-size: 1rem; margin: 0 0 12px; }
+  .row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: end; }
+  .base { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  label { display: block; font-size: .8rem; color: var(--muted); margin-bottom: 4px; }
+  input, textarea {
+    width: 100%; padding: 10px 12px; font: inherit; color: var(--text);
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  }
+  input:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  textarea { min-height: 150px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9rem; resize: vertical; }
+  .eq { padding-bottom: 10px; color: var(--muted); font-size: 1.2rem; }
+  button {
+    font: inherit; cursor: pointer; padding: 8px 14px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--card); color: var(--text);
+  }
+  button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .presets button { padding: 4px 10px; font-size: .85rem; }
+  .result { margin-top: 12px; font-family: ui-monospace, Menlo, monospace; background: var(--code); border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; gap: 8px; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); font-size: .9rem; }
+  th { color: var(--muted); font-weight: 600; }
+  tr.clickable { cursor: pointer; }
+  tr.clickable:hover { background: var(--code); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .opts { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; font-size: .9rem; }
+  .opts label { display: inline-flex; align-items: center; gap: 6px; color: var(--text); font-size: .9rem; margin: 0; }
+  .opts input { width: auto; }
+  @media (max-width: 560px) {
+    .row { grid-template-columns: 1fr; }
+    .eq { display: none; }
+    .two { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>PX ⇄ REM Converter</h1>
+  <p class="sub">Convert pixels to rem and back, or batch-convert a CSS snippet.</p>
+
+  <section class="card">
+    <h2>Base font size</h2>
+    <div class="base">
+      <input id="base" type="number" min="1" step="any" value="16" style="width:100px" aria-label="Base font size in px">
+      <span>px = 1rem</span>
+      <span class="presets">
+        <button data-base="10">10</button>
+        <button data-base="14">14</button>
+        <button data-base="16">16</button>
+        <button data-base="18">18</button>
+      </span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Quick convert</h2>
+    <div class="row">
+      <div><label for="px">Pixels (px)</label><input id="px" type="number" step="any" placeholder="e.g. 24"></div>
+      <div class="eq">⇄</div>
+      <div><label for="rem">Rem (rem)</label><input id="rem" type="number" step="any" placeholder="e.g. 1.5"></div>
+    </div>
+    <div class="result"><span id="out">—</span><button id="copy">Copy</button></div>
+  </section>
+
+  <section class="card">
+    <h2>Batch convert CSS</h2>
+    <div class="opts">
+      <label><input type="radio" name="dir" value="px2rem" checked> px → rem</label>
+      <label><input type="radio" name="dir" value="rem2px"> rem → px</label>
+      <label><input type="checkbox" id="comment"> Keep original in comment</label>
+    </div>
+    <div class="two">
+      <div><label for="in">Input</label><textarea id="in" placeholder="padding: 16px 24px;&#10;font-size: 14px;&#10;margin: -8px 0 0.5px;"></textarea></div>
+      <div><label for="outcss">Output</label><textarea id="outcss" readonly></textarea></div>
+    </div>
+    <div class="actions"><button class="primary" id="copycss">Copy output</button><button id="clear">Clear</button></div>
+  </section>
+
+  <section class="card">
+    <h2>Common sizes <small style="color:var(--muted);font-weight:400">(click a row to load it)</small></h2>
+    <table>
+      <thead><tr><th>px</th><th>rem</th><th>px</th><th>rem</th></tr></thead>
+      <tbody id="table"></tbody>
+    </table>
+  </section>
+</main>
+
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const base = () => { const b = parseFloat($('base').value); return b > 0 ? b : 16; };
+  const fmt = n => String(parseFloat(n.toFixed(4)));
+  const sizes = [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72];
+
+  function setOut(px, rem) {
+    $('out').textContent = px === '' ? '—' : px + 'px = ' + rem + 'rem';
+  }
+  function fromPx() {
+    const v = parseFloat($('px').value);
+    if (isNaN(v)) { $('rem').value = ''; return setOut('', ''); }
+    const r = fmt(v / base()); $('rem').value = r; setOut(fmt(v), r);
+  }
+  function fromRem() {
+    const v = parseFloat($('rem').value);
+    if (isNaN(v)) { $('px').value = ''; return setOut('', ''); }
+    const p = fmt(v * base()); $('px').value = p; setOut(p, fmt(v));
+  }
+
+  function batch() {
+    const toRem = document.querySelector('input[name=dir]:checked').value === 'px2rem';
+    const keep = $('comment').checked;
+    const re = toRem ? /(-?\d*\.?\d+)px\b/gi : /(-?\d*\.?\d+)rem\b/gi;
+    $('outcss').value = $('in').value.split('\n').map(line => {
+      let changed = false;
+      const out = line.replace(re, (m, n) => {
+        changed = true;
+        const x = parseFloat(n);
+        if (x === 0) return '0';
+        return toRem ? fmt(x / base()) + 'rem' : fmt(x * base()) + 'px';
+      });
+      return keep && changed ? out + ' /* ' + line.trim() + ' */' : out;
+    }).join('\n');
+  }
+
+  function buildTable() {
+    const rows = [];
+    for (let i = 0; i < sizes.length; i += 2) {
+      const cells = [sizes[i], sizes[i + 1]].map(p =>
+        p === undefined ? '<td></td><td></td>' : '<td>' + p + '</td><td>' + fmt(p / base()) + '</td>');
+      rows.push('<tr class="clickable">' + cells.join('') + '</tr>');
+    }
+    $('table').innerHTML = rows.join('');
+  }
+  $('table').addEventListener('click', e => {
+    const td = e.target.closest('td'); if (!td) return;
+    const idx = [...td.parentNode.children].indexOf(td) & ~1;
+    const px = td.parentNode.children[idx].textContent;
+    if (px) { $('px').value = px; fromPx(); }
+  });
+
+  function copy(text, btn) {
+    const done = () => { const t = btn.textContent; btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = t, 1200); };
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, () => {});
+  }
+
+  function refresh() { buildTable(); $('px').value ? fromPx() : fromRem(); batch(); }
+
+  $('px').addEventListener('input', fromPx);
+  $('rem').addEventListener('input', fromRem);
+  $('base').addEventListener('input', refresh);
+  $('in').addEventListener('input', batch);
+  $('comment').addEventListener('change', batch);
+  document.querySelectorAll('input[name=dir]').forEach(r => r.addEventListener('change', batch));
+  document.querySelectorAll('[data-base]').forEach(b => b.addEventListener('click', () => { $('base').value = b.dataset.base; refresh(); }));
+  $('copy').addEventListener('click', e => copy($('out').textContent, e.target));
+  $('copycss').addEventListener('click', e => copy($('outcss').value, e.target));
+  $('clear').addEventListener('click', () => { $('in').value = ''; batch(); });
+
+  buildTable();
+})();
+</script>
+</body>
+</html>
