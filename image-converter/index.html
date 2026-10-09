@@ -1,0 +1,902 @@
+<div id="icv-root">
+<style>
+  #icv-root{
+    --bg-0:#0b0d14;
+    --bg-1:#11141d;
+    --bg-2:#171b27;
+    --card:#1a1f2d;
+    --card-hover:#20263a;
+    --border:rgba(255,255,255,0.08);
+    --border-strong:rgba(255,255,255,0.16);
+    --text-0:#f2f4f8;
+    --text-1:#b8bfd0;
+    --text-2:#7b8299;
+    --accent-a:#7c5cff;
+    --accent-b:#00d4c8;
+    --accent-grad:linear-gradient(135deg,#7c5cff 0%,#00b8d4 55%,#00d4c8 100%);
+    --danger:#ff5d7a;
+    --success:#38e0a8;
+    --warn:#ffb648;
+    --radius-lg:20px;
+    --radius-md:14px;
+    --radius-sm:9px;
+    --shadow-soft:0 10px 30px rgba(0,0,0,0.35);
+    --shadow-glow:0 0 0 1px rgba(124,92,255,0.25), 0 8px 24px rgba(124,92,255,0.18);
+
+    display:block;
+    background:
+      radial-gradient(1200px 800px at 15% -10%, rgba(124,92,255,0.20), transparent 60%),
+      radial-gradient(1000px 700px at 110% 10%, rgba(0,212,200,0.14), transparent 55%),
+      var(--bg-0) !important;
+    color:var(--text-0) !important;
+    font-family:'Segoe UI', system-ui, -apple-system, "Inter", Roboto, Helvetica, Arial, sans-serif !important;
+    -webkit-font-smoothing:antialiased;
+    padding:40px 20px 60px;
+    border-radius:24px;
+    overflow:hidden;
+    line-height:1.5;
+  }
+  #icv-root, #icv-root *{ box-sizing:border-box !important; }
+  #icv-root button, #icv-root input, #icv-root select, #icv-root label, #icv-root div, #icv-root span, #icv-root p, #icv-root h1{
+    font-family:inherit !important;
+    text-transform:none;
+    letter-spacing:normal;
+    line-height:normal;
+    -webkit-appearance:none;
+    appearance:none;
+    box-shadow:none;
+    text-shadow:none;
+    float:none;
+  }
+  #icv-root a{ text-decoration:none; }
+  #icv-root ul, #icv-root ol{ margin:0; padding:0; list-style:none; }
+
+  #icv-root .wrap{ max-width:1080px; margin:0 auto; }
+
+  /* ---------- Header ---------- */
+  #icv-root header{ text-align:center; margin-bottom:36px; }
+  #icv-root .logo-badge{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:64px; height:64px; border-radius:18px;
+    background:var(--accent-grad);
+    box-shadow:var(--shadow-glow);
+    margin-bottom:18px;
+  }
+  #icv-root .logo-badge svg{ width:32px; height:32px; }
+  #icv-root h1{
+    font-size:2.4rem !important; margin:0 0 8px !important; font-weight:700 !important;
+    letter-spacing:-0.02em !important;
+    background:linear-gradient(135deg,#ffffff 30%,#c9c3ff 70%,#8fe9df 100%) !important;
+    -webkit-background-clip:text !important; background-clip:text !important; color:transparent !important;
+    border:none !important;
+  }
+  #icv-root header p{ color:var(--text-1) !important; font-size:1.02rem; margin:0; }
+  #icv-root header .sub{ color:var(--text-2) !important; font-size:0.88rem; margin-top:6px; }
+
+  /* ---------- Card ---------- */
+  #icv-root .card{
+    background:var(--card) !important;
+    border:1px solid var(--border) !important;
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-soft);
+    padding:28px;
+    margin-bottom:24px;
+  }
+
+  /* ---------- Dropzone ---------- */
+  #icv-root .dropzone{
+    border:2px dashed var(--border-strong) !important;
+    border-radius:var(--radius-md);
+    padding:48px 24px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .2s ease, background .2s ease, transform .15s ease;
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  }
+  #icv-root .dropzone:hover{ border-color:var(--accent-a) !important; background:rgba(124,92,255,0.06); }
+  #icv-root .dropzone.dragover{
+    border-color:var(--accent-b) !important;
+    background:rgba(0,212,200,0.08);
+    transform:scale(1.01);
+  }
+  #icv-root .dropzone .icon{
+    width:56px; height:56px; margin:0 auto 16px;
+    border-radius:16px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--accent-grad);
+    opacity:0.9;
+  }
+  #icv-root .dropzone .icon svg{ width:28px; height:28px; }
+  #icv-root .dropzone strong{ color:var(--text-0) !important; font-size:1.05rem; font-weight:700 !important; }
+  #icv-root .dropzone p{ color:var(--text-2) !important; margin:6px 0 0; font-size:0.88rem; }
+  #icv-root input[type="file"]{ display:none !important; }
+
+  /* ---------- Controls ---------- */
+  #icv-root .controls{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+    gap:18px;
+    margin-top:24px;
+  }
+  #icv-root .field label{
+    display:block; font-size:0.78rem; font-weight:600 !important;
+    color:var(--text-2) !important; text-transform:uppercase !important; letter-spacing:0.06em !important;
+    margin-bottom:8px;
+  }
+  #icv-root select, #icv-root input[type="number"], #icv-root input[type="text"]{
+    width:100% !important;
+    background:var(--bg-2) !important;
+    border:1px solid var(--border) !important;
+    color:var(--text-0) !important;
+    padding:10px 12px !important;
+    border-radius:var(--radius-sm) !important;
+    font-size:0.92rem !important;
+    outline:none;
+    height:auto !important;
+    margin:0 !important;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  #icv-root select:focus, #icv-root input:focus{
+    border-color:var(--accent-a) !important;
+    box-shadow:0 0 0 3px rgba(124,92,255,0.18) !important;
+  }
+  #icv-root .format-grid{ display:flex; gap:8px; flex-wrap:wrap; }
+  #icv-root .format-chip{
+    padding:9px 16px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:var(--bg-2);
+    color:var(--text-1) !important;
+    font-size:0.86rem;
+    font-weight:600 !important;
+    cursor:pointer;
+    transition:all .15s ease;
+    user-select:none;
+  }
+  #icv-root .format-chip:hover{ border-color:var(--border-strong); color:var(--text-0) !important; }
+  #icv-root .format-chip.active{
+    background:var(--accent-grad);
+    color:#0b0d14 !important;
+    border-color:transparent;
+  }
+
+  #icv-root .quality-row{ display:flex; align-items:center; gap:14px; }
+  #icv-root input[type="range"]{
+    -webkit-appearance:none !important; appearance:none !important;
+    flex:1; height:6px !important; border-radius:999px;
+    background:var(--bg-2) !important;
+    outline:none;
+    width:100%;
+    padding:0 !important;
+    border:none !important;
+  }
+  #icv-root input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:18px; height:18px; border-radius:50%;
+    background:var(--accent-grad);
+    cursor:pointer;
+    border:3px solid #0b0d14;
+    box-shadow:0 0 0 1px rgba(255,255,255,0.15);
+  }
+  #icv-root .quality-val{
+    min-width:44px; text-align:center;
+    font-variant-numeric:tabular-nums;
+    font-weight:700 !important; color:var(--text-0) !important;
+    background:var(--bg-2); border-radius:var(--radius-sm);
+    padding:6px 8px; font-size:0.86rem;
+  }
+
+  #icv-root .checkbox-row{ display:flex; align-items:center; gap:10px; }
+  #icv-root .checkbox-row input[type="checkbox"]{ width:18px !important; height:18px !important; accent-color:var(--accent-a); cursor:pointer; margin:0 !important; }
+  #icv-root .checkbox-row label{ color:var(--text-1) !important; font-size:0.88rem; cursor:pointer; margin:0 !important; text-transform:none !important; letter-spacing:normal !important; font-weight:500 !important; }
+
+  #icv-root .resize-fields{ display:flex; gap:10px; align-items:center; }
+  #icv-root .resize-fields input{ width:100% !important; }
+  #icv-root .resize-fields span{ color:var(--text-2) !important; font-size:0.85rem; }
+
+  #icv-root #icv-avifWarning{
+    display:none;
+    margin-top:16px;
+    padding:12px 16px;
+    border-radius:var(--radius-sm);
+    background:rgba(255,182,72,0.1);
+    border:1px solid rgba(255,182,72,0.3);
+    color:var(--warn) !important;
+    font-size:0.85rem;
+  }
+
+  /* ---------- Action bar ---------- */
+  #icv-root .action-bar{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px; margin-top:26px; flex-wrap:wrap;
+  }
+  #icv-root .btn{
+    border:none !important; cursor:pointer;
+    padding:13px 26px !important;
+    border-radius:999px !important;
+    font-size:0.94rem !important; font-weight:700 !important;
+    display:inline-flex; align-items:center; gap:8px;
+    transition:transform .12s ease, box-shadow .15s ease, opacity .15s ease;
+    margin:0 !important;
+    width:auto !important;
+  }
+  #icv-root .btn:active{ transform:scale(0.97); }
+  #icv-root .btn-primary{
+    background:var(--accent-grad) !important; color:#0a0c12 !important;
+    box-shadow:0 6px 20px rgba(124,92,255,0.35) !important;
+  }
+  #icv-root .btn-primary:hover{ box-shadow:0 8px 26px rgba(124,92,255,0.5) !important; color:#0a0c12 !important; }
+  #icv-root .btn-primary:disabled{ opacity:0.45; cursor:not-allowed; box-shadow:none !important; }
+  #icv-root .btn-ghost{
+    background:var(--bg-2) !important; color:var(--text-1) !important;
+    border:1px solid var(--border) !important;
+  }
+  #icv-root .btn-ghost:hover{ color:var(--text-0) !important; border-color:var(--border-strong) !important; }
+  #icv-root .btn-danger{ background:rgba(255,93,122,0.12) !important; color:var(--danger) !important; border:1px solid rgba(255,93,122,0.3) !important; }
+  #icv-root .btn-danger:hover{ background:rgba(255,93,122,0.2) !important; color:var(--danger) !important; }
+
+  #icv-root .count-pill{
+    color:var(--text-2) !important; font-size:0.86rem;
+    background:var(--bg-2); padding:8px 14px; border-radius:999px;
+    border:1px solid var(--border);
+  }
+
+  /* ---------- Results ---------- */
+  #icv-root .results{ display:flex; flex-direction:column; gap:12px; }
+  #icv-root .result-item{
+    display:flex; align-items:center; gap:16px;
+    background:var(--bg-2) !important;
+    border:1px solid var(--border) !important;
+    border-radius:var(--radius-md);
+    padding:14px 16px;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  #icv-root .result-item:hover{ background:var(--card-hover) !important; border-color:var(--border-strong) !important; }
+  #icv-root .thumb{
+    width:64px; height:64px; border-radius:10px;
+    object-fit:cover; flex-shrink:0;
+    background:repeating-conic-gradient(#22283a 0% 25%, #1a1f2d 0% 50%) 50%/16px 16px;
+    border:1px solid var(--border);
+    max-width:none !important;
+  }
+  #icv-root .r-info{ flex:1; min-width:0; }
+  #icv-root .r-name{
+    font-size:0.92rem; font-weight:600 !important; color:var(--text-0) !important;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  #icv-root .r-meta{ font-size:0.8rem; color:var(--text-2) !important; margin-top:4px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+  #icv-root .r-arrow{ color:var(--text-2) !important; }
+  #icv-root .r-size-new{ color:var(--success) !important; font-weight:600 !important; }
+  #icv-root .r-size-old{ text-decoration:line-through; opacity:0.6; }
+  #icv-root .badge{
+    font-size:0.72rem; font-weight:700 !important; text-transform:uppercase !important;
+    padding:2px 8px; border-radius:6px; letter-spacing:0.04em !important;
+  }
+  #icv-root .badge-save{ background:rgba(56,224,168,0.12); color:var(--success) !important; }
+  #icv-root .badge-grow{ background:rgba(255,93,122,0.12); color:var(--danger) !important; }
+  #icv-root .badge-err{ background:rgba(255,93,122,0.15); color:var(--danger) !important; }
+  #icv-root .r-actions{ display:flex; gap:8px; flex-shrink:0; align-items:center; }
+  #icv-root .status-spin{
+    width:18px; height:18px; border-radius:50%;
+    border:2px solid var(--border-strong); border-top-color:var(--accent-b);
+    animation:icv-spin 0.8s linear infinite;
+  }
+  @keyframes icv-spin{ to{ transform:rotate(360deg); } }
+  #icv-root .icon-btn{
+    width:36px; height:36px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--bg-1) !important; border:1px solid var(--border) !important;
+    color:var(--text-1) !important; cursor:pointer; transition:all .15s ease;
+  }
+  #icv-root .icon-btn:hover{ color:var(--text-0) !important; border-color:var(--border-strong) !important; background:var(--card-hover) !important; }
+  #icv-root .icon-btn svg{ width:16px; height:16px; }
+
+  #icv-root footer{ text-align:center; color:var(--text-2) !important; font-size:0.8rem; margin-top:30px; }
+  #icv-root footer a{ color:var(--accent-b) !important; text-decoration:none; }
+
+  @media (max-width:600px){
+    #icv-root{ padding:24px 12px 40px; }
+    #icv-root .card{ padding:18px; }
+    #icv-root h1{ font-size:1.8rem !important; }
+    #icv-root .result-item{ flex-wrap:wrap; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="logo-badge">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 16.5V6.5C4 5.4 4.9 4.5 6 4.5H18C19.1 4.5 20 5.4 20 6.5V16.5" stroke="#0b0d14" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="8.5" cy="9" r="1.6" fill="#0b0d14"/>
+        <path d="M4 15L9 11L13 14L16 11.5L20 15" stroke="#0b0d14" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M4 19H20" stroke="#0b0d14" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h1>Image Converter</h1>
+    <p>Convert PNG, JPG, WebP, AVIF, GIF and more — right in your browser.</p>
+    <div class="sub">No uploads. Nothing leaves your device.</div>
+  </header>
+
+  <div class="card">
+    <div class="dropzone" id="icv-dropzone">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 16V4M12 4L7 9M12 4L17 9" stroke="#0b0d14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4 16V18C4 19.1 4.9 20 6 20H18C19.1 20 20 19.1 20 18V16" stroke="#0b0d14" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <strong>Drop images here or click to browse</strong>
+      <p>Supports PNG, JPG, WebP, AVIF, GIF, BMP — batch upload OK</p>
+    </div>
+    <input type="file" id="icv-fileInput" multiple accept="image/*,.avif">
+
+    <div class="controls">
+      <div class="field">
+        <label>Output Format</label>
+        <div class="format-grid" id="icv-formatGrid">
+          <div class="format-chip active" data-format="image/webp">WebP</div>
+          <div class="format-chip" data-format="image/avif">AVIF</div>
+          <div class="format-chip" data-format="image/jpeg">JPEG</div>
+          <div class="format-chip" data-format="image/png">PNG</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Quality <span id="icv-qualityLabelExtra" style="text-transform:none;letter-spacing:normal;color:var(--text-2);"></span></label>
+        <div class="quality-row">
+          <input type="range" id="icv-qualitySlider" min="1" max="100" value="85">
+          <div class="quality-val" id="icv-qualityVal">85%</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Resize (optional)</label>
+        <div class="resize-fields">
+          <input type="number" id="icv-resizeWidth" placeholder="Width" min="1">
+          <span>×</span>
+          <input type="number" id="icv-resizeHeight" placeholder="Height" min="1">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Filename Suffix</label>
+        <input type="text" id="icv-filenameSuffix" placeholder="e.g. -converted" value="">
+      </div>
+    </div>
+
+    <div class="controls" style="margin-top:2px;">
+      <div class="field checkbox-row">
+        <input type="checkbox" id="icv-keepAspect" checked>
+        <label for="icv-keepAspect">Maintain aspect ratio when resizing</label>
+      </div>
+    </div>
+
+    <div id="icv-avifWarning"></div>
+
+    <div class="action-bar">
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <button class="btn btn-primary" id="icv-convertBtn" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 12C4 7.6 7.6 4 12 4C15 4 17.6 5.7 19 8.2M20 12C20 16.4 16.4 20 12 20C9 20 6.4 18.3 5 15.8M8 8H4V4M16 16H20V20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Convert All
+        </button>
+        <button class="btn btn-ghost" id="icv-downloadAllBtn" style="display:none;">Download All</button>
+        <button class="btn btn-danger" id="icv-clearBtn" style="display:none;">Clear</button>
+      </div>
+      <div class="count-pill" id="icv-countPill">0 files loaded</div>
+    </div>
+  </div>
+
+  <div class="card" id="icv-resultsCard" style="display:none;">
+    <div class="results" id="icv-results"></div>
+  </div>
+
+  <footer>
+    Built with HTML5 Canvas — runs 100% locally in your browser. · <span id="icv-year"></span>
+  </footer>
+</div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  const dropzone = document.getElementById('icv-dropzone');
+  const fileInput = document.getElementById('icv-fileInput');
+  const formatGrid = document.getElementById('icv-formatGrid');
+  const qualitySlider = document.getElementById('icv-qualitySlider');
+  const qualityVal = document.getElementById('icv-qualityVal');
+  const qualityLabelExtra = document.getElementById('icv-qualityLabelExtra');
+  const resizeWidth = document.getElementById('icv-resizeWidth');
+  const resizeHeight = document.getElementById('icv-resizeHeight');
+  const keepAspect = document.getElementById('icv-keepAspect');
+  const filenameSuffix = document.getElementById('icv-filenameSuffix');
+  const convertBtn = document.getElementById('icv-convertBtn');
+  const downloadAllBtn = document.getElementById('icv-downloadAllBtn');
+  const clearBtn = document.getElementById('icv-clearBtn');
+  const countPill = document.getElementById('icv-countPill');
+  const resultsCard = document.getElementById('icv-resultsCard');
+  const resultsEl = document.getElementById('icv-results');
+  const avifWarning = document.getElementById('icv-avifWarning');
+
+  document.getElementById('icv-year').textContent = new Date().getFullYear();
+
+  let selectedFormat = 'image/webp';
+  let items = []; // { id, file, url, width, height, resultBlob, resultUrl, status, error }
+  let idCounter = 0;
+
+  const EXT_MAP = {
+    'image/webp':'webp',
+    'image/avif':'avif',
+    'image/jpeg':'jpg',
+    'image/png':'png'
+  };
+
+  function fmtBytes(bytes){
+    if (bytes === 0) return '0 B';
+    const units = ['B','KB','MB','GB'];
+    const i = Math.min(Math.floor(Math.log(bytes)/Math.log(1024)), units.length-1);
+    return (bytes/Math.pow(1024,i)).toFixed(i===0?0:1) + ' ' + units[i];
+  }
+
+  function baseName(name){
+    const idx = name.lastIndexOf('.');
+    return idx > 0 ? name.slice(0, idx) : name;
+  }
+
+  // ---------- Format support detection ----------
+  const formatSupportCache = {};
+  function isFormatSupported(mime){
+    if (mime in formatSupportCache) return formatSupportCache[mime];
+    let supported = false;
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1; canvas.height = 1;
+      supported = canvas.toDataURL(mime).indexOf('data:' + mime) === 0;
+    } catch (e){ supported = false; }
+    formatSupportCache[mime] = supported;
+    return supported;
+  }
+
+  // ---------- AVIF fallback (WebAssembly) ----------
+  // Browsers without native canvas AVIF encoding (e.g. Firefox, Safari) use a
+  // WebAssembly AVIF codec (@jsquash/avif, built on libavif) loaded on demand.
+  // Browsers that cannot decode AVIF files natively use the WASM decoder too.
+  const AVIF_CODEC_BASE = 'https://cdn.jsdelivr.net/npm/@jsquash/avif@2.1.1/codec/';
+  let avifEncoderPromise = null;
+  let avifDecoderPromise = null;
+
+  function loadAvifCodec(kind){
+    const file = kind === 'enc' ? 'enc/avif_enc.js' : 'dec/avif_dec.js';
+    const p = import(AVIF_CODEC_BASE + file).then(m => m.default({ noInitialRun: true }));
+    p.catch(() => { // allow a retry after a network failure
+      if (kind === 'enc') avifEncoderPromise = null; else avifDecoderPromise = null;
+    });
+    return p;
+  }
+  function getAvifEncoder(){
+    if (!avifEncoderPromise) avifEncoderPromise = loadAvifCodec('enc');
+    return avifEncoderPromise;
+  }
+  function getAvifDecoder(){
+    if (!avifDecoderPromise) avifDecoderPromise = loadAvifCodec('dec');
+    return avifDecoderPromise;
+  }
+
+  async function encodeAvifWasm(canvas, quality){
+    let mod;
+    try { mod = await getAvifEncoder(); }
+    catch (e){ throw new Error('AVIF is not supported natively here and the fallback encoder could not be loaded (check your connection)'); }
+    const w = canvas.width, h = canvas.height;
+    const rgba = canvas.getContext('2d').getImageData(0, 0, w, h).data;
+    const out = mod.encode(new Uint8Array(rgba.buffer, rgba.byteOffset, rgba.byteLength), w, h, {
+      quality: Math.round(quality * 100),
+      qualityAlpha: -1,
+      denoiseLevel: 0,
+      tileRowsLog2: 0,
+      tileColsLog2: 0,
+      speed: 6,
+      subsample: 1,
+      chromaDeltaQ: false,
+      sharpness: 0,
+      tune: 0,
+      enableSharpYUV: false,
+      bitDepth: 8
+    });
+    if (!out) throw new Error('AVIF encoding failed');
+    return new Blob([out], { type: 'image/avif' });
+  }
+
+  function looksLikeAvif(file){
+    return file.type === 'image/avif' || /\.avif$/i.test(file.name);
+  }
+
+  // Decode an AVIF file with WASM and return a canvas holding the pixels.
+  async function decodeAvifToCanvas(file){
+    let mod;
+    try { mod = await getAvifDecoder(); }
+    catch (e){ throw new Error('This browser cannot decode AVIF and the fallback decoder could not be loaded'); }
+    const buf = await new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onload = () => resolve(fr.result);
+      fr.onerror = () => reject(new Error('Could not read file'));
+      fr.readAsArrayBuffer(file);
+    });
+    const res = mod.decode(new Uint8Array(buf), 8);
+    if (!res) throw new Error('Could not decode image');
+    const canvas = document.createElement('canvas');
+    canvas.width = res.width; canvas.height = res.height;
+    const imgData = new ImageData(new Uint8ClampedArray(res.data.buffer, res.data.byteOffset, res.data.byteLength), res.width, res.height);
+    canvas.getContext('2d').putImageData(imgData, 0, 0);
+    return canvas;
+  }
+
+  function updateAvifWarning(){
+    if (selectedFormat !== 'image/avif'){
+      avifWarning.style.display = 'none';
+      return;
+    }
+    if (isFormatSupported('image/avif')){
+      avifWarning.style.display = 'none';
+    } else {
+      avifWarning.textContent = 'ℹ️ This browser cannot encode AVIF natively, so a built-in WebAssembly encoder will be downloaded the first time you convert (a few MB, then cached). Large images may take a little longer.';
+      avifWarning.style.display = 'block';
+    }
+  }
+
+  // ---------- Format selection ----------
+  formatGrid.addEventListener('click', (e) => {
+    const chip = e.target.closest('.format-chip');
+    if (!chip) return;
+    [...formatGrid.children].forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    selectedFormat = chip.dataset.format;
+    updateQualityUI();
+    updateAvifWarning();
+  });
+
+  function updateQualityUI(){
+    const lossless = selectedFormat === 'image/png';
+    qualitySlider.disabled = lossless;
+    qualitySlider.style.opacity = lossless ? 0.4 : 1;
+    qualityLabelExtra.textContent = lossless ? '(N/A for PNG)' : '';
+  }
+  updateQualityUI();
+  updateAvifWarning();
+
+  qualitySlider.addEventListener('input', () => {
+    qualityVal.textContent = qualitySlider.value + '%';
+  });
+
+  // ---------- Drag & drop ----------
+  dropzone.addEventListener('click', () => fileInput.click());
+  ['dragenter','dragover'].forEach(evt => {
+    dropzone.addEventListener(evt, (e) => {
+      e.preventDefault(); e.stopPropagation();
+      dropzone.classList.add('dragover');
+    });
+  });
+  ['dragleave','drop'].forEach(evt => {
+    dropzone.addEventListener(evt, (e) => {
+      e.preventDefault(); e.stopPropagation();
+      dropzone.classList.remove('dragover');
+    });
+  });
+  dropzone.addEventListener('drop', (e) => {
+    const files = [...e.dataTransfer.files].filter(f => f.type.startsWith('image/') || looksLikeAvif(f));
+    addFiles(files);
+  });
+  fileInput.addEventListener('change', () => {
+    addFiles([...fileInput.files]);
+    fileInput.value = '';
+  });
+
+  function addFiles(files){
+    files.forEach(file => {
+      const id = 'f' + (++idCounter);
+      const url = URL.createObjectURL(file);
+      const item = { id, file, url, width:0, height:0, resultBlob:null, resultUrl:null, status:'ready', error:null };
+      items.push(item);
+
+      const img = new Image();
+      img.onload = () => {
+        item.width = img.naturalWidth;
+        item.height = img.naturalHeight;
+        renderResults();
+      };
+      img.onerror = async () => {
+        // Browser can't decode this AVIF natively: decode with WASM for size + thumbnail
+        if (!looksLikeAvif(file)) return;
+        try {
+          const canvas = await decodeAvifToCanvas(file);
+          item.width = canvas.width;
+          item.height = canvas.height;
+          const thumbBlob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+          if (thumbBlob && items.indexOf(item) !== -1){
+            URL.revokeObjectURL(item.url);
+            item.url = URL.createObjectURL(thumbBlob);
+          }
+          renderResults();
+        } catch (e){ /* conversion will report the error */ }
+      };
+      img.src = url;
+    });
+    renderResults();
+    updateActionBar();
+  }
+
+  function updateActionBar(){
+    countPill.textContent = items.length + ' file' + (items.length===1?'':'s') + ' loaded';
+    convertBtn.disabled = items.length === 0;
+    const anyDone = items.some(it => it.status === 'done');
+    downloadAllBtn.style.display = anyDone ? 'inline-flex' : 'none';
+    clearBtn.style.display = items.length > 0 ? 'inline-flex' : 'none';
+    resultsCard.style.display = items.length > 0 ? 'block' : 'none';
+  }
+
+  function svgIcon(name){
+    const icons = {
+      download:'<svg viewBox="0 0 24 24" fill="none"><path d="M12 3V15M12 15L7 10M12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 18V19C4 20.1 4.9 21 6 21H18C19.1 21 20 20.1 20 19V18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+      trash:'<svg viewBox="0 0 24 24" fill="none"><path d="M4 7H20M9 7V5C9 4.4 9.4 4 10 4H14C14.6 4 15 4.4 15 5V7M18 7L17.3 19C17.3 19.6 16.7 20 16.1 20H7.9C7.3 20 6.7 19.6 6.7 19L6 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    };
+    return icons[name] || '';
+  }
+
+  function renderResults(){
+    resultsEl.innerHTML = '';
+    if (items.length === 0){
+      updateActionBar();
+      return;
+    }
+    items.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'result-item';
+
+      const thumb = document.createElement('img');
+      thumb.className = 'thumb';
+      thumb.src = item.url;
+      div.appendChild(thumb);
+
+      const info = document.createElement('div');
+      info.className = 'r-info';
+
+      const outExt = EXT_MAP[selectedFormat] || 'img';
+      const newName = baseName(item.file.name) + (filenameSuffix.value || '') + '.' + outExt;
+
+      const nameEl = document.createElement('div');
+      nameEl.className = 'r-name';
+      nameEl.textContent = item.status === 'done' ? newName : item.file.name;
+      info.appendChild(nameEl);
+
+      const meta = document.createElement('div');
+      meta.className = 'r-meta';
+
+      if (item.width && item.height){
+        const dimSpan = document.createElement('span');
+        dimSpan.textContent = item.width + '×' + item.height;
+        meta.appendChild(dimSpan);
+      }
+
+      if (item.status === 'converting'){
+        const spin = document.createElement('div');
+        spin.className = 'status-spin';
+        meta.appendChild(spin);
+        const label = document.createElement('span');
+        label.textContent = 'Converting…';
+        meta.appendChild(label);
+      } else if (item.status === 'error'){
+        const oldSize = document.createElement('span');
+        oldSize.textContent = fmtBytes(item.file.size);
+        meta.appendChild(oldSize);
+        const badge = document.createElement('span');
+        badge.className = 'badge badge-err';
+        badge.textContent = 'Failed';
+        meta.appendChild(badge);
+        const errText = document.createElement('span');
+        errText.style.color = 'var(--danger)';
+        errText.textContent = item.error || 'Conversion error';
+        meta.appendChild(errText);
+      } else if (item.status === 'done'){
+        const oldSize = document.createElement('span');
+        oldSize.className = 'r-size-old';
+        oldSize.textContent = fmtBytes(item.file.size);
+        meta.appendChild(oldSize);
+
+        const arrow = document.createElement('span');
+        arrow.className = 'r-arrow';
+        arrow.textContent = '→';
+        meta.appendChild(arrow);
+
+        const newSize = document.createElement('span');
+        newSize.className = 'r-size-new';
+        newSize.textContent = fmtBytes(item.resultBlob.size);
+        meta.appendChild(newSize);
+
+        const diff = item.file.size - item.resultBlob.size;
+        const pct = Math.abs(Math.round((diff / item.file.size) * 100));
+        const badge = document.createElement('span');
+        badge.className = 'badge ' + (diff >= 0 ? 'badge-save' : 'badge-grow');
+        badge.textContent = diff >= 0 ? ('-' + pct + '%') : ('+' + pct + '%');
+        meta.appendChild(badge);
+      } else {
+        const oldSize = document.createElement('span');
+        oldSize.textContent = fmtBytes(item.file.size);
+        meta.appendChild(oldSize);
+        const badge = document.createElement('span');
+        badge.textContent = 'Ready';
+        badge.style.color = 'var(--text-2)';
+        meta.appendChild(badge);
+      }
+
+      info.appendChild(meta);
+      div.appendChild(info);
+
+      const actions = document.createElement('div');
+      actions.className = 'r-actions';
+
+      if (item.status === 'done'){
+        const dlBtn = document.createElement('div');
+        dlBtn.className = 'icon-btn';
+        dlBtn.title = 'Download';
+        dlBtn.innerHTML = svgIcon('download');
+        dlBtn.addEventListener('click', () => downloadItem(item));
+        actions.appendChild(dlBtn);
+      }
+
+      const rmBtn = document.createElement('div');
+      rmBtn.className = 'icon-btn';
+      rmBtn.title = 'Remove';
+      rmBtn.innerHTML = svgIcon('trash');
+      rmBtn.addEventListener('click', () => removeItem(item.id));
+      actions.appendChild(rmBtn);
+
+      div.appendChild(actions);
+      resultsEl.appendChild(div);
+    });
+
+    updateActionBar();
+  }
+
+  function removeItem(id){
+    const idx = items.findIndex(it => it.id === id);
+    if (idx === -1) return;
+    const item = items[idx];
+    URL.revokeObjectURL(item.url);
+    if (item.resultUrl) URL.revokeObjectURL(item.resultUrl);
+    items.splice(idx, 1);
+    renderResults();
+  }
+
+  clearBtn.addEventListener('click', () => {
+    items.forEach(it => {
+      URL.revokeObjectURL(it.url);
+      if (it.resultUrl) URL.revokeObjectURL(it.resultUrl);
+    });
+    items = [];
+    renderResults();
+  });
+
+  function downloadItem(item){
+    const outExt = EXT_MAP[selectedFormat] || 'img';
+    const newName = baseName(item.file.name) + (filenameSuffix.value || '') + '.' + outExt;
+    const a = document.createElement('a');
+    a.href = item.resultUrl;
+    a.download = newName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  downloadAllBtn.addEventListener('click', async () => {
+    const done = items.filter(it => it.status === 'done');
+    for (const item of done){
+      downloadItem(item);
+      await new Promise(r => setTimeout(r, 250));
+    }
+  });
+
+  function loadImageBitmap(file){
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => {
+        // Native decode failed: fall back to the WASM decoder for AVIF files
+        if (looksLikeAvif(file)) decodeAvifToCanvas(file).then(resolve, reject);
+        else reject(new Error('Could not decode image'));
+      };
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  function computeDimensions(origW, origH){
+    let w = parseInt(resizeWidth.value, 10);
+    let h = parseInt(resizeHeight.value, 10);
+    const hasW = !isNaN(w) && w > 0;
+    const hasH = !isNaN(h) && h > 0;
+
+    if (!hasW && !hasH) return { w: origW, h: origH };
+
+    if (keepAspect.checked){
+      if (hasW && hasH){
+        const ratio = Math.min(w / origW, h / origH);
+        return { w: Math.round(origW * ratio), h: Math.round(origH * ratio) };
+      } else if (hasW){
+        const ratio = w / origW;
+        return { w, h: Math.round(origH * ratio) };
+      } else {
+        const ratio = h / origH;
+        return { w: Math.round(origW * ratio), h };
+      }
+    } else {
+      return { w: hasW ? w : origW, h: hasH ? h : origH };
+    }
+  }
+
+  function canvasToBlob(canvas, mime, quality){
+    return new Promise((resolve) => {
+      try { canvas.toBlob((b) => resolve(b), mime, mime === 'image/png' ? undefined : quality); }
+      catch (e){ resolve(null); }
+    });
+  }
+
+  async function convertItem(item){
+    item.status = 'converting';
+    item.error = null;
+    renderResults();
+
+    try {
+      const img = await loadImageBitmap(item.file);
+      const { w, h } = computeDimensions(img.naturalWidth || img.width || item.width, img.naturalHeight || img.height || item.height);
+
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      if (selectedFormat === 'image/jpeg'){
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, w, h);
+      }
+      ctx.drawImage(img, 0, 0, w, h);
+
+      const quality = qualitySlider.value / 100;
+      const isAvif = selectedFormat === 'image/avif';
+      let blob = null;
+
+      // Try the browser's native encoder first (skipped for AVIF when detection says it's unavailable)
+      if (!isAvif || isFormatSupported('image/avif')){
+        blob = await canvasToBlob(canvas, selectedFormat, quality);
+        if (blob && blob.type && blob.type !== selectedFormat){
+          if (!isAvif) throw new Error(`Browser silently fell back to ${blob.type} — no ${selectedFormat} encoder available here`);
+          blob = null; // silent PNG fallback → use the WASM encoder
+        }
+        if (!blob && !isAvif) throw new Error('Format not supported by this browser');
+      }
+
+      if (!blob && isAvif) blob = await encodeAvifWasm(canvas, quality);
+
+      item.resultBlob = blob;
+      item.resultUrl = URL.createObjectURL(blob);
+      item.status = 'done';
+    } catch (err){
+      item.status = 'error';
+      item.error = err.message || 'Conversion failed';
+    }
+    renderResults();
+  }
+
+  convertBtn.addEventListener('click', async () => {
+    convertBtn.disabled = true;
+    const originalLabel = convertBtn.innerHTML;
+    convertBtn.innerHTML = 'Converting…';
+
+    for (const item of items){
+      await convertItem(item);
+    }
+
+    convertBtn.innerHTML = originalLabel;
+    convertBtn.disabled = items.length === 0;
+  });
+
+})();
+</script>
