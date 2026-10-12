@@ -1,0 +1,790 @@
+<!--
+  URL LINK CHECKER &#x2014; single-file tool for the Elementor "HTML" widget.
+  Paste this ENTIRE file into the widget. No other setup needed.
+-->
+<div id="ulc-app" class="ulc" aria-label="URL Link Checker">
+
+  <!-- ============ HEADER / INPUT ============ -->
+  <section class="ulc-hero">
+    <div class="ulc-hero-text">
+      <span class="ulc-eyebrow">Free tool</span>
+      <h2 class="ulc-title">URL Link Checker</h2>
+      <p class="ulc-sub">Paste any link to find where it is used on this website, how it is linked, and where else on the web to look for it.</p>
+    </div>
+
+    <form class="ulc-form" id="ulc-form" novalidate>
+      <label class="ulc-sr" for="ulc-input">URL to check</label>
+      <div class="ulc-field">
+        <svg class="ulc-field-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3A5 5 0 0 0 11 21.07l1.5-1.5"/></svg>
+        <input id="ulc-input" class="ulc-input" type="text" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://example.com/page">
+        <button type="submit" class="ulc-btn ulc-btn-primary" id="ulc-go">Check URL</button>
+      </div>
+      <p class="ulc-error" id="ulc-error" role="alert" hidden></p>
+
+      <div class="ulc-options">
+        <fieldset class="ulc-seg" aria-label="Match mode">
+          <legend class="ulc-opt-label">Match</legend>
+          <label class="ulc-seg-item"><input type="radio" name="ulc-mode" value="exact" checked><span>Exact page</span></label>
+          <label class="ulc-seg-item"><input type="radio" name="ulc-mode" value="prefix"><span>Page &amp; sub-pages</span></label>
+          <label class="ulc-seg-item"><input type="radio" name="ulc-mode" value="domain"><span>Whole domain</span></label>
+        </fieldset>
+        <div class="ulc-checks">
+          <label class="ulc-check"><input type="checkbox" id="ulc-deep" checked><span>Deep scan <small>(slower, most accurate)</small></span></label>
+          <label class="ulc-check"><input type="checkbox" id="ulc-comments"><span>Include comments</span></label>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <!-- ============ INTRO (before first check) ============ -->
+  <section class="ulc-intro" id="ulc-intro">
+    <div class="ulc-step"><span class="ulc-step-n">1</span><h3>Paste a URL</h3><p>Any web address. Missing <code>https://</code> is added for you.</p></div>
+    <div class="ulc-step"><span class="ulc-step-n">2</span><h3>We scan this site</h3><p>Posts, pages and other content are searched for links, images, embeds and plain-text mentions.</p></div>
+    <div class="ulc-step"><span class="ulc-step-n">3</span><h3>Explore the web</h3><p>One click opens search engines and backlink tools prepared for your URL.</p></div>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section class="ulc-results" id="ulc-results" hidden>
+    <div class="ulc-target">
+      <span class="ulc-target-label">Checking</span>
+      <a class="ulc-target-url" id="ulc-target-url" target="_blank" rel="noopener noreferrer"></a>
+    </div>
+
+    <div class="ulc-tabs" role="tablist" aria-label="Result sections">
+      <button type="button" class="ulc-tab is-active" role="tab" id="ulc-tab-site" aria-controls="ulc-panel-site" aria-selected="true" data-tab="site">On this website <span class="ulc-count" id="ulc-site-count">&#x2026;</span></button>
+      <button type="button" class="ulc-tab" role="tab" id="ulc-tab-web" aria-controls="ulc-panel-web" aria-selected="false" data-tab="web" tabindex="-1">Across the web</button>
+      <button type="button" class="ulc-tab" role="tab" id="ulc-tab-info" aria-controls="ulc-panel-info" aria-selected="false" data-tab="info" tabindex="-1">Link details</button>
+    </div>
+
+    <!-- Panel: site scan -->
+    <div class="ulc-panel" role="tabpanel" id="ulc-panel-site" aria-labelledby="ulc-tab-site">
+      <div class="ulc-progress" id="ulc-progress" hidden>
+        <div class="ulc-progress-row">
+          <span id="ulc-progress-text" aria-live="polite">Starting&#x2026;</span>
+          <button type="button" class="ulc-btn ulc-btn-ghost" id="ulc-cancel">Stop</button>
+        </div>
+        <div class="ulc-bar"><div class="ulc-bar-fill" id="ulc-bar-fill"></div></div>
+      </div>
+      <div class="ulc-notice" id="ulc-site-notice" hidden></div>
+      <div class="ulc-stats" id="ulc-stats" hidden></div>
+      <div class="ulc-actions" id="ulc-actions" hidden>
+        <button type="button" class="ulc-btn ulc-btn-soft" id="ulc-csv">Download CSV</button>
+        <button type="button" class="ulc-btn ulc-btn-soft" id="ulc-copy">Copy page list</button>
+        <span class="ulc-flash" id="ulc-flash" aria-live="polite"></span>
+      </div>
+      <div class="ulc-list" id="ulc-list"></div>
+      <p class="ulc-fine" id="ulc-site-fine" hidden>Only publicly visible content is scanned. Menus, widgets, headers/footers built with a theme builder, drafts and private pages may not appear here.</p>
+    </div>
+
+    <!-- Panel: web -->
+    <div class="ulc-panel" role="tabpanel" id="ulc-panel-web" aria-labelledby="ulc-tab-web" hidden>
+      <p class="ulc-lead">A browser tool cannot crawl the whole internet, so these buttons open trusted search engines and backlink tools with your URL already prepared. Results depend on what each service has indexed.</p>
+      <label class="ulc-check ulc-check-inline"><input type="checkbox" id="ulc-exclude" checked><span>Hide results from the URL's own website <small>(finds outside sites only)</small></span></label>
+      <h3 class="ulc-h3">Search engines</h3>
+      <div class="ulc-grid" id="ulc-engines"></div>
+      <h3 class="ulc-h3">Backlink &amp; history tools</h3>
+      <div class="ulc-grid" id="ulc-tools"></div>
+      <p class="ulc-fine">These services are run by third parties. Some may ask you to sign in or limit free results, and the links open in a new tab.</p>
+    </div>
+
+    <!-- Panel: info -->
+    <div class="ulc-panel" role="tabpanel" id="ulc-panel-info" aria-labelledby="ulc-tab-info" hidden>
+      <dl class="ulc-dl" id="ulc-info"></dl>
+      <div class="ulc-actions">
+        <a class="ulc-btn ulc-btn-soft" id="ulc-open" target="_blank" rel="noopener noreferrer">Open link</a>
+        <button type="button" class="ulc-btn ulc-btn-soft" id="ulc-copyurl">Copy link</button>
+        <span class="ulc-flash" id="ulc-flash2" aria-live="polite"></span>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+#ulc-app, #ulc-app *, #ulc-app *::before, #ulc-app *::after { box-sizing: border-box; }
+#ulc-app {
+  --ulc-primary: #4f46e5; --ulc-primary-d: #4338ca; --ulc-accent: #7c3aed;
+  --ulc-ink: #1e1b4b; --ulc-text: #374151; --ulc-muted: #64748b;
+  --ulc-bg: #ffffff; --ulc-soft: #f5f6ff; --ulc-line: #e3e6f4;
+  --ulc-ok: #047857; --ulc-ok-bg: #d1fae5; --ulc-warn: #b45309; --ulc-warn-bg: #fef3c7;
+  --ulc-bad: #b91c1c; --ulc-bad-bg: #fee2e2; --ulc-info-bg: #e0e7ff;
+  --ulc-radius: 16px;
+  width: 100%; max-width: 1140px; margin: 0 auto; padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px; line-height: 1.55; color: var(--ulc-text); text-align: left;
+  -webkit-text-size-adjust: 100%;
+}
+#ulc-app [hidden] { display: none !important; }
+#ulc-app h2, #ulc-app h3, #ulc-app p, #ulc-app dl, #ulc-app dd, #ulc-app fieldset { margin: 0; padding: 0; }
+#ulc-app .ulc-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+#ulc-app code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 15px; background: var(--ulc-soft); padding: 1px 6px; border-radius: 6px; color: var(--ulc-primary-d); }
+#ulc-app small { font-size: 15px; color: var(--ulc-muted); }
+#ulc-app a { text-decoration: none; }
+
+/* ---------- Hero ---------- */
+#ulc-app .ulc-hero {
+  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 55%, #9333ea 100%);
+  border-radius: 24px; padding: 44px 40px 36px; color: #fff;
+  box-shadow: 0 20px 45px -20px rgba(67, 56, 202, .55);
+}
+#ulc-app .ulc-eyebrow { display: inline-block; font-size: 15px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; background: rgba(255,255,255,.18); padding: 4px 14px; border-radius: 999px; margin-bottom: 14px; }
+#ulc-app .ulc-title { font-size: clamp(30px, 4.6vw, 44px); line-height: 1.15; font-weight: 800; color: #fff; margin: 0 0 12px; letter-spacing: -.02em; }
+#ulc-app .ulc-sub { font-size: 18px; max-width: 720px; color: rgba(255,255,255,.92); margin-bottom: 26px; }
+
+#ulc-app .ulc-field { display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 16px; padding: 8px 8px 8px 18px; box-shadow: 0 8px 24px -10px rgba(0,0,0,.35); position: relative; }
+#ulc-app .ulc-field:focus-within { outline: 3px solid #c4b5fd; outline-offset: 2px; }
+#ulc-app .ulc-field-icon { width: 24px; height: 24px; flex: none; fill: none; stroke: var(--ulc-primary); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+#ulc-app input.ulc-input { flex: 1; min-width: 0; width: 100%; border: 0 !important; outline: 0 !important; box-shadow: none !important; background: transparent !important; font: inherit; font-size: 17px; color: var(--ulc-ink); padding: 12px 4px; height: auto; margin: 0; border-radius: 0; }
+#ulc-app input.ulc-input::placeholder { color: #94a3b8; opacity: 1; }
+
+#ulc-app .ulc-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font: inherit; font-size: 16px; font-weight: 700; line-height: 1.2; padding: 14px 24px; border-radius: 12px; border: 2px solid transparent; cursor: pointer; text-decoration: none; transition: transform .15s ease, background .15s ease, box-shadow .15s ease; min-height: 48px; text-transform: none; letter-spacing: 0; margin: 0; }
+#ulc-app .ulc-btn:focus-visible, #ulc-app .ulc-tab:focus-visible { outline: 3px solid #a78bfa; outline-offset: 2px; }
+#ulc-app .ulc-btn-primary { background: var(--ulc-primary); color: #fff; white-space: nowrap; }
+#ulc-app .ulc-btn-primary:hover { background: var(--ulc-primary-d); color: #fff; transform: translateY(-1px); box-shadow: 0 8px 18px -8px rgba(67,56,202,.8); }
+#ulc-app .ulc-btn-primary[disabled] { opacity: .7; cursor: progress; transform: none; }
+#ulc-app .ulc-btn-soft { background: var(--ulc-soft); color: var(--ulc-primary-d); border-color: var(--ulc-line); }
+#ulc-app .ulc-btn-soft:hover { background: var(--ulc-info-bg); color: var(--ulc-primary-d); }
+#ulc-app .ulc-btn-ghost { background: transparent; color: var(--ulc-bad); border-color: #fecaca; padding: 8px 16px; min-height: 40px; }
+#ulc-app .ulc-btn-ghost:hover { background: var(--ulc-bad-bg); color: var(--ulc-bad); }
+
+#ulc-app .ulc-error { margin-top: 12px; background: #fff1f2; color: #9f1239; border-radius: 10px; padding: 10px 14px; font-weight: 600; }
+
+#ulc-app .ulc-options { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; margin-top: 20px; }
+#ulc-app .ulc-seg { border: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+#ulc-app .ulc-opt-label { float: left; font-weight: 700; color: #fff; margin-right: 6px; padding: 0; font-size: 16px; }
+#ulc-app .ulc-seg-item { position: relative; cursor: pointer; margin: 0; }
+#ulc-app .ulc-seg-item input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; cursor: pointer; margin: 0; }
+#ulc-app .ulc-seg-item span { display: inline-block; padding: 9px 16px; border-radius: 999px; background: rgba(255,255,255,.14); color: #fff; font-weight: 600; border: 2px solid transparent; transition: background .15s; }
+#ulc-app .ulc-seg-item input:checked + span { background: #fff; color: var(--ulc-primary-d); }
+#ulc-app .ulc-seg-item input:focus-visible + span { outline: 3px solid #ddd6fe; outline-offset: 2px; }
+#ulc-app .ulc-checks { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+#ulc-app .ulc-check { display: inline-flex; align-items: flex-start; gap: 10px; cursor: pointer; margin: 0; font-weight: 600; }
+#ulc-app .ulc-hero .ulc-check { color: #fff; }
+#ulc-app .ulc-hero .ulc-check small { color: rgba(255,255,255,.8); font-weight: 400; }
+#ulc-app .ulc-check input { width: 20px; height: 20px; margin: 3px 0 0; flex: none; accent-color: var(--ulc-primary); cursor: pointer; }
+#ulc-app .ulc-check-inline { margin: 4px 0 8px; color: var(--ulc-ink); }
+
+/* ---------- Intro ---------- */
+#ulc-app .ulc-intro { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 28px; }
+#ulc-app .ulc-step { background: var(--ulc-bg); border: 1px solid var(--ulc-line); border-radius: var(--ulc-radius); padding: 24px; }
+#ulc-app .ulc-step-n { display: inline-flex; width: 38px; height: 38px; align-items: center; justify-content: center; background: var(--ulc-info-bg); color: var(--ulc-primary-d); font-weight: 800; border-radius: 50%; margin-bottom: 12px; font-size: 17px; }
+#ulc-app .ulc-step h3 { font-size: 19px; font-weight: 700; color: var(--ulc-ink); margin-bottom: 6px; line-height: 1.3; }
+#ulc-app .ulc-step p { font-size: 16px; }
+
+/* ---------- Results ---------- */
+#ulc-app .ulc-results { margin-top: 28px; background: var(--ulc-bg); border: 1px solid var(--ulc-line); border-radius: 24px; padding: 28px; box-shadow: 0 10px 30px -22px rgba(30,27,75,.5); }
+#ulc-app .ulc-target { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; margin-bottom: 20px; }
+#ulc-app .ulc-target-label { font-weight: 700; color: var(--ulc-muted); text-transform: uppercase; letter-spacing: .05em; font-size: 15px; }
+#ulc-app .ulc-target-url { color: var(--ulc-primary-d); font-weight: 700; font-size: 18px; word-break: break-all; overflow-wrap: anywhere; }
+#ulc-app .ulc-target-url:hover { text-decoration: underline; }
+
+#ulc-app .ulc-tabs { display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 2px solid var(--ulc-line); margin-bottom: 24px; }
+#ulc-app .ulc-tab { font: inherit; font-size: 16px; font-weight: 700; background: transparent; color: var(--ulc-muted); border: 0; border-bottom: 3px solid transparent; margin: 0 0 -2px; padding: 12px 16px; cursor: pointer; border-radius: 10px 10px 0 0; text-transform: none; letter-spacing: 0; display: inline-flex; align-items: center; gap: 8px; }
+#ulc-app .ulc-tab:hover { color: var(--ulc-primary-d); background: var(--ulc-soft); }
+#ulc-app .ulc-tab.is-active { color: var(--ulc-primary-d); border-bottom-color: var(--ulc-primary); background: transparent; }
+#ulc-app .ulc-count { background: var(--ulc-info-bg); color: var(--ulc-primary-d); border-radius: 999px; padding: 1px 10px; font-size: 15px; min-width: 28px; text-align: center; }
+
+#ulc-app .ulc-lead { margin-bottom: 14px; font-size: 16px; }
+#ulc-app .ulc-h3 { font-size: 20px; font-weight: 700; color: var(--ulc-ink); margin: 22px 0 12px; line-height: 1.3; }
+#ulc-app .ulc-fine { margin-top: 20px; font-size: 15px; color: var(--ulc-muted); }
+
+/* progress */
+#ulc-app .ulc-progress { background: var(--ulc-soft); border-radius: 14px; padding: 16px 18px; margin-bottom: 20px; }
+#ulc-app .ulc-progress-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; font-weight: 600; color: var(--ulc-ink); }
+#ulc-app .ulc-bar { height: 10px; background: #dfe3fb; border-radius: 99px; overflow: hidden; }
+#ulc-app .ulc-bar-fill { height: 100%; width: 0; background: linear-gradient(90deg, #4f46e5, #a855f7); border-radius: 99px; transition: width .25s ease; }
+
+#ulc-app .ulc-notice { border-radius: 14px; padding: 16px 18px; margin-bottom: 20px; font-weight: 500; }
+#ulc-app .ulc-notice.is-warn { background: var(--ulc-warn-bg); color: #78350f; }
+#ulc-app .ulc-notice.is-bad { background: var(--ulc-bad-bg); color: #7f1d1d; }
+#ulc-app .ulc-notice.is-ok { background: var(--ulc-ok-bg); color: #064e3b; }
+#ulc-app .ulc-notice.is-info { background: var(--ulc-info-bg); color: var(--ulc-ink); }
+
+/* stats */
+#ulc-app .ulc-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+#ulc-app .ulc-stat { background: var(--ulc-soft); border-radius: 14px; padding: 16px 18px; }
+#ulc-app .ulc-stat b { display: block; font-size: 30px; line-height: 1.1; color: var(--ulc-primary-d); font-weight: 800; }
+#ulc-app .ulc-stat span { font-size: 15px; color: var(--ulc-muted); font-weight: 600; }
+
+#ulc-app .ulc-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 20px; }
+#ulc-app .ulc-flash { color: var(--ulc-ok); font-weight: 700; }
+
+/* result cards */
+#ulc-app .ulc-list { display: grid; gap: 14px; }
+#ulc-app .ulc-card { border: 1px solid var(--ulc-line); border-radius: 14px; background: #fff; overflow: hidden; }
+#ulc-app .ulc-card-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding: 16px 18px; background: #fbfbff; }
+#ulc-app .ulc-card-title { font-size: 18px; font-weight: 700; color: var(--ulc-ink); line-height: 1.35; overflow-wrap: anywhere; min-width: 0; flex: 1 1 260px; }
+#ulc-app .ulc-card-title a { color: inherit; }
+#ulc-app .ulc-card-title a:hover { color: var(--ulc-primary-d); text-decoration: underline; }
+#ulc-app .ulc-card-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+#ulc-app .ulc-card-url { display: block; font-weight: 400; font-size: 15px; color: var(--ulc-muted); margin-top: 2px; word-break: break-all; }
+#ulc-app .ulc-hits { list-style: none; margin: 0; padding: 4px 18px 12px; }
+#ulc-app .ulc-hit { padding: 12px 0; border-top: 1px solid var(--ulc-line); display: grid; gap: 6px; }
+#ulc-app .ulc-hit:first-child { border-top: 0; }
+#ulc-app .ulc-hit-line { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+#ulc-app .ulc-hit-anchor { font-weight: 600; color: var(--ulc-ink); overflow-wrap: anywhere; }
+#ulc-app .ulc-hit-url { font-size: 15px; color: var(--ulc-muted); word-break: break-all; }
+
+#ulc-app .ulc-badge { display: inline-block; font-size: 15px; font-weight: 700; line-height: 1.3; padding: 2px 10px; border-radius: 999px; background: var(--ulc-info-bg); color: var(--ulc-primary-d); white-space: nowrap; }
+#ulc-app .ulc-badge.ok { background: var(--ulc-ok-bg); color: var(--ulc-ok); }
+#ulc-app .ulc-badge.warn { background: var(--ulc-warn-bg); color: var(--ulc-warn); }
+#ulc-app .ulc-badge.bad { background: var(--ulc-bad-bg); color: var(--ulc-bad); }
+#ulc-app .ulc-badge.gray { background: #eef0f6; color: #475569; }
+
+/* web grid */
+#ulc-app .ulc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+#ulc-app .ulc-tile { border: 1px solid var(--ulc-line); border-radius: 14px; padding: 18px; background: #fff; display: flex; flex-direction: column; gap: 10px; }
+#ulc-app .ulc-tile h4 { margin: 0; font-size: 18px; font-weight: 700; color: var(--ulc-ink); line-height: 1.3; }
+#ulc-app .ulc-tile p { font-size: 15px; color: var(--ulc-muted); flex: 1; margin: 0; }
+#ulc-app .ulc-tile-links { display: flex; flex-wrap: wrap; gap: 8px; }
+#ulc-app .ulc-tile-links .ulc-btn { padding: 9px 14px; min-height: 42px; font-size: 15px; flex: 1 1 auto; }
+
+/* info */
+#ulc-app .ulc-dl { display: grid; gap: 0; border: 1px solid var(--ulc-line); border-radius: 14px; overflow: hidden; margin-bottom: 20px; }
+#ulc-app .ulc-dl-row { display: grid; grid-template-columns: 220px 1fr; gap: 6px 20px; padding: 14px 18px; border-top: 1px solid var(--ulc-line); align-items: start; }
+#ulc-app .ulc-dl-row:first-child { border-top: 0; }
+#ulc-app .ulc-dl-row:nth-child(odd) { background: #fbfbff; }
+#ulc-app .ulc-dl dt { font-weight: 700; color: var(--ulc-ink); margin: 0; }
+#ulc-app .ulc-dl dd { margin: 0; overflow-wrap: anywhere; word-break: break-word; }
+
+#ulc-app .ulc-empty { text-align: center; padding: 36px 16px; background: var(--ulc-soft); border-radius: 14px; }
+#ulc-app .ulc-empty b { display: block; font-size: 20px; color: var(--ulc-ink); margin-bottom: 6px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  #ulc-app .ulc-grid { grid-template-columns: repeat(2, 1fr); }
+  #ulc-app .ulc-stats { grid-template-columns: repeat(2, 1fr); }
+  #ulc-app .ulc-intro { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  #ulc-app .ulc-hero { padding: 28px 18px 24px; border-radius: 20px; }
+  #ulc-app .ulc-sub { font-size: 16px; }
+  #ulc-app .ulc-field { flex-wrap: wrap; padding: 12px; gap: 8px; }
+  #ulc-app .ulc-field-icon { display: none; }
+  #ulc-app input.ulc-input { flex: 1 1 100%; padding: 10px 6px; }
+  #ulc-app .ulc-btn-primary { width: 100%; }
+  #ulc-app .ulc-results { padding: 18px 14px; border-radius: 20px; }
+  #ulc-app .ulc-grid { grid-template-columns: 1fr; }
+  #ulc-app .ulc-dl-row { grid-template-columns: 1fr; }
+  #ulc-app .ulc-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  #ulc-app .ulc-tabs::-webkit-scrollbar { display: none; }
+  #ulc-app .ulc-tab { white-space: nowrap; padding: 12px 12px; }
+  #ulc-app .ulc-actions .ulc-btn { flex: 1 1 100%; }
+  #ulc-app .ulc-stat b { font-size: 26px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #ulc-app *, #ulc-app *::before, #ulc-app *::after { transition: none !important; animation: none !important; }
+}
+</style>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ------------------------------------------------------------------
+     OPTIONAL SETTINGS (most sites need no changes)
+     apiRoot: leave '' to auto-detect. Only fill in if the scan reports
+              that the REST API cannot be found, e.g. 'https://yoursite.com/wp-json/'
+     ------------------------------------------------------------------ */
+  var CONFIG = { apiRoot: '', maxPagesPerType: 60, requestTimeoutMs: 25000 };
+
+  var root = document.getElementById('ulc-app');
+  if (!root || root.getAttribute('data-ready')) return;
+  root.setAttribute('data-ready', '1');
+
+  function $(sel) { return root.querySelector(sel); }
+  function $$(sel) { return Array.prototype.slice.call(root.querySelectorAll(sel)); }
+
+  /* Safe DOM builder (never injects HTML strings) */
+  function h(tag, attrs, kids) {
+    var el = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      if (k === 'class') el.className = attrs[k];
+      else if (k === 'text') el.textContent = attrs[k];
+      else if (attrs[k] !== null && attrs[k] !== undefined && attrs[k] !== false) el.setAttribute(k, attrs[k]);
+    });
+    (kids || []).forEach(function (c) { if (c) el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return el;
+  }
+  function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+  function trunc(s, n) { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '\u2026' : s; }
+  function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
+
+  var el = {
+    form: $('#ulc-form'), input: $('#ulc-input'), go: $('#ulc-go'), error: $('#ulc-error'),
+    deep: $('#ulc-deep'), comments: $('#ulc-comments'),
+    intro: $('#ulc-intro'), results: $('#ulc-results'), targetUrl: $('#ulc-target-url'),
+    siteCount: $('#ulc-site-count'), progress: $('#ulc-progress'), progressText: $('#ulc-progress-text'),
+    bar: $('#ulc-bar-fill'), cancel: $('#ulc-cancel'), notice: $('#ulc-site-notice'),
+    stats: $('#ulc-stats'), actions: $('#ulc-actions'), list: $('#ulc-list'), fine: $('#ulc-site-fine'),
+    flash: $('#ulc-flash'), flash2: $('#ulc-flash2'), exclude: $('#ulc-exclude'),
+    engines: $('#ulc-engines'), tools: $('#ulc-tools'), info: $('#ulc-info'),
+    open: $('#ulc-open'), copyUrl: $('#ulc-copyurl')
+  };
+
+  var state = { target: null, ctl: null, runId: 0, pages: [] };
+
+  /* ------------------------------------------------------------------
+     URL helpers
+     ------------------------------------------------------------------ */
+  function parseInput(raw) {
+    raw = String(raw || '').trim();
+    if (!raw) return { error: 'Please paste a URL first.' };
+    if (/\s/.test(raw)) return { error: 'A URL cannot contain spaces. Please check what you pasted.' };
+    if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(raw)) raw = 'https://' + raw;
+    var u;
+    try { u = new URL(raw); } catch (e) { return { error: 'That does not look like a valid URL. Example: https://example.com/page' }; }
+    if (!/^https?:$/.test(u.protocol)) return { error: 'Only http:// and https:// links can be checked.' };
+    if (u.hostname.indexOf('.') === -1 && u.hostname !== 'localhost') return { error: 'The domain looks incomplete. Example: example.com' };
+    return { url: u };
+  }
+  function safeDecode(s) { try { return decodeURIComponent(s); } catch (e) { return s; } }
+  function parts(u) {
+    return {
+      host: u.hostname.toLowerCase().replace(/^www\./, ''),
+      path: safeDecode(u.pathname).replace(/\/+$/, '').toLowerCase(),
+      search: u.search
+    };
+  }
+  function makeMatcher(target, mode) {
+    var t = parts(target);
+    return function (href, base) {
+      var u;
+      try { u = new URL(href, base); } catch (e) { return false; }
+      if (!/^https?:$/.test(u.protocol)) return false;
+      var c = parts(u);
+      if (mode === 'domain') return c.host === t.host || c.host.slice(-(t.host.length + 1)) === '.' + t.host;
+      if (c.host !== t.host) return false;
+      if (mode === 'exact') return c.path === t.path && c.search === t.search;
+      var pathOk = t.path === '' || c.path === t.path || c.path.indexOf(t.path + '/') === 0;
+      return pathOk && (!t.search || c.search === t.search);
+    };
+  }
+
+  /* ------------------------------------------------------------------
+     Content analysis
+     ------------------------------------------------------------------ */
+  function findHits(html, matcher, base) {
+    var hits = [], seen = {};
+    if (!html) return hits;
+    var doc = new DOMParser().parseFromString(html, 'text/html'); // inert: nothing is loaded
+    function add(hit) {
+      var key = hit.kind + '|' + hit.url + '|' + hit.text;
+      if (seen[key]) return; seen[key] = 1; hits.push(hit);
+    }
+    Array.prototype.forEach.call(doc.querySelectorAll('a[href]'), function (a) {
+      var href = a.getAttribute('href');
+      if (!matcher(href, base)) return;
+      var text = (a.textContent || '').replace(/\s+/g, ' ').trim();
+      if (!text) { var img = a.querySelector('img'); text = img ? 'Image link' + (img.getAttribute('alt') ? ': ' + img.getAttribute('alt') : '') : '(no link text)'; }
+      var rel = (a.getAttribute('rel') || '').toLowerCase();
+      add({ kind: 'Link', url: href, text: trunc(text, 140), nofollow: /nofollow/.test(rel), sponsored: /sponsored/.test(rel), ugc: /\bugc\b/.test(rel), newTab: a.getAttribute('target') === '_blank' });
+    });
+    var media = { img: 'Image', iframe: 'Embed', source: 'Media', video: 'Media', audio: 'Media', script: 'Script' };
+    Array.prototype.forEach.call(doc.querySelectorAll('img[src],iframe[src],source[src],video[src],audio[src],script[src]'), function (n) {
+      var src = n.getAttribute('src');
+      if (matcher(src, base)) add({ kind: media[n.tagName.toLowerCase()] || 'Media', url: src, text: n.getAttribute('alt') || n.getAttribute('title') || '' });
+    });
+    // plain-text mentions (URL typed as text, not clickable)
+    var text = doc.body ? doc.body.textContent : '';
+    var re = /https?:\/\/[^\s<>"'()\[\]]+/gi, m;
+    var known = hits.map(function (x) { return x.url.replace(/\/+$/, ''); });
+    while ((m = re.exec(text))) {
+      var u = m[0].replace(/[.,;:!?]+$/, '');
+      if (known.indexOf(u.replace(/\/+$/, '')) !== -1) continue;
+      if (matcher(u, base)) { add({ kind: 'Text mention', url: u, text: '' }); known.push(u.replace(/\/+$/, '')); }
+    }
+    return hits;
+  }
+
+  /* ------------------------------------------------------------------
+     WordPress REST API
+     ------------------------------------------------------------------ */
+  function apiBase() {
+    var r = CONFIG.apiRoot;
+    if (!r) {
+      var l = document.querySelector('link[rel="https://api.w.org/"]');
+      r = l ? l.href : (location.origin + '/wp-json/');
+    }
+    return r;
+  }
+  function apiUrl(path, params) {
+    var base = apiBase(), q = Object.keys(params || {}).map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
+    var u;
+    try { u = new URL(base, location.href); } catch (e) { u = new URL(location.origin + '/wp-json/'); }
+    if (u.searchParams.has('rest_route')) return u.origin + u.pathname + '?rest_route=/' + path + (q ? '&' + q : '');
+    return u.origin + u.pathname.replace(/\/?$/, '/') + path + (q ? '?' + q : '');
+  }
+  function getJSON(url, signal) {
+    var timer, ctl = new AbortController();
+    if (signal) signal.addEventListener('abort', function () { ctl.abort(); });
+    timer = setTimeout(function () { ctl.abort(); }, CONFIG.requestTimeoutMs);
+    return fetch(url, { signal: ctl.signal, credentials: 'same-origin', headers: { Accept: 'application/json' } }).then(function (res) {
+      clearTimeout(timer);
+      if (!res.ok) { var e = new Error('HTTP ' + res.status); e.status = res.status; throw e; }
+      var total = parseInt(res.headers.get('X-WP-Total') || '0', 10);
+      var pages = parseInt(res.headers.get('X-WP-TotalPages') || '1', 10);
+      return res.json().then(function (data) { return { data: data, total: total, pages: pages }; });
+    }, function (err) { clearTimeout(timer); throw err; });
+  }
+
+  function getTypes(signal) {
+    return getJSON(apiUrl('wp/v2/types', {}), signal).then(function (r) {
+      var out = [];
+      Object.keys(r.data || {}).forEach(function (k) {
+        var t = r.data[k];
+        if (!t || !t.rest_base || k === 'attachment' || k === 'wp_block' || k === 'wp_template' || k === 'wp_template_part' || k === 'wp_navigation') return;
+        out.push({ slug: k, base: t.rest_base, label: t.name || k });
+      });
+      return out.length ? out : [{ slug: 'post', base: 'posts', label: 'Posts' }, { slug: 'page', base: 'pages', label: 'Pages' }];
+    }, function (err) {
+      if (err && err.name === 'AbortError') throw err;
+      return [{ slug: 'post', base: 'posts', label: 'Posts' }, { slug: 'page', base: 'pages', label: 'Pages' }];
+    });
+  }
+
+  function searchTerm(target) {
+    var p = parts(target);
+    return p.path ? p.host + p.path : p.host;
+  }
+
+  /* ------------------------------------------------------------------
+     Scan
+     ------------------------------------------------------------------ */
+  function setProgress(done, total, text) {
+    el.progressText.textContent = text;
+    el.bar.style.width = (total > 0 ? Math.min(100, Math.round(done / total * 100)) : 4) + '%';
+  }
+
+  function showNotice(kind, text) {
+    el.notice.className = 'ulc-notice is-' + kind;
+    el.notice.textContent = text;
+    el.notice.hidden = false;
+  }
+
+  async function scanSite(runId) {
+    var target = state.target, mode = checkedMode(), deep = el.deep.checked, withComments = el.comments.checked;
+    var matcher = makeMatcher(target, mode), signal = state.ctl.signal;
+    var alive = function () { return runId === state.runId; };
+    var term = searchTerm(target);
+    var scanned = 0, grand = 0, truncated = false;
+
+    setProgress(0, 0, 'Finding your content types\u2026');
+    var types = await getTypes(signal);
+    if (!alive()) return;
+
+    // count first so the progress bar is meaningful
+    var plan = [];
+    for (var i = 0; i < types.length; i++) {
+      var t = types[i], params = { per_page: 1, _fields: 'id' };
+      if (!deep) params.search = term;
+      try {
+        var c = await getJSON(apiUrl('wp/v2/' + t.base, params), signal);
+        if (!alive()) return;
+        if (c.total > 0) { plan.push({ kind: 'type', t: t, total: c.total }); grand += c.total; }
+      } catch (e) {
+        if (e && e.name === 'AbortError') throw e;
+        if (i === 0 && (e.status === 404 || e.status === 401 || e.status === 403 || !e.status)) throw e;
+      }
+    }
+    if (withComments) {
+      try {
+        var cc = await getJSON(apiUrl('wp/v2/comments', { per_page: 1, _fields: 'id' }), signal);
+        if (cc.total > 0) { plan.push({ kind: 'comments', total: cc.total }); grand += cc.total; }
+      } catch (e) { if (e && e.name === 'AbortError') throw e; }
+    }
+    if (!alive()) return;
+
+    for (var p = 0; p < plan.length; p++) {
+      var step = plan[p], page = 1, totalPages = 1;
+      var label = step.kind === 'comments' ? 'comments' : step.t.label.toLowerCase();
+      while (page <= totalPages) {
+        if (page > CONFIG.maxPagesPerType) { truncated = true; break; }
+        var q = { per_page: 100, page: page };
+        var url;
+        if (step.kind === 'comments') {
+          q._fields = 'id,link,content,author_name,post'; url = apiUrl('wp/v2/comments', q);
+        } else {
+          q._fields = 'id,link,title,type,content'; if (!deep) q.search = term; url = apiUrl('wp/v2/' + step.t.base, q);
+        }
+        setProgress(scanned, grand, 'Scanning ' + label + '\u2026 ' + scanned + ' of ' + grand);
+        var r = await getJSON(url, signal);
+        if (!alive()) return;
+        totalPages = r.pages || 1;
+        (r.data || []).forEach(function (item) {
+          scanned++;
+          var html = item.content && item.content.rendered;
+          var hits = findHits(html, matcher, item.link || location.href);
+          if (hits.length) {
+            var title = step.kind === 'comments' ? ('Comment by ' + (item.author_name || 'a visitor')) : stripTags((item.title && item.title.rendered) || '(no title)');
+            state.pages.push({ title: title || '(no title)', link: item.link, type: step.kind === 'comments' ? 'Comment' : step.t.label.replace(/s$/i, ''), hits: hits });
+            renderResults(false);
+          }
+        });
+        page++;
+      }
+    }
+    setProgress(1, 1, 'Scan complete \u2014 ' + plural(scanned, 'item', 'items') + ' checked.');
+    return { scanned: scanned, truncated: truncated, deep: deep };
+  }
+
+  function stripTags(s) {
+    var d = new DOMParser().parseFromString(String(s), 'text/html');
+    return (d.body.textContent || '').trim();
+  }
+  function checkedMode() { var r = root.querySelector('input[name="ulc-mode"]:checked'); return r ? r.value : 'exact'; }
+
+  /* ------------------------------------------------------------------
+     Rendering \u2014 site results
+     ------------------------------------------------------------------ */
+  function totalHits() { return state.pages.reduce(function (n, p) { return n + p.hits.length; }, 0); }
+
+  function renderResults(final) {
+    var pages = state.pages.slice().sort(function (a, b) { return b.hits.length - a.hits.length; });
+    var total = totalHits();
+    el.siteCount.textContent = String(pages.length);
+    clear(el.list);
+    pages.forEach(function (pg) {
+      var head = h('div', { class: 'ulc-card-head' }, [
+        h('div', { class: 'ulc-card-title' }, [
+          pg.link ? h('a', { href: pg.link, target: '_blank', rel: 'noopener noreferrer', text: pg.title }) : document.createTextNode(pg.title),
+          pg.link ? h('span', { class: 'ulc-card-url', text: pg.link }) : null
+        ]),
+        h('div', { class: 'ulc-card-meta' }, [
+          h('span', { class: 'ulc-badge gray', text: pg.type }),
+          h('span', { class: 'ulc-badge', text: plural(pg.hits.length, 'match', 'matches') })
+        ])
+      ]);
+      var list = h('ul', { class: 'ulc-hits' });
+      pg.hits.forEach(function (x) {
+        var badges = [h('span', { class: 'ulc-badge', text: x.kind })];
+        if (x.kind === 'Link') {
+          if (x.nofollow) badges.push(h('span', { class: 'ulc-badge warn', text: 'nofollow' }));
+          else badges.push(h('span', { class: 'ulc-badge ok', text: 'dofollow' }));
+          if (x.sponsored) badges.push(h('span', { class: 'ulc-badge warn', text: 'sponsored' }));
+          if (x.ugc) badges.push(h('span', { class: 'ulc-badge warn', text: 'ugc' }));
+          if (x.newTab) badges.push(h('span', { class: 'ulc-badge gray', text: 'new tab' }));
+        }
+        list.appendChild(h('li', { class: 'ulc-hit' }, [
+          h('div', { class: 'ulc-hit-line' }, badges.concat(x.text ? [h('span', { class: 'ulc-hit-anchor', text: x.text })] : [])),
+          h('div', { class: 'ulc-hit-url', text: x.url })
+        ]));
+      });
+      el.list.appendChild(h('article', { class: 'ulc-card' }, [head, list]));
+    });
+
+    var dof = 0, nof = 0, links = 0;
+    state.pages.forEach(function (p) { p.hits.forEach(function (x) { if (x.kind === 'Link') { links++; if (x.nofollow || x.sponsored || x.ugc) nof++; else dof++; } }); });
+    clear(el.stats);
+    [[pages.length, 'Pages using it'], [total, 'Total matches'], [links, 'Clickable links'], [dof + ' / ' + nof, 'Dofollow / Nofollow']].forEach(function (s) {
+      el.stats.appendChild(h('div', { class: 'ulc-stat' }, [h('b', { text: String(s[0]) }), h('span', { text: s[1] })]));
+    });
+    el.stats.hidden = el.actions.hidden = pages.length === 0;
+  }
+
+  function finishScan(info) {
+    el.progress.hidden = true;
+    el.fine.hidden = false;
+    renderResults(true);
+    if (state.pages.length === 0) {
+      var tip = info.deep ? 'We checked every public item on this site and none uses this URL.' : 'The quick search found nothing. Turn on \u201cDeep scan\u201d for the most accurate result.';
+      clear(el.list);
+      el.list.appendChild(h('div', { class: 'ulc-empty' }, [h('b', { text: 'No matches on this website' }), h('span', { text: tip + ' Try \u201cPage & sub-pages\u201d or \u201cWhole domain\u201d, or look at the \u201cAcross the web\u201d tab.' })]));
+    }
+    if (info.truncated) showNotice('warn', 'Your site is very large, so only the first ' + (CONFIG.maxPagesPerType * 100) + ' items of some content types were scanned.');
+  }
+
+  function failScan(err) {
+    el.progress.hidden = true;
+    if (err && err.name === 'AbortError') {
+      if (state.stopped) { showNotice('info', 'Scan stopped. Showing what was found so far.'); renderResults(true); el.fine.hidden = false; if (!state.pages.length) el.siteCount.textContent = '0'; }
+      else showNotice('bad', 'The website took too long to answer. Please try again, or turn off \u201cDeep scan\u201d.');
+      return;
+    }
+    el.siteCount.textContent = '\u2013';
+    if (err && (err.status === 401 || err.status === 403)) showNotice('bad', 'This website\u2019s content API is restricted (a security plugin or host may be blocking it), so the on-site scan cannot run. The \u201cAcross the web\u201d and \u201cLink details\u201d tabs still work.');
+    else if (err && err.status === 404) showNotice('bad', 'The WordPress REST API was not found at ' + apiBase() + '. If it is disabled or uses a different address, set it in CONFIG.apiRoot at the top of the script. The other two tabs still work.');
+    else showNotice('bad', 'The on-site scan could not run (' + ((err && err.message) || 'network error') + '). This tool must be placed on the same WordPress website you want to scan. The other two tabs still work.');
+  }
+
+  /* ------------------------------------------------------------------
+     Rendering \u2014 web & details
+     ------------------------------------------------------------------ */
+  function renderWeb() {
+    var t = state.target, p = parts(t);
+    var full = t.href;
+    var bare = t.host + (p.path ? t.pathname.replace(/\/+$/, '') : '') + (t.search || '');
+    bare = bare.replace(/^www\./, '');
+    var excl = el.exclude.checked ? ' -site:' + p.host : '';
+    var q1 = '"' + full + '"' + excl, q2 = '"' + bare + '"' + excl;
+    function link(href, label) { return h('a', { class: 'ulc-btn ulc-btn-soft', href: href, target: '_blank', rel: 'noopener noreferrer', text: label }); }
+
+    var engines = [
+      { name: 'Google', desc: 'The largest index. Best first stop.', f: function (q) { return 'https://www.google.com/search?q=' + encodeURIComponent(q); } },
+      { name: 'Bing', desc: 'Microsoft\u2019s index, often shows different pages.', f: function (q) { return 'https://www.bing.com/search?q=' + encodeURIComponent(q); } },
+      { name: 'DuckDuckGo', desc: 'Privacy-focused search.', f: function (q) { return 'https://duckduckgo.com/?q=' + encodeURIComponent(q); } },
+      { name: 'Brave Search', desc: 'Independent index.', f: function (q) { return 'https://search.brave.com/search?q=' + encodeURIComponent(q); } },
+      { name: 'Yandex', desc: 'Strong coverage of Eastern European sites.', f: function (q) { return 'https://yandex.com/search/?text=' + encodeURIComponent(q.replace(/ -site:\S+$/, '')); } }
+    ];
+    clear(el.engines);
+    engines.forEach(function (e) {
+      el.engines.appendChild(h('div', { class: 'ulc-tile' }, [
+        h('h4', { text: e.name }), h('p', { text: e.desc }),
+        h('div', { class: 'ulc-tile-links' }, [link(e.f(q1), 'Full URL'), link(e.f(q2), 'Without https://')])
+      ]));
+    });
+
+    var archive = 'https://web.archive.org/web/*/' + full;
+    var tools = [
+      { name: 'Ahrefs Backlink Checker', desc: 'Free tool listing top backlinks for a domain or URL.', href: 'https://ahrefs.com/backlink-checker', copy: true },
+      { name: 'Semrush Backlink Analytics', desc: 'Detailed backlink reports (free account needed).', href: 'https://www.semrush.com/analytics/backlinks/', copy: true },
+      { name: 'Moz Link Explorer', desc: 'Link metrics and linking domains.', href: 'https://moz.com/link-explorer', copy: true },
+      { name: 'Google Search Console', desc: 'Links report for sites you own \u2014 the most reliable source for your own pages.', href: 'https://search.google.com/search-console/links', copy: false },
+      { name: 'Wayback Machine', desc: 'See saved copies of this URL over the years.', href: archive, copy: false }
+    ];
+    clear(el.tools);
+    tools.forEach(function (tl) {
+      var kids = [link(tl.href, 'Open')];
+      if (tl.copy) { var b = h('button', { type: 'button', class: 'ulc-btn ulc-btn-soft', text: 'Copy URL, then paste' }); b.addEventListener('click', function () { copyText(full, b, 'Copied!'); }); kids.push(b); }
+      el.tools.appendChild(h('div', { class: 'ulc-tile' }, [h('h4', { text: tl.name }), h('p', { text: tl.desc }), h('div', { class: 'ulc-tile-links' }, kids)]));
+    });
+  }
+
+  function row(k, v) { return h('div', { class: 'ulc-dl-row' }, [h('dt', { text: k }), h('dd', null, [typeof v === 'string' ? document.createTextNode(v) : v])]); }
+  function badge(cls, text) { return h('span', { class: 'ulc-badge ' + cls, text: text }); }
+
+  function renderInfo() {
+    var t = state.target, internal = t.hostname.replace(/^www\./, '') === location.hostname.replace(/^www\./, '');
+    var status = h('span', null, [badge('gray', 'Testing\u2026')]);
+    clear(el.info);
+    [
+      ['Full URL', t.href], ['Secure (HTTPS)', t.protocol === 'https:' ? badge('ok', 'Yes \u2014 encrypted') : badge('warn', 'No \u2014 plain http')],
+      ['Domain', t.hostname], ['Path', t.pathname === '/' ? '/ (home page)' : safeDecode(t.pathname)],
+      ['Query string', t.search || 'None'], ['Fragment', t.hash || 'None'],
+      ['Location', internal ? badge('', 'Internal \u2014 same website as this tool') : badge('gray', 'External \u2014 a different website')],
+      ['Link status', status]
+    ].forEach(function (r) { el.info.appendChild(row(r[0], r[1])); });
+    el.open.href = t.href;
+    probe(t, internal).then(function (r) {
+      clear(status);
+      status.appendChild(badge(r.cls, r.label));
+      if (r.note) status.appendChild(h('div', { class: 'ulc-hit-url', text: r.note }));
+    });
+  }
+
+  function probe(u, internal) {
+    var ctl = new AbortController(), timer = setTimeout(function () { ctl.abort(); }, 9000);
+    var sameOrigin = u.origin === location.origin;
+    if (!sameOrigin && u.protocol === 'http:' && location.protocol === 'https:') {
+      clearTimeout(timer);
+      return Promise.resolve({ cls: 'gray', label: 'Cannot be tested', note: 'Browsers block insecure (http) tests from a secure (https) page.' });
+    }
+    if (sameOrigin) {
+      return fetch(u.href, { signal: ctl.signal, redirect: 'follow' }).then(function (r) {
+        clearTimeout(timer);
+        var extra = r.redirected ? 'Redirects to ' + r.url : '';
+        return { cls: r.ok ? 'ok' : 'bad', label: 'HTTP ' + r.status + (r.ok ? ' \u2014 working' : ' \u2014 problem'), note: extra };
+      }, function () { clearTimeout(timer); return { cls: 'bad', label: 'No response', note: 'The page could not be loaded.' }; });
+    }
+    return fetch(u.href, { mode: 'no-cors', signal: ctl.signal }).then(function () {
+      clearTimeout(timer);
+      return { cls: 'ok', label: 'Server responded', note: 'Browser security hides the exact status code (200, 404\u2026) of other websites, so this only confirms the site answers.' };
+    }, function () {
+      clearTimeout(timer);
+      return { cls: 'warn', label: 'No response', note: 'The site may be down, may block browser requests, or the address may be wrong. Open the link to confirm.' };
+    });
+  }
+
+  /* ------------------------------------------------------------------
+     Copy / CSV
+     ------------------------------------------------------------------ */
+  function copyText(text, btn, msg, flashEl) {
+    function done() {
+      var f = flashEl || (btn && btn.parentNode && btn.parentNode.querySelector('.ulc-flash'));
+      if (btn && !f) { var old = btn.textContent; btn.textContent = msg; setTimeout(function () { btn.textContent = old; }, 1600); return; }
+      if (f) { f.textContent = msg; setTimeout(function () { f.textContent = ''; }, 2000); }
+    }
+    function fallback() {
+      var ta = h('textarea', { style: 'position:fixed;opacity:0;left:-999px' }); ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { window.prompt('Copy this text:', text); }
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
+  }
+  function csvCell(v) { v = String(v == null ? '' : v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  function downloadCsv() {
+    var rows = [['Page title', 'Page URL', 'Content type', 'Match type', 'Link text', 'Matched URL', 'Follow type']];
+    state.pages.forEach(function (p) {
+      p.hits.forEach(function (x) {
+        var f = x.kind === 'Link' ? (x.sponsored ? 'sponsored' : x.ugc ? 'ugc' : x.nofollow ? 'nofollow' : 'dofollow') : '';
+        rows.push([p.title, p.link, p.type, x.kind, x.text, x.url, f]);
+      });
+    });
+    var csv = '\ufeff' + rows.map(function (r) { return r.map(csvCell).join(','); }).join('\r\n');
+    var a = h('a', { href: URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })), download: 'link-usage-' + parts(state.target).host + '.csv' });
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+
+  /* ------------------------------------------------------------------
+     Tabs
+     ------------------------------------------------------------------ */
+  function selectTab(name, focus) {
+    $$('.ulc-tab').forEach(function (t) {
+      var on = t.getAttribute('data-tab') === name;
+      t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); t.tabIndex = on ? 0 : -1;
+      if (on && focus) t.focus();
+    });
+    $('#ulc-panel-site').hidden = name !== 'site';
+    $('#ulc-panel-web').hidden = name !== 'web';
+    $('#ulc-panel-info').hidden = name !== 'info';
+  }
+  $$('.ulc-tab').forEach(function (t, i, all) {
+    t.addEventListener('click', function () { selectTab(t.getAttribute('data-tab')); });
+    t.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (d) { e.preventDefault(); selectTab(all[(i + d + all.length) % all.length].getAttribute('data-tab'), true); }
+    });
+  });
+
+  /* ------------------------------------------------------------------
+     Main flow
+     ------------------------------------------------------------------ */
+  function start(e) {
+    if (e) e.preventDefault();
+    var r = parseInput(el.input.value);
+    if (r.error) { el.error.textContent = r.error; el.error.hidden = false; el.input.focus(); return; }
+    el.error.hidden = true;
+    if (state.ctl) { state.stopped = false; state.ctl.abort(); }
+
+    state.target = r.url; state.pages = []; state.stopped = false;
+    state.ctl = new AbortController(); var runId = ++state.runId;
+    el.input.value = r.url.href;
+
+    el.intro.hidden = true; el.results.hidden = false;
+    el.targetUrl.textContent = r.url.href; el.targetUrl.href = r.url.href;
+    el.siteCount.textContent = '\u2026';
+    el.notice.hidden = true; el.stats.hidden = true; el.actions.hidden = true; el.fine.hidden = true; clear(el.list);
+    el.progress.hidden = false; setProgress(0, 0, 'Starting\u2026');
+    el.go.disabled = true; el.go.textContent = 'Checking\u2026';
+    selectTab('site');
+    renderWeb(); renderInfo();
+    if (window.matchMedia && !window.matchMedia('(min-width: 900px)').matches) el.results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    scanSite(runId).then(function (info) { if (runId === state.runId && info) finishScan(info); }, function (err) { if (runId === state.runId) failScan(err); })
+      .then(function () { if (runId === state.runId) { el.go.disabled = false; el.go.textContent = 'Check URL'; } });
+  }
+
+  el.form.addEventListener('submit', start);
+  el.cancel.addEventListener('click', function () { state.stopped = true; if (state.ctl) state.ctl.abort(); });
+  el.exclude.addEventListener('change', function () { if (state.target) renderWeb(); });
+  $('#ulc-csv').addEventListener('click', downloadCsv);
+  $('#ulc-copy').addEventListener('click', function () {
+    var lines = state.pages.map(function (p) { return p.title + ' \u2014 ' + p.link; });
+    copyText(lines.join('\n'), $('#ulc-copy'), 'Copied!', el.flash);
+  });
+  el.copyUrl.addEventListener('click', function () { copyText(state.target.href, el.copyUrl, 'Copied!', el.flash2); });
+  Array.prototype.forEach.call(root.querySelectorAll('input[name="ulc-mode"]'), function (r) {
+    r.addEventListener('change', function () { if (state.target && !el.results.hidden) start(); });
+  });
+})();
+</script>
