@@ -1,0 +1,293 @@
+<!-- ============================================================
+  BROKEN LINK CHECKER  |  Paste this whole block into an Elementor "HTML" widget
+  ============================================================ -->
+<div id="blc-app">
+<style>
+#blc-app{--blc-ink:#1e1b4b;--blc-text:#334155;--blc-muted:#64748b;--blc-line:#e2e8f0;--blc-bg:#f8fafc;--blc-card:#ffffff;--blc-a:#4f46e5;--blc-b:#7c3aed;--blc-ok:#047857;--blc-okbg:#d1fae5;--blc-bad:#b91c1c;--blc-badbg:#fee2e2;--blc-warn:#a16207;--blc-warnbg:#fef3c7;box-sizing:border-box;width:100%;max-width:1140px;margin:0 auto;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.55;color:var(--blc-text);text-align:left}
+#blc-app *,#blc-app *::before,#blc-app *::after{box-sizing:border-box}
+#blc-app .blc-shell{background:var(--blc-card);border:1px solid var(--blc-line);border-radius:20px;box-shadow:0 10px 40px rgba(79,70,229,.10);overflow:hidden}
+#blc-app .blc-head{padding:36px 32px;color:#fff;background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 55%,#c026d3 100%)}
+#blc-app .blc-head h2{margin:0 0 8px;padding:0;font-size:32px;line-height:1.2;font-weight:800;color:#fff;letter-spacing:-.01em}
+#blc-app .blc-head p{margin:0;font-size:17px;color:rgba(255,255,255,.92);max-width:720px}
+#blc-app .blc-body{padding:28px 32px 32px}
+#blc-app .blc-tabs{display:flex;gap:6px;padding:5px;background:#eef2ff;border-radius:14px;margin-bottom:22px}
+#blc-app .blc-tab{flex:1;appearance:none;-webkit-appearance:none;border:0;background:transparent;color:var(--blc-a);font:inherit;font-weight:700;font-size:16px;padding:12px 14px;border-radius:10px;cursor:pointer;transition:all .2s;text-transform:none;letter-spacing:0;box-shadow:none}
+#blc-app .blc-tab:hover{background:rgba(255,255,255,.6)}
+#blc-app .blc-tab[aria-selected="true"]{background:#fff;color:var(--blc-ink);box-shadow:0 2px 8px rgba(79,70,229,.18)}
+#blc-app [hidden]{display:none!important}
+#blc-app .blc-lbl{display:block;margin:0 0 8px;font-weight:700;font-size:16px;color:var(--blc-ink)}
+#blc-app .blc-input,#blc-app .blc-textarea,#blc-app .blc-select{display:block;width:100%;margin:0;padding:14px 16px;font:inherit;font-size:16px;color:var(--blc-ink);background:#fff;border:2px solid var(--blc-line);border-radius:12px;outline:none;box-shadow:none;height:auto;transition:border-color .2s,box-shadow .2s}
+#blc-app .blc-textarea{min-height:170px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+#blc-app .blc-input:focus,#blc-app .blc-textarea:focus,#blc-app .blc-select:focus{border-color:var(--blc-a);box-shadow:0 0 0 4px rgba(79,70,229,.15)}
+#blc-app .blc-hint{margin:8px 0 0;font-size:15px;color:var(--blc-muted)}
+#blc-app .blc-opts{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0}
+#blc-app .blc-check{display:flex;align-items:center;gap:10px;font-size:16px;color:var(--blc-text);cursor:pointer;padding:12px 14px;border:2px solid var(--blc-line);border-radius:12px;background:var(--blc-bg);margin:0}
+#blc-app .blc-check input{width:20px;height:20px;margin:0;accent-color:var(--blc-a);flex:none}
+#blc-app details.blc-adv{margin:0 0 20px;border:2px dashed var(--blc-line);border-radius:12px;padding:12px 16px}
+#blc-app details.blc-adv summary{cursor:pointer;font-weight:700;color:var(--blc-a);font-size:16px}
+#blc-app details.blc-adv .blc-advin{padding-top:14px}
+#blc-app .blc-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+#blc-app .blc-btn{appearance:none;-webkit-appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;margin:0;cursor:pointer;font:inherit;font-weight:700;font-size:16px;line-height:1.2;padding:15px 28px;border-radius:12px;color:#fff;background:linear-gradient(135deg,var(--blc-a),var(--blc-b));box-shadow:0 6px 18px rgba(79,70,229,.35);transition:transform .15s,box-shadow .15s,opacity .2s;text-transform:none;letter-spacing:0;text-decoration:none}
+#blc-app .blc-btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(79,70,229,.4);color:#fff}
+#blc-app .blc-btn:active{transform:translateY(0)}
+#blc-app .blc-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+#blc-app .blc-btn.blc-ghost{background:#fff;color:var(--blc-a);border:2px solid #c7d2fe;box-shadow:none}
+#blc-app .blc-btn.blc-ghost:hover{background:#eef2ff;color:var(--blc-a);box-shadow:none}
+#blc-app .blc-btn.blc-stop{background:linear-gradient(135deg,#dc2626,#b91c1c);box-shadow:0 6px 18px rgba(220,38,38,.3)}
+#blc-app .blc-btn:focus-visible,#blc-app .blc-tab:focus-visible,#blc-app .blc-chip:focus-visible,#blc-app .blc-copy:focus-visible{outline:3px solid #a5b4fc;outline-offset:2px}
+#blc-app .blc-msg{display:none;margin-top:18px;padding:14px 16px;border-radius:12px;font-size:16px;background:var(--blc-badbg);color:var(--blc-bad);border:1px solid #fecaca}
+#blc-app .blc-msg.blc-show{display:block}
+#blc-app .blc-msg.blc-info{background:#eef2ff;color:var(--blc-ink);border-color:#c7d2fe}
+#blc-app .blc-results{display:none;margin-top:30px}
+#blc-app .blc-results.blc-show{display:block}
+#blc-app .blc-prog{height:14px;background:#e0e7ff;border-radius:99px;overflow:hidden}
+#blc-app .blc-prog span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blc-a),var(--blc-b),#c026d3);border-radius:99px;transition:width .25s}
+#blc-app .blc-progtxt{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:8px 0 20px;font-size:15px;color:var(--blc-muted)}
+#blc-app .blc-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+#blc-app .blc-stat{padding:18px;border-radius:16px;background:var(--blc-bg);border:1px solid var(--blc-line)}
+#blc-app .blc-stat b{display:block;font-size:34px;line-height:1.1;font-weight:800;color:var(--blc-ink)}
+#blc-app .blc-stat span{font-size:15px;color:var(--blc-muted);font-weight:600}
+#blc-app .blc-stat.blc-s-ok{background:#ecfdf5;border-color:#a7f3d0}#blc-app .blc-stat.blc-s-ok b{color:var(--blc-ok)}
+#blc-app .blc-stat.blc-s-bad{background:#fef2f2;border-color:#fecaca}#blc-app .blc-stat.blc-s-bad b{color:var(--blc-bad)}
+#blc-app .blc-stat.blc-s-warn{background:#fffbeb;border-color:#fde68a}#blc-app .blc-stat.blc-s-warn b{color:var(--blc-warn)}
+#blc-app .blc-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
+#blc-app .blc-chips{display:flex;flex-wrap:wrap;gap:8px}
+#blc-app .blc-chip{appearance:none;-webkit-appearance:none;border:2px solid var(--blc-line);background:#fff;color:var(--blc-text);font:inherit;font-size:15px;font-weight:700;padding:8px 16px;border-radius:99px;cursor:pointer;margin:0;text-transform:none;letter-spacing:0;box-shadow:none;transition:all .15s}
+#blc-app .blc-chip:hover{border-color:#a5b4fc;color:var(--blc-a);background:#fff}
+#blc-app .blc-chip[aria-pressed="true"]{background:var(--blc-a);border-color:var(--blc-a);color:#fff}
+#blc-app .blc-search{max-width:280px;padding:10px 14px}
+#blc-app .blc-list{border:1px solid var(--blc-line);border-radius:16px;overflow:hidden}
+#blc-app .blc-row{display:grid;grid-template-columns:150px minmax(0,1fr) 90px 56px;gap:14px;align-items:center;padding:14px 18px;border-top:1px solid var(--blc-line);background:#fff}
+#blc-app .blc-row.blc-th{border-top:0;background:var(--blc-bg);font-weight:700;color:var(--blc-ink);font-size:15px}
+#blc-app .blc-row:not(.blc-th):hover{background:#fafaff}
+#blc-app .blc-url a{display:block;color:var(--blc-a);font-weight:600;text-decoration:none;word-break:break-all;overflow-wrap:anywhere}
+#blc-app .blc-url a:hover{text-decoration:underline}
+#blc-app .blc-sub{display:block;font-size:15px;color:var(--blc-muted);overflow-wrap:anywhere}
+#blc-app .blc-badge{display:inline-flex;align-items:center;gap:6px;font-size:15px;font-weight:700;padding:5px 12px;border-radius:99px;white-space:nowrap}
+#blc-app .blc-b-ok{background:var(--blc-okbg);color:var(--blc-ok)}
+#blc-app .blc-b-bad{background:var(--blc-badbg);color:var(--blc-bad)}
+#blc-app .blc-b-warn{background:var(--blc-warnbg);color:var(--blc-warn)}
+#blc-app .blc-code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:700;color:var(--blc-ink)}
+#blc-app .blc-copy{appearance:none;-webkit-appearance:none;border:2px solid var(--blc-line);background:#fff;color:var(--blc-muted);font:inherit;font-size:15px;font-weight:700;padding:6px 10px;border-radius:8px;cursor:pointer;margin:0;text-transform:none;box-shadow:none}
+#blc-app .blc-copy:hover{border-color:#a5b4fc;color:var(--blc-a);background:#fff}
+#blc-app .blc-empty{padding:30px 18px;text-align:center;color:var(--blc-muted);font-size:16px;background:#fff}
+#blc-app .blc-foot{margin-top:24px;padding:18px 20px;border-radius:14px;background:var(--blc-bg);border:1px solid var(--blc-line);font-size:15px;color:var(--blc-muted)}
+#blc-app .blc-foot strong{color:var(--blc-ink)}
+#blc-app .blc-spin{display:inline-block;width:16px;height:16px;border:3px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:blcspin .8s linear infinite}
+@keyframes blcspin{to{transform:rotate(360deg)}}
+#blc-app .blc-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:900px){
+#blc-app .blc-opts{grid-template-columns:1fr}
+#blc-app .blc-stats{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:720px){
+#blc-app .blc-head{padding:26px 20px}
+#blc-app .blc-head h2{font-size:26px}
+#blc-app .blc-body{padding:20px 16px 24px}
+#blc-app .blc-tab{padding:12px 8px;font-size:15px}
+#blc-app .blc-row.blc-th{display:none}
+#blc-app .blc-row{grid-template-columns:1fr auto;grid-template-areas:"status code" "url url" "act act";gap:8px 12px;padding:16px}
+#blc-app .blc-row .blc-st{grid-area:status}
+#blc-app .blc-row .blc-url{grid-area:url}
+#blc-app .blc-row .blc-cd{grid-area:code;text-align:right}
+#blc-app .blc-row .blc-ac{grid-area:act}
+#blc-app .blc-search{max-width:none;width:100%}
+#blc-app .blc-btn{width:100%}
+#blc-app .blc-stat b{font-size:28px}
+}
+@media (prefers-reduced-motion:reduce){#blc-app *{transition:none!important;animation-duration:2s!important}}
+</style>
+
+<div class="blc-shell">
+  <div class="blc-head">
+    <h2>Broken Link Checker</h2>
+    <p>Find dead links, missing pages and server errors in seconds. Check a whole web page, or paste your own list of links.</p>
+  </div>
+  <div class="blc-body">
+    <div class="blc-tabs" role="tablist" aria-label="Check mode">
+      <button class="blc-tab" role="tab" id="blc-tab-scan" aria-selected="true" aria-controls="blc-panel-scan" type="button">Scan a web page</button>
+      <button class="blc-tab" role="tab" id="blc-tab-list" aria-selected="false" aria-controls="blc-panel-list" type="button">Paste a list of links</button>
+    </div>
+
+    <div id="blc-panel-scan" role="tabpanel" aria-labelledby="blc-tab-scan">
+      <label class="blc-lbl" for="blc-url">Web page address</label>
+      <input class="blc-input" id="blc-url" type="text" inputmode="url" autocomplete="off" placeholder="https://www.example.com/my-page">
+      <p class="blc-hint">We open the page, collect every link on it, and test each one.</p>
+    </div>
+
+    <div id="blc-panel-list" role="tabpanel" aria-labelledby="blc-tab-list" hidden>
+      <label class="blc-lbl" for="blc-links">Links to check (one per line)</label>
+      <textarea class="blc-textarea" id="blc-links" spellcheck="false" placeholder="https://example.com/&#10;https://example.com/about&#10;https://another-site.com/page"></textarea>
+      <p class="blc-hint">Up to 300 links per check.</p>
+    </div>
+
+    <div class="blc-opts">
+      <div>
+        <label class="blc-lbl" for="blc-scope">Which links?</label>
+        <select class="blc-select" id="blc-scope">
+          <option value="all">All links</option>
+          <option value="internal">Internal links only</option>
+          <option value="external">External links only</option>
+        </select>
+      </div>
+      <div>
+        <label class="blc-lbl" for="blc-speed">Speed</label>
+        <select class="blc-select" id="blc-speed">
+          <option value="3">Gentle (slower, most reliable)</option>
+          <option value="5" selected>Normal</option>
+          <option value="8">Fast</option>
+        </select>
+      </div>
+      <div>
+        <span class="blc-lbl" style="margin-bottom:8px">Extras</span>
+        <label class="blc-check"><input type="checkbox" id="blc-img"> Also check images</label>
+      </div>
+    </div>
+
+    <details class="blc-adv">
+      <summary>Advanced: use my own proxy (optional)</summary>
+      <div class="blc-advin">
+        <label class="blc-lbl" for="blc-proxy">Custom proxy address</label>
+        <input class="blc-input" id="blc-proxy" type="text" autocomplete="off" placeholder="https://my-proxy.example.workers.dev/?url=">
+        <p class="blc-hint">Leave empty to use the built-in free proxies. If you set one, the page address is added to the end of it and the proxy must pass the real status code through.</p>
+      </div>
+    </details>
+
+    <div class="blc-actions">
+      <button class="blc-btn" id="blc-go" type="button">Check links</button>
+      <button class="blc-btn blc-stop" id="blc-stop" type="button" hidden>Stop</button>
+    </div>
+    <div class="blc-msg" id="blc-msg" role="alert" aria-live="polite"></div>
+
+    <div class="blc-results" id="blc-results">
+      <div class="blc-prog" aria-hidden="true"><span id="blc-bar"></span></div>
+      <div class="blc-progtxt"><span id="blc-ptxt">Starting&#8230;</span><span id="blc-ppct">0%</span></div>
+
+      <div class="blc-stats">
+        <div class="blc-stat"><b id="blc-n-total">0</b><span>Links checked</span></div>
+        <div class="blc-stat blc-s-ok"><b id="blc-n-ok">0</b><span>Working</span></div>
+        <div class="blc-stat blc-s-bad"><b id="blc-n-bad">0</b><span>Broken</span></div>
+        <div class="blc-stat blc-s-warn"><b id="blc-n-warn">0</b><span>Needs a look</span></div>
+      </div>
+
+      <div class="blc-bar">
+        <div class="blc-chips" role="group" aria-label="Filter results">
+          <button class="blc-chip" type="button" data-f="all" aria-pressed="false">All</button>
+          <button class="blc-chip" type="button" data-f="bad" aria-pressed="true">Broken</button>
+          <button class="blc-chip" type="button" data-f="warn" aria-pressed="false">Needs a look</button>
+          <button class="blc-chip" type="button" data-f="ok" aria-pressed="false">Working</button>
+        </div>
+        <input class="blc-input blc-search" id="blc-q" type="search" placeholder="Search results&#8230;" aria-label="Search results">
+      </div>
+
+      <div class="blc-list" id="blc-list">
+        <div class="blc-row blc-th"><div>Status</div><div>Link</div><div>Code</div><div></div></div>
+        <div id="blc-rows"></div>
+      </div>
+
+      <div class="blc-actions" style="margin-top:18px">
+        <button class="blc-btn blc-ghost" id="blc-csv" type="button">Download CSV</button>
+        <button class="blc-btn blc-ghost" id="blc-copybad" type="button">Copy broken links</button>
+      </div>
+    </div>
+
+    <div class="blc-foot">
+      <strong>Good to know:</strong> this tool runs entirely in your browser, so it uses free public relay services to read other websites. Results are a very good guide, but some sites block automated checks (shown as &#8220;Needs a look&#8221;) &#8211; open those links yourself to confirm. Links starting with mailto:, tel: or # are skipped.
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+var root=document.getElementById('blc-app');
+if(!root||root.getAttribute('data-ready'))return;
+root.setAttribute('data-ready','1');
+function $(s){return root.querySelector(s);}
+var MAX_LINKS=300,TIMEOUT=20000;
+var mode='scan',results=[],running=false,ctrl=null,filter='bad',query='',renderQueued=false;
+var el={go:$('#blc-go'),stop:$('#blc-stop'),msg:$('#blc-msg'),res:$('#blc-results'),bar:$('#blc-bar'),ptxt:$('#blc-ptxt'),ppct:$('#blc-ppct'),rows:$('#blc-rows'),q:$('#blc-q')};
+function enc(s){return encodeURIComponent(s);}
+function showMsg(t,info){el.msg.textContent=t;el.msg.className='blc-msg blc-show'+(info?' blc-info':'');}
+function hideMsg(){el.msg.className='blc-msg';}
+function normalize(u){u=(u||'').trim();if(!u)return null;if(!/^[a-z][a-z0-9+.-]*:/i.test(u))u='https://'+u;try{var x=new URL(u);if(x.protocol!=='http:'&&x.protocol!=='https:')return null;return x.href;}catch(e){return null;}}
+function cleanKey(u){try{var x=new URL(u);x.hash='';return x.href.replace(/\/$/,'');}catch(e){return u;}}
+/* ---------- tabs ---------- */
+function setMode(m){mode=m;['scan','list'].forEach(function(k){var t=$('#blc-tab-'+k),p=$('#blc-panel-'+k);t.setAttribute('aria-selected',k===m?'true':'false');p.hidden=k!==m;});$('#blc-scope').parentNode.style.display=m==='scan'?'':'none';$('#blc-img').parentNode.parentNode.style.display=m==='scan'?'':'none';}
+$('#blc-tab-scan').addEventListener('click',function(){setMode('scan');});
+$('#blc-tab-list').addEventListener('click',function(){setMode('list');});
+setMode('scan');
+/* ---------- network ---------- */
+function withTimeout(parent){var c=new AbortController();var t=setTimeout(function(){c.abort();},TIMEOUT);function onAbort(){c.abort();}if(parent)parent.addEventListener('abort',onAbort);return{signal:c.signal,done:function(){clearTimeout(t);if(parent)parent.removeEventListener('abort',onAbort);}};}
+function passthrough(prefix){return function(url,sig,wantBody){return fetch(prefix+enc(url),{signal:sig}).then(function(r){var st=r.status;if(wantBody)return r.text().then(function(b){return{status:st,body:b};});if(r.body&&r.body.cancel)try{r.body.cancel();}catch(e){}return{status:st,body:''};});};}
+var allorigins=function(url,sig){return fetch('https://api.allorigins.win/get?url='+enc(url),{signal:sig}).then(function(r){if(!r.ok)throw new Error('proxy');return r.json();}).then(function(j){var st=j&&j.status&&Number(j.status.http_code);if(!st)throw new Error('nostatus');return{status:st,body:typeof j.contents==='string'?j.contents:'',finalUrl:j.status.url};});};
+function getProxies(){var list=[],custom=$('#blc-proxy').value.trim();if(custom)list.push(passthrough(custom));list.push(allorigins);list.push(passthrough('https://corsproxy.io/?url='));return list;}
+function viaProxies(url,wantBody){var proxies=getProxies(),i=0;function next(){if(i>=proxies.length)return Promise.reject(new Error('all-failed'));var p=proxies[i++];var t=withTimeout(ctrl&&ctrl.signal);return p(url,t.signal,wantBody).then(function(r){t.done();return r;},function(e){t.done();if(ctrl&&ctrl.signal.aborted)throw e;return next();});}return next();}
+function directProbe(url){if(location.protocol==='https:'&&/^http:/i.test(url))return Promise.resolve('unknown');var t=withTimeout(ctrl&&ctrl.signal);return fetch(url,{mode:'no-cors',signal:t.signal,cache:'no-store'}).then(function(){t.done();return 'reachable';},function(e){t.done();if(ctrl&&ctrl.signal.aborted)throw e;return 'unreachable';});}
+function classify(url,r){var st=r.status,fin=r.finalUrl;
+if(st>=200&&st<300){if(fin&&cleanKey(fin)!==cleanKey(url))return{cat:'warn',label:'Redirects',code:st,note:'Redirects to '+fin};return{cat:'ok',label:'Working',code:st};}
+if(st>=300&&st<400)return{cat:'warn',label:'Redirect',code:st,note:'The link redirects elsewhere'};
+if(st===401||st===403||st===429||st===999||st===451)return{cat:'warn',label:'Blocked',code:st,note:'The site may be blocking automated checks. Open it to confirm.'};
+if(st===404||st===410)return{cat:'bad',label:'Not found',code:st,note:'This page no longer exists'};
+if(st>=500)return{cat:'bad',label:'Server error',code:st,note:'The website had a problem'};
+if(st>=400)return{cat:'bad',label:'Error',code:st,note:'The request was rejected'};
+return{cat:'warn',label:'Unknown',code:st,note:''};}
+function checkOne(item){return viaProxies(item.url,false).then(function(r){return classify(item.url,r);},function(e){if(ctrl&&ctrl.signal.aborted)throw e;return directProbe(item.url).then(function(d){if(d==='reachable')return{cat:'warn',label:'Unverified',code:'\u2013',note:'The server answered, but the exact status could not be read.'};if(d==='unknown')return{cat:'warn',label:'Unverified',code:'\u2013',note:'Could not be tested from this page (http link on an https site).'};return{cat:'bad',label:'Unreachable',code:'\u2013',note:'Could not connect. The address may be wrong or the site is down.'};});});}
+/* ---------- link extraction ---------- */
+function extract(html,pageUrl){var doc=new DOMParser().parseFromString(html,'text/html');var base=pageUrl;var b=doc.querySelector('base[href]');if(b){try{base=new URL(b.getAttribute('href'),pageUrl).href;}catch(e){}}
+var host=new URL(pageUrl).hostname.replace(/^www\./,'');var scope=$('#blc-scope').value,seen={},out=[];
+function add(raw,text,kind){if(!raw)return;raw=raw.trim();if(!raw||raw.charAt(0)==='#'||/^(mailto|tel|javascript|sms|data|blob|whatsapp|skype):/i.test(raw))return;var abs;try{abs=new URL(raw,base);}catch(e){return;}if(abs.protocol!=='http:'&&abs.protocol!=='https:')return;abs.hash='';var href=abs.href;var internal=abs.hostname.replace(/^www\./,'')===host;if(scope==='internal'&&!internal)return;if(scope==='external'&&internal)return;if(seen[href])return;seen[href]=1;out.push({url:href,text:(text||'').replace(/\s+/g,' ').trim().slice(0,90),kind:kind});}
+Array.prototype.forEach.call(doc.querySelectorAll('a[href]'),function(a){add(a.getAttribute('href'),a.textContent||a.getAttribute('title')||'','link');});
+if($('#blc-img').checked)Array.prototype.forEach.call(doc.querySelectorAll('img[src]'),function(i){add(i.getAttribute('src'),i.getAttribute('alt')||'','image');});
+return out;}
+/* ---------- run ---------- */
+function setRunning(on){running=on;el.go.disabled=on;el.go.innerHTML=on?'<span class="blc-spin"></span> Checking\u2026':'Check links';el.stop.hidden=!on;}
+function progress(done,total,label){var pct=total?Math.round(done/total*100):0;el.bar.style.width=pct+'%';el.ppct.textContent=pct+'%';el.ptxt.textContent=label||('Checked '+done+' of '+total+' links');}
+function stats(){var c={ok:0,bad:0,warn:0};results.forEach(function(r){c[r.cat]++;});$('#blc-n-total').textContent=results.length;$('#blc-n-ok').textContent=c.ok;$('#blc-n-bad').textContent=c.bad;$('#blc-n-warn').textContent=c.warn;}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'\u0027'}[c];});}
+function render(){renderQueued=false;stats();var q=query.toLowerCase(),html='',n=0;
+results.forEach(function(r,i){if(filter!=='all'&&r.cat!==filter)return;if(q&&(r.url+' '+r.text+' '+r.label).toLowerCase().indexOf(q)<0)return;n++;
+var icon=r.cat==='ok'?'\u2714':r.cat==='bad'?'\u2716':'!';
+html+='<div class="blc-row"><div class="blc-st"><span class="blc-badge blc-b-'+r.cat+'">'+icon+' '+esc(r.label)+'</span></div><div class="blc-url"><a href="'+esc(r.url)+'" target="_blank" rel="noopener noreferrer">'+esc(r.url)+'</a>'+(r.text?'<span class="blc-sub">'+(r.kind==='image'?'Image: ':'Text: ')+esc(r.text)+'</span>':'')+(r.note&&r.cat!=='ok'?'<span class="blc-sub">'+esc(r.note)+'</span>':'')+'</div><div class="blc-cd blc-code">'+esc(r.code)+'</div><div class="blc-ac"><button class="blc-copy" type="button" data-i="'+i+'">Copy</button></div></div>';});
+if(!n){html='<div class="blc-empty">'+(results.length?(filter==='bad'&&!query?(running?'No broken links so far\u2026':'No broken links found! \ud83c\udf89'):'Nothing matches this filter.'):(running?'Working\u2026':'No results yet.'))+'</div>';}
+el.rows.innerHTML=html;}
+function queueRender(){if(!renderQueued){renderQueued=true;(window.requestAnimationFrame||setTimeout)(render);}}
+function crawl(items){var idx=0,done=0,total=items.length,workers=Math.min(parseInt($('#blc-speed').value,10)||5,total);
+return new Promise(function(resolve){if(!total)return resolve();var active=0;
+function pump(){if(ctrl.signal.aborted){if(active===0)resolve();return;}
+while(active<workers&&idx<total){(function(item){active++;checkOne(item).then(function(v){results.push({url:item.url,text:item.text,kind:item.kind,cat:v.cat,label:v.label,code:v.code,note:v.note});},function(){}).then(function(){active--;done++;progress(done,total);queueRender();if(done>=total||(ctrl.signal.aborted&&active===0))resolve();else pump();});})(items[idx++]);}}
+pump();});}
+function start(){if(running)return;hideMsg();var items=[];
+ctrl=new AbortController();results=[];
+var prep;
+if(mode==='scan'){var page=normalize($('#blc-url').value);if(!page){showMsg('Please enter a valid web page address, for example https://www.example.com');return;}
+setRunning(true);el.res.className='blc-results blc-show';progress(0,0,'Opening the page and collecting links\u2026');queueRender();
+prep=viaProxies(page,true).then(function(r){if(r.status>=400)throw new Error('page:'+r.status);if(!r.body||r.body.length<20)throw new Error('empty');return extract(r.body,r.finalUrl||page);});
+}else{var lines=$('#blc-links').value.split(/\s+/),seen={};lines.forEach(function(l){var u=normalize(l);if(u&&!seen[u]){seen[u]=1;items.push({url:u,text:'',kind:'link'});}});
+if(!items.length){showMsg('Please paste at least one valid link (starting with http:// or https://).');return;}
+setRunning(true);el.res.className='blc-results blc-show';prep=Promise.resolve(items);}
+prep.then(function(list){if(!list.length){showMsg('No links were found on that page with your current settings.',true);progress(0,0,'Nothing to check');return;}
+var note='';if(list.length>MAX_LINKS){note=' Showing the first '+MAX_LINKS+' of '+list.length+' links.';list=list.slice(0,MAX_LINKS);}
+if(note)showMsg('Found more links than the limit.'+note,true);
+progress(0,list.length,'Found '+list.length+' links. Checking\u2026');return crawl(list).then(function(){if(ctrl.signal.aborted)progress(results.length,list.length,'Stopped. '+results.length+' of '+list.length+' links checked.');else progress(list.length,list.length,'Finished. '+list.length+' links checked.');});
+}).catch(function(e){if(ctrl&&ctrl.signal.aborted)return;var m=String(e&&e.message||'');
+if(m.indexOf('page:')===0)showMsg('The page replied with an error ('+m.slice(5)+'). Check the address and try again.');
+else showMsg('We could not open that page. The site may block automated access, or the free relay services are busy. Try again in a minute, use the \u201cPaste a list of links\u201d tab, or set your own proxy under Advanced.');
+progress(0,0,'Could not complete the scan');}).then(function(){setRunning(false);render();});}
+el.go.addEventListener('click',start);
+el.stop.addEventListener('click',function(){if(ctrl)ctrl.abort();});
+$('#blc-url').addEventListener('keydown',function(e){if(e.key==='Enter')start();});
+/* ---------- filters / actions ---------- */
+Array.prototype.forEach.call(root.querySelectorAll('.blc-chip'),function(b){b.addEventListener('click',function(){filter=b.getAttribute('data-f');Array.prototype.forEach.call(root.querySelectorAll('.blc-chip'),function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});render();});});
+el.q.addEventListener('input',function(){query=el.q.value;render();});
+function copyText(t,done){function fallback(){var a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(a);done();}
+if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,fallback);else fallback();}
+el.rows.addEventListener('click',function(e){var b=e.target.closest?e.target.closest('.blc-copy'):null;if(!b)return;var r=results[+b.getAttribute('data-i')];if(!r)return;copyText(r.url,function(){b.textContent='Copied!';setTimeout(function(){b.textContent='Copy';},1400);});});
+$('#blc-copybad').addEventListener('click',function(){var bad=results.filter(function(r){return r.cat==='bad';}).map(function(r){return r.url;});var b=this;if(!bad.length){showMsg('There are no broken links to copy.',true);return;}copyText(bad.join('\n'),function(){var o=b.textContent;b.textContent='Copied '+bad.length+' links!';setTimeout(function(){b.textContent=o;},1600);});});
+$('#blc-csv').addEventListener('click',function(){if(!results.length){showMsg('Run a check first, then you can download the results.',true);return;}
+function q(v){return '"'+String(v).replace(/"/g,'""')+'"';}
+var csv='\ufeffStatus,Code,URL,Link text,Note\r\n'+results.map(function(r){return[r.label,r.code,r.url,r.text,r.note||''].map(q).join(',');}).join('\r\n');
+var blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='link-check-results.csv';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);document.body.removeChild(a);},500);});
+render();
+})();
+</script>
+</div>
