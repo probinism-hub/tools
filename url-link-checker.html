@@ -1,0 +1,760 @@
+<!-- ============================================================
+  URL LINK CHECKER (Backlink / Link-usage finder)
+  Single-file tool: paste this whole block into an Elementor "HTML" widget.
+  No libraries, no API keys, no installation needed.
+============================================================ -->
+<style>
+.ulc, .ulc * { box-sizing: border-box; }
+.ulc {
+  --ulc-primary: #4f46e5;
+  --ulc-primary-d: #3d36c4;
+  --ulc-accent: #06b6d4;
+  --ulc-ink: #0f172a;
+  --ulc-muted: #475569;
+  --ulc-line: #e2e8f0;
+  --ulc-bg: #f8fafc;
+  --ulc-ok: #15803d;
+  --ulc-ok-bg: #dcfce7;
+  --ulc-bad: #b91c1c;
+  --ulc-bad-bg: #fee2e2;
+  --ulc-warn: #a16207;
+  --ulc-warn-bg: #fef3c7;
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ulc-ink);
+  background: #fff;
+  border: 1px solid var(--ulc-line);
+  border-radius: 20px;
+  box-shadow: 0 20px 50px -20px rgba(15, 23, 42, .25);
+  overflow: hidden;
+}
+.ulc h2, .ulc h3, .ulc p { margin: 0; padding: 0; }
+.ulc-hero {
+  padding: 40px 32px 56px;
+  color: #fff;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 55%, #06b6d4 120%);
+}
+.ulc-hero h2 { font-size: 34px; line-height: 1.2; font-weight: 800; color: #fff; letter-spacing: -.02em; }
+.ulc-hero p { margin-top: 10px; font-size: 17px; max-width: 720px; color: rgba(255,255,255,.92); }
+.ulc-body { padding: 0 32px 32px; margin-top: -30px; }
+.ulc-card {
+  background: #fff;
+  border: 1px solid var(--ulc-line);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 30px -15px rgba(15, 23, 42, .2);
+}
+.ulc-label { display: block; font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--ulc-ink); }
+.ulc-hint { font-size: 15px; color: var(--ulc-muted); margin-top: 6px; }
+.ulc input[type=text], .ulc textarea, .ulc select {
+  width: 100%;
+  font: inherit;
+  font-size: 16px;
+  color: var(--ulc-ink);
+  background: #fff;
+  border: 2px solid var(--ulc-line);
+  border-radius: 12px;
+  padding: 13px 16px;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  margin: 0;
+  height: auto;
+}
+.ulc textarea { min-height: 130px; resize: vertical; }
+.ulc input[type=text]:focus, .ulc textarea:focus, .ulc select:focus {
+  border-color: var(--ulc-primary);
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, .15);
+}
+.ulc ::placeholder { font-size: 16px; color: #94a3b8; opacity: 1; }
+.ulc-row { display: flex; gap: 14px; flex-wrap: wrap; }
+.ulc-row > * { flex: 1 1 220px; min-width: 0; }
+.ulc-field { margin-top: 18px; }
+.ulc-tabs {
+  display: flex; gap: 8px; margin-top: 24px; padding: 6px;
+  background: var(--ulc-bg); border: 1px solid var(--ulc-line); border-radius: 14px;
+}
+.ulc .ulc-tab {
+  flex: 1 1 0; font: inherit; font-size: 16px; font-weight: 700;
+  padding: 12px 10px; border: 0; border-radius: 10px; cursor: pointer;
+  background: transparent; color: var(--ulc-muted); text-align: center; line-height: 1.3;
+  transition: all .15s; box-shadow: none; text-transform: none; letter-spacing: 0;
+}
+.ulc .ulc-tab:hover { color: var(--ulc-primary); background: rgba(79,70,229,.07); }
+.ulc .ulc-tab.is-on { background: #fff; color: var(--ulc-primary); box-shadow: 0 2px 8px rgba(15,23,42,.12); }
+.ulc-panel { display: none; margin-top: 22px; }
+.ulc-panel.is-on { display: block; }
+.ulc .ulc-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font: inherit; font-size: 16px; font-weight: 700; line-height: 1.2;
+  padding: 14px 24px; border-radius: 12px; border: 2px solid transparent; cursor: pointer;
+  color: #fff; background: linear-gradient(135deg, var(--ulc-primary), #7c3aed);
+  box-shadow: 0 8px 20px -8px rgba(79,70,229,.7); transition: transform .12s, box-shadow .12s, opacity .12s;
+  text-decoration: none; text-transform: none; letter-spacing: 0;
+}
+.ulc .ulc-btn:hover { transform: translateY(-1px); color: #fff; box-shadow: 0 12px 24px -8px rgba(79,70,229,.8); }
+.ulc .ulc-btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+.ulc .ulc-btn.ghost { background: #fff; color: var(--ulc-primary); border-color: var(--ulc-line); box-shadow: none; }
+.ulc .ulc-btn.ghost:hover { border-color: var(--ulc-primary); color: var(--ulc-primary-d); }
+.ulc .ulc-btn.stop { background: linear-gradient(135deg, #dc2626, #b91c1c); box-shadow: 0 8px 20px -8px rgba(220,38,38,.7); }
+.ulc .ulc-btn.sm { padding: 10px 16px; }
+.ulc-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; align-items: center; }
+.ulc-check { display: flex; align-items: center; gap: 10px; font-size: 16px; cursor: pointer; margin-top: 14px; }
+.ulc-check input { width: 20px; height: 20px; accent-color: var(--ulc-primary); margin: 0; flex: none; }
+.ulc-note {
+  margin-top: 18px; padding: 14px 16px; border-radius: 12px; font-size: 15px;
+  background: #eef2ff; border: 1px solid #c7d2fe; color: #312e81;
+}
+.ulc-note.warn { background: var(--ulc-warn-bg); border-color: #fde68a; color: #713f12; }
+.ulc-note.err { background: var(--ulc-bad-bg); border-color: #fecaca; color: #7f1d1d; }
+.ulc-engines { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 16px; }
+.ulc-engine {
+  display: flex; flex-direction: column; gap: 4px; text-decoration: none; padding: 16px;
+  border: 2px solid var(--ulc-line); border-radius: 14px; background: #fff; color: var(--ulc-ink);
+  transition: all .15s; cursor: pointer;
+}
+.ulc-engine:hover { border-color: var(--ulc-primary); transform: translateY(-2px); box-shadow: 0 10px 20px -12px rgba(79,70,229,.5); color: var(--ulc-ink); }
+.ulc-engine strong { font-size: 17px; }
+.ulc-engine span { font-size: 15px; color: var(--ulc-muted); }
+.ulc-variants { margin-top: 18px; display: flex; flex-direction: column; gap: 8px; }
+.ulc-variant {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: space-between;
+  padding: 10px 14px; background: var(--ulc-bg); border: 1px solid var(--ulc-line); border-radius: 10px;
+}
+.ulc-variant code { font-size: 15px; word-break: break-all; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--ulc-ink); background: none; padding: 0; }
+.ulc-results { margin-top: 28px; display: none; }
+.ulc-results.is-on { display: block; }
+.ulc-progress { height: 12px; background: var(--ulc-line); border-radius: 999px; overflow: hidden; margin: 12px 0 6px; }
+.ulc-progress > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--ulc-primary), var(--ulc-accent)); transition: width .25s; }
+.ulc-status { font-size: 15px; color: var(--ulc-muted); }
+.ulc-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 18px; }
+.ulc-stat { padding: 16px; border-radius: 14px; background: var(--ulc-bg); border: 1px solid var(--ulc-line); }
+.ulc-stat b { display: block; font-size: 30px; line-height: 1.1; font-weight: 800; }
+.ulc-stat span { font-size: 15px; color: var(--ulc-muted); }
+.ulc-stat.ok b { color: var(--ulc-ok); }
+.ulc-stat.bad b { color: var(--ulc-bad); }
+.ulc-toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-top: 22px; }
+.ulc-filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.ulc .ulc-chip {
+  font: inherit; font-size: 15px; font-weight: 700; padding: 8px 16px; border-radius: 999px;
+  border: 2px solid var(--ulc-line); background: #fff; color: var(--ulc-muted); cursor: pointer; line-height: 1.2;
+  text-transform: none; letter-spacing: 0; box-shadow: none;
+}
+.ulc .ulc-chip:hover { border-color: var(--ulc-primary); color: var(--ulc-primary); }
+.ulc .ulc-chip.is-on { background: var(--ulc-primary); border-color: var(--ulc-primary); color: #fff; }
+.ulc-tablewrap { margin-top: 14px; border: 1px solid var(--ulc-line); border-radius: 14px; overflow: hidden; }
+.ulc table { width: 100%; border-collapse: collapse; margin: 0; border: 0; table-layout: fixed; }
+.ulc th {
+  text-align: left; font-size: 15px; font-weight: 700; padding: 13px 16px; background: var(--ulc-bg);
+  border: 0; border-bottom: 1px solid var(--ulc-line); color: var(--ulc-muted);
+}
+.ulc td { padding: 14px 16px; vertical-align: top; font-size: 16px; border: 0; border-bottom: 1px solid var(--ulc-line); word-break: break-word; overflow-wrap: anywhere; background: #fff; }
+.ulc tr:last-child td { border-bottom: 0; }
+.ulc .c-page { width: 36%; }
+.ulc .c-status { width: 16%; }
+.ulc td a { color: var(--ulc-primary); text-decoration: none; font-weight: 600; }
+.ulc td a:hover { text-decoration: underline; }
+.ulc-badge { display: inline-block; font-size: 15px; font-weight: 700; padding: 4px 12px; border-radius: 999px; line-height: 1.3; white-space: nowrap; }
+.ulc-badge.ok { background: var(--ulc-ok-bg); color: var(--ulc-ok); }
+.ulc-badge.bad { background: #f1f5f9; color: var(--ulc-muted); }
+.ulc-badge.err { background: var(--ulc-bad-bg); color: var(--ulc-bad); }
+.ulc-badge.rel { background: var(--ulc-warn-bg); color: var(--ulc-warn); margin: 2px 4px 2px 0; }
+.ulc-badge.fol { background: var(--ulc-ok-bg); color: var(--ulc-ok); margin: 2px 4px 2px 0; }
+.ulc-badge.tag { background: #e0e7ff; color: #3730a3; margin: 2px 4px 2px 0; }
+.ulc-hit { padding: 8px 0; border-bottom: 1px dashed var(--ulc-line); }
+.ulc-hit:first-child { padding-top: 0; }
+.ulc-hit:last-child { border-bottom: 0; padding-bottom: 0; }
+.ulc-hit small { display: block; font-size: 15px; color: var(--ulc-muted); margin-top: 2px; }
+.ulc-empty { padding: 36px 16px; text-align: center; color: var(--ulc-muted); font-size: 16px; }
+.ulc-foot { margin-top: 22px; font-size: 15px; color: var(--ulc-muted); }
+
+@media (max-width: 860px) {
+  .ulc-stats { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 680px) {
+  .ulc { border-radius: 14px; }
+  .ulc-hero { padding: 28px 20px 50px; }
+  .ulc-hero h2 { font-size: 27px; }
+  .ulc-hero p { font-size: 16px; }
+  .ulc-body { padding: 0 14px 20px; }
+  .ulc-card { padding: 18px 16px; }
+  .ulc-tabs { flex-direction: column; }
+  .ulc .ulc-btn { width: 100%; }
+  .ulc .ulc-btn.inline { width: auto; }
+  .ulc table, .ulc thead, .ulc tbody, .ulc tr, .ulc td { display: block; width: 100%; }
+  .ulc thead { display: none; }
+  .ulc tr { padding: 14px 4px; border-bottom: 1px solid var(--ulc-line); }
+  .ulc tr:last-child { border-bottom: 0; }
+  .ulc td, .ulc .c-page, .ulc .c-status { width: 100%; border: 0; padding: 6px 12px; }
+  .ulc td::before {
+    content: attr(data-label); display: block; font-size: 15px; font-weight: 700; color: var(--ulc-muted); margin-bottom: 2px;
+  }
+}
+</style>
+
+<div class="ulc" id="ulc-root">
+  <div class="ulc-hero">
+    <h2>URL Link Checker</h2>
+    <p>Find out where a link is used. Enter any URL, then scan your website or a list of pages to see exactly which pages link to it, with anchor text and nofollow status.</p>
+  </div>
+
+  <div class="ulc-body">
+    <div class="ulc-card">
+      <label class="ulc-label" for="ulc-target">1. The URL you want to track</label>
+      <input type="text" id="ulc-target" placeholder="https://example.com/my-page" autocomplete="off" inputmode="url" spellcheck="false">
+
+      <div class="ulc-field">
+        <label class="ulc-label" for="ulc-match">What counts as a match?</label>
+        <select id="ulc-match">
+          <option value="exact">This exact page only</option>
+          <option value="prefix">This page and everything under it</option>
+          <option value="domain">Any link to this whole website (domain)</option>
+        </select>
+      </div>
+
+      <div class="ulc-tabs" role="tablist">
+        <button type="button" class="ulc-tab is-on" data-tab="site" role="tab">&#127760; Scan a website</button>
+        <button type="button" class="ulc-tab" data-tab="list" role="tab">&#128203; Check specific pages</button>
+        <button type="button" class="ulc-tab" data-tab="web" role="tab">&#128270; Find on the web</button>
+      </div>
+
+      <!-- TAB: scan a website -->
+      <div class="ulc-panel is-on" id="ulc-p-site">
+        <div class="ulc-row">
+          <div>
+            <label class="ulc-label" for="ulc-site">2. Website to search inside</label>
+            <input type="text" id="ulc-site" placeholder="https://yourwebsite.com" autocomplete="off" inputmode="url" spellcheck="false">
+          </div>
+          <div>
+            <label class="ulc-label" for="ulc-max">Maximum pages to scan</label>
+            <select id="ulc-max">
+              <option value="25">25 pages</option>
+              <option value="50" selected>50 pages</option>
+              <option value="100">100 pages</option>
+              <option value="250">250 pages</option>
+              <option value="500">500 pages</option>
+            </select>
+          </div>
+        </div>
+        <p class="ulc-hint">The tool reads the website's sitemap (for example <b>/sitemap.xml</b> or WordPress's <b>/wp-sitemap.xml</b>) to get the page list, then opens each page and looks for your URL.</p>
+        <div class="ulc-actions">
+          <button type="button" class="ulc-btn" id="ulc-go-site">Start scan</button>
+        </div>
+      </div>
+
+      <!-- TAB: list -->
+      <div class="ulc-panel" id="ulc-p-list">
+        <label class="ulc-label" for="ulc-list">2. Pages to check (one URL per line)</label>
+        <textarea id="ulc-list" placeholder="https://blog.example.org/article-1&#10;https://another-site.com/resources&#10;https://third-site.net/partners" spellcheck="false"></textarea>
+        <p class="ulc-hint">Paste any pages, on any website, that you think might link to your URL. Up to 500 pages.</p>
+        <div class="ulc-actions">
+          <button type="button" class="ulc-btn" id="ulc-go-list">Check these pages</button>
+        </div>
+      </div>
+
+      <!-- TAB: web -->
+      <div class="ulc-panel" id="ulc-p-web">
+        <p>Open ready-made searches on major search engines to discover pages across the web that mention your URL. Then copy the pages you find into <b>Check specific pages</b> to confirm each one really links to you.</p>
+        <label class="ulc-check"><input type="checkbox" id="ulc-excl" checked> Hide results from my own website</label>
+        <div class="ulc-engines" id="ulc-engines"></div>
+        <div class="ulc-variants" id="ulc-variants"></div>
+        <div class="ulc-note warn"><b>Good to know:</b> a search engine shows only a small sample of the links pointing to a page, and these searches are not a complete backlink report. For a fuller picture of your own site, use the <b>Links</b> report in Google Search Console, or a dedicated backlink service that runs its own web crawler.</div>
+      </div>
+
+      <div class="ulc-note err" id="ulc-error" style="display:none" role="alert"></div>
+    </div>
+
+    <div class="ulc-results" id="ulc-results">
+      <div class="ulc-card">
+        <div class="ulc-status" id="ulc-statustext"></div>
+        <div class="ulc-progress"><i id="ulc-bar"></i></div>
+        <div class="ulc-actions" style="margin-top:12px">
+          <button type="button" class="ulc-btn stop sm inline" id="ulc-stop" style="display:none">Stop</button>
+        </div>
+
+        <div class="ulc-stats">
+          <div class="ulc-stat"><b id="ulc-s-pages">0</b><span>Pages scanned</span></div>
+          <div class="ulc-stat ok"><b id="ulc-s-found">0</b><span>Pages linking to it</span></div>
+          <div class="ulc-stat"><b id="ulc-s-links">0</b><span>Total links found</span></div>
+          <div class="ulc-stat bad"><b id="ulc-s-err">0</b><span>Pages not reachable</span></div>
+        </div>
+
+        <div class="ulc-toolbar">
+          <div class="ulc-filters" id="ulc-filters">
+            <button type="button" class="ulc-chip is-on" data-f="all">All</button>
+            <button type="button" class="ulc-chip" data-f="found">Link found</button>
+            <button type="button" class="ulc-chip" data-f="notfound">Not found</button>
+            <button type="button" class="ulc-chip" data-f="error">Unreachable</button>
+          </div>
+          <div class="ulc-filters">
+            <button type="button" class="ulc-btn ghost sm inline" id="ulc-copy">Copy links</button>
+            <button type="button" class="ulc-btn ghost sm inline" id="ulc-csv">Download CSV</button>
+          </div>
+        </div>
+
+        <div class="ulc-tablewrap">
+          <table>
+            <thead><tr><th class="c-page">Page</th><th class="c-status">Status</th><th>Where your URL is used</th></tr></thead>
+            <tbody id="ulc-tbody"></tbody>
+          </table>
+          <div class="ulc-empty" id="ulc-empty" style="display:none">Nothing to show for this filter.</div>
+        </div>
+
+        <p class="ulc-foot">&#8220;Unreachable&#8221; means the page could not be opened from your browser (the site may block automated access or be offline). Those pages were not checked, so they are not proof either way.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var root = document.getElementById('ulc-root');
+  if (!root) return;
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- Settings ---------- */
+  var TIMEOUT_MS = 15000;
+  var CONCURRENCY = 4;
+  var PROXIES = [
+    function (u) { return 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u); },
+    function (u) { return 'https://corsproxy.io/?url=' + encodeURIComponent(u); },
+    function (u) { return 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u); }
+  ];
+  var SKIP_EXT = /\.(jpe?g|png|gif|webp|svg|ico|pdf|zip|rar|mp3|mp4|mov|avi|css|js|json|xml|docx?|xlsx?|pptx?)(\?|$)/i;
+
+  /* ---------- State ---------- */
+  var rows = [];
+  var filter = 'all';
+  var running = false;
+  var aborted = false;
+  var controllers = [];
+  var renderTimer = null;
+
+  /* ---------- Helpers ---------- */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function toURL(s, base) {
+    s = (s || '').trim();
+    if (!s) return null;
+    try {
+      if (base) return new URL(s, base);
+      return new URL(/^https?:\/\//i.test(s) ? s : 'https://' + s);
+    } catch (e) { return null; }
+  }
+  function validHost(h) { return /\./.test(h) || h === "localhost"; }
+  function normHost(h) { return h.toLowerCase().replace(/^www\./, ''); }
+  function normPath(p) {
+    try { p = decodeURIComponent(p); } catch (e) {}
+    return p.replace(/\/+$/, '').toLowerCase();
+  }
+  function showError(msg) {
+    var el = $('ulc-error');
+    if (!msg) { el.style.display = 'none'; el.textContent = ''; return; }
+    el.textContent = msg; el.style.display = 'block';
+  }
+
+  /* ---------- Matching ---------- */
+  function makeMatcher(target, mode) {
+    var th = normHost(target.hostname);
+    var tp = normPath(target.pathname);
+    var hasQuery = !!target.search;
+    return function (u) {
+      if (!/^https?:$/.test(u.protocol)) return false;
+      var h = normHost(u.hostname);
+      if (mode === 'domain') return h === th || h.slice(-(th.length + 1)) === '.' + th;
+      if (h !== th) return false;
+      var p = normPath(u.pathname);
+      if (mode === 'prefix') return p === tp || p.indexOf(tp + '/') === 0;
+      if (p !== tp) return false;
+      return hasQuery ? u.search === target.search : true;
+    };
+  }
+
+  var SOURCES = [
+    ['a', 'href', 'Link'], ['area', 'href', 'Image map'], ['link', 'href', 'Header link'],
+    ['img', 'src', 'Image'], ['iframe', 'src', 'Embed'], ['script', 'src', 'Script'],
+    ['source', 'src', 'Media'], ['video', 'src', 'Video'], ['form', 'action', 'Form']
+  ];
+
+  function findInHtml(html, pageUrl, isMatch) {
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    var hits = [];
+    SOURCES.forEach(function (s) {
+      var els = doc.getElementsByTagName(s[0]);
+      for (var i = 0; i < els.length; i++) {
+        var raw = els[i].getAttribute(s[1]);
+        if (!raw) continue;
+        raw = raw.trim();
+        if (/^(mailto|tel|javascript|data|#)/i.test(raw)) continue;
+        var u = toURL(raw, pageUrl);
+        if (!u || !isMatch(u)) continue;
+        var rel = (els[i].getAttribute('rel') || '').toLowerCase();
+        var text = (els[i].textContent || '').replace(/\s+/g, ' ').trim();
+        if (!text) text = els[i].getAttribute('alt') || els[i].getAttribute('title') || els[i].getAttribute('aria-label') || '';
+        hits.push({
+          type: s[2], href: u.href, text: text.slice(0, 140),
+          nofollow: /nofollow/.test(rel), sponsored: /sponsored/.test(rel), ugc: /\bugc\b/.test(rel),
+          hasText: !!text
+        });
+      }
+    });
+    return hits;
+  }
+
+  /* ---------- Networking ---------- */
+  function timedFetch(url) {
+    var ctrl = new AbortController();
+    controllers.push(ctrl);
+    var t = setTimeout(function () { ctrl.abort(); }, TIMEOUT_MS);
+    return fetch(url, { signal: ctrl.signal, redirect: 'follow', credentials: 'omit' })
+      .then(function (r) {
+        if (!r.ok) { var he = new Error('HTTP ' + r.status); he.http = true; throw he; }
+        return r.text();
+      })
+      .then(function (txt) { clearTimeout(t); remove(ctrl); return txt; },
+            function (e) { clearTimeout(t); remove(ctrl); throw e; });
+  }
+  function remove(c) { var i = controllers.indexOf(c); if (i > -1) controllers.splice(i, 1); }
+
+  function fetchText(url) {
+    var attempt = timedFetch(url).then(function (t) { return { text: t, via: 'direct' }; },
+      function (e) { if (e && e.http) e.direct = true; throw e; });
+    PROXIES.forEach(function (p, i) {
+      attempt = attempt.catch(function (err) {
+        if (aborted) throw new Error('Stopped');
+        if (err && err.http && err.direct) throw err;
+        return timedFetch(p(url)).then(function (t) {
+          if (!t || t.length < 20) throw new Error('Empty response');
+          return { text: t, via: 'proxy' + (i + 1) };
+        });
+      });
+    });
+    return attempt;
+  }
+
+  /* ---------- Sitemap discovery ---------- */
+  function discoverPages(origin, cap, say) {
+    var pages = [], seen = {}, sitemapsDone = 0, queue = [];
+    function addPage(u) {
+      if (!u || seen[u] || SKIP_EXT.test(u)) return;
+      seen[u] = 1; pages.push(u);
+    }
+    function parse(xml) {
+      var doc = new DOMParser().parseFromString(xml, 'text/xml');
+      var subs = doc.getElementsByTagName('sitemap');
+      var urls = doc.getElementsByTagName('url');
+      var i, loc;
+      for (i = 0; i < subs.length; i++) {
+        loc = subs[i].getElementsByTagName('loc')[0];
+        if (loc) queue.push(loc.textContent.trim());
+      }
+      for (i = 0; i < urls.length && pages.length < cap; i++) {
+        loc = urls[i].getElementsByTagName('loc')[0];
+        if (loc) addPage(loc.textContent.trim());
+      }
+    }
+    function next() {
+      if (aborted || pages.length >= cap || !queue.length || sitemapsDone > 60) return Promise.resolve();
+      var u = queue.shift();
+      sitemapsDone++;
+      say('Reading sitemap: ' + u);
+      return fetchText(u).then(function (r) { parse(r.text); }, function () {}).then(next);
+    }
+    say('Looking for the sitemap\u2026');
+    return fetchText(origin + '/robots.txt').then(function (r) {
+      var m, re = /^\s*sitemap:\s*(\S+)/gim;
+      while ((m = re.exec(r.text))) queue.push(m[1]);
+    }, function () {}).then(function () {
+      ['/sitemap.xml', '/wp-sitemap.xml', '/sitemap_index.xml'].forEach(function (p) {
+        if (queue.indexOf(origin + p) < 0) queue.push(origin + p);
+      });
+      return next();
+    }).then(function () {
+      if (!pages.length && !aborted) {
+        throw new Error('No sitemap could be read for this website. Use the \u201cCheck specific pages\u201d tab and paste the page addresses instead.');
+      }
+      var home = origin + '/';
+      if (!seen[home] && !seen[origin]) pages.unshift(home);
+      return pages.slice(0, cap);
+    });
+  }
+
+  /* ---------- Scan runner ---------- */
+  function setRunning(on) {
+    running = on;
+    $('ulc-stop').style.display = on ? 'inline-flex' : 'none';
+    ['ulc-go-site', 'ulc-go-list'].forEach(function (id) { $(id).disabled = on; });
+  }
+  function setStatus(t) { $('ulc-statustext').textContent = t; }
+
+  function scanPages(urls, isMatch) {
+    rows = urls.map(function (u) { return { url: u, status: 'pending', hits: [], note: '' }; });
+    var done = 0, idx = 0;
+    scheduleRender(true);
+    return new Promise(function (resolve) {
+      function worker() {
+        if (aborted || idx >= rows.length) return Promise.resolve();
+        var row = rows[idx++];
+        setStatus('Scanning ' + (done + 1) + ' of ' + rows.length + ': ' + row.url);
+        return fetchText(row.url).then(function (r) {
+          row.hits = findInHtml(r.text, row.url, isMatch);
+          row.status = row.hits.length ? 'found' : 'notfound';
+        }, function (e) {
+          row.status = 'error';
+          row.note = (e && e.name === 'AbortError') ? 'Timed out' : 'Could not open the page';
+        }).then(function () {
+          done++;
+          $('ulc-bar').style.width = Math.round(done / rows.length * 100) + '%';
+          scheduleRender(false);
+          return worker();
+        });
+      }
+      var ws = [];
+      for (var i = 0; i < Math.min(CONCURRENCY, rows.length); i++) ws.push(worker());
+      Promise.all(ws).then(resolve);
+    });
+  }
+
+  function begin(label) {
+    showError('');
+    var target = toURL($('ulc-target').value);
+    if (!target || !validHost(target.hostname)) { showError('Please enter a valid URL to track in step 1, for example https://example.com/my-page'); $('ulc-target').focus(); return null; }
+    aborted = false;
+    setRunning(true);
+    rows = [];
+    filter = 'all';
+    setFilterUI();
+    $('ulc-bar').style.width = '0%';
+    $('ulc-results').className = 'ulc-results is-on';
+    setStatus(label);
+    scheduleRender(true);
+    return makeMatcher(target, $('ulc-match').value);
+  }
+
+  function finish() {
+    setRunning(false);
+    var s = aborted ? 'Stopped. ' : 'Finished. ';
+    var found = rows.filter(function (r) { return r.status === 'found'; }).length;
+    if (!aborted) $('ulc-bar').style.width = '100%';
+    setStatus(s + found + ' page' + (found === 1 ? '' : 's') + ' link' + (found === 1 ? 's' : '') + ' to your URL.');
+    scheduleRender(true);
+    try { $('ulc-results').scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
+  }
+
+  $('ulc-go-site').addEventListener('click', function () {
+    var site = toURL($('ulc-site').value);
+    var isMatch = null;
+    if (!site || !validHost(site.hostname)) { showError('Please enter the website you want to search inside, for example https://yourwebsite.com'); $('ulc-site').focus(); return; }
+    isMatch = begin('Preparing\u2026');
+    if (!isMatch) return;
+    var cap = parseInt($('ulc-max').value, 10) || 50;
+    discoverPages(site.origin, cap, setStatus).then(function (pages) {
+      if (aborted) return;
+      return scanPages(pages, isMatch);
+    }).catch(function (e) {
+      showError(e.message || 'Something went wrong.');
+      $('ulc-results').className = 'ulc-results';
+    }).then(finish);
+  });
+
+  $('ulc-go-list').addEventListener('click', function () {
+    var lines = $('ulc-list').value.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+    var urls = [], seen = {};
+    lines.forEach(function (l) {
+      var u = toURL(l);
+      if (u && !seen[u.href]) { seen[u.href] = 1; urls.push(u.href); }
+    });
+    if (!urls.length) { showError('Please paste at least one page address (one per line).'); $('ulc-list').focus(); return; }
+    urls = urls.slice(0, 500);
+    var isMatch = begin('Starting\u2026');
+    if (!isMatch) return;
+    scanPages(urls, isMatch).then(finish);
+  });
+
+  $('ulc-stop').addEventListener('click', function () {
+    aborted = true;
+    controllers.slice().forEach(function (c) { try { c.abort(); } catch (e) {} });
+  });
+
+  /* ---------- Rendering ---------- */
+  function scheduleRender(now) {
+    if (now) { clearTimeout(renderTimer); renderTimer = null; render(); return; }
+    if (renderTimer) return;
+    renderTimer = setTimeout(function () { renderTimer = null; render(); }, 200);
+  }
+
+  function render() {
+    var scanned = 0, found = 0, links = 0, err = 0;
+    rows.forEach(function (r) {
+      if (r.status !== 'pending') scanned++;
+      if (r.status === 'found') { found++; links += r.hits.length; }
+      if (r.status === 'error') err++;
+    });
+    $('ulc-s-pages').textContent = scanned;
+    $('ulc-s-found').textContent = found;
+    $('ulc-s-links').textContent = links;
+    $('ulc-s-err').textContent = err;
+
+    var html = '';
+    var shown = 0;
+    rows.forEach(function (r) {
+      if (filter !== 'all' && r.status !== filter) return;
+      if (r.status === 'pending' && filter !== 'all') return;
+      shown++;
+      var badge = r.status === 'found' ? '<span class="ulc-badge ok">\u2714 Link found</span>'
+        : r.status === 'notfound' ? '<span class="ulc-badge bad">Not found</span>'
+        : r.status === 'error' ? '<span class="ulc-badge err">Unreachable</span>'
+        : '<span class="ulc-badge bad">Waiting\u2026</span>';
+      var detail = '';
+      if (r.status === 'found') {
+        detail = r.hits.map(function (h) {
+          var tags = '<span class="ulc-badge tag">' + esc(h.type) + '</span>';
+          if (h.type === 'Link') {
+            if (h.nofollow) tags += '<span class="ulc-badge rel">nofollow</span>';
+            if (h.sponsored) tags += '<span class="ulc-badge rel">sponsored</span>';
+            if (h.ugc) tags += '<span class="ulc-badge rel">ugc</span>';
+            if (!h.nofollow && !h.sponsored && !h.ugc) tags += '<span class="ulc-badge fol">dofollow</span>';
+          }
+          return '<div class="ulc-hit">' + tags +
+            (h.text ? '<div>\u201c' + esc(h.text) + '\u201d</div>' : '<div style="color:#475569">No anchor text</div>') +
+            '<small>' + esc(h.href) + '</small></div>';
+        }).join('');
+      } else if (r.status === 'error') {
+        detail = '<span style="color:#475569">' + esc(r.note) + '</span>';
+      } else if (r.status === 'notfound') {
+        detail = '<span style="color:#475569">No link to your URL on this page.</span>';
+      }
+      html += '<tr><td class="c-page" data-label="Page"><a href="' + esc(r.url) + '" target="_blank" rel="noopener noreferrer">' + esc(r.url) + '</a></td>' +
+        '<td class="c-status" data-label="Status">' + badge + '</td>' +
+        '<td data-label="Where your URL is used">' + detail + '</td></tr>';
+    });
+    $('ulc-tbody').innerHTML = html;
+    $('ulc-empty').style.display = shown ? 'none' : 'block';
+  }
+
+  function setFilterUI() {
+    var chips = $('ulc-filters').getElementsByTagName('button');
+    for (var i = 0; i < chips.length; i++) {
+      chips[i].className = 'ulc-chip' + (chips[i].getAttribute('data-f') === filter ? ' is-on' : '');
+    }
+  }
+  $('ulc-filters').addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('button') : null;
+    if (!b) return;
+    filter = b.getAttribute('data-f');
+    setFilterUI();
+    render();
+  });
+
+  /* ---------- Export ---------- */
+  function foundRows() { return rows.filter(function (r) { return r.status === 'found'; }); }
+  function flash(btn, txt) {
+    var old = btn.textContent; btn.textContent = txt;
+    setTimeout(function () { btn.textContent = old; }, 1600);
+  }
+  $('ulc-copy').addEventListener('click', function () {
+    var btn = this;
+    var list = foundRows().map(function (r) { return r.url; }).join('\n');
+    if (!list) { flash(btn, 'No links to copy'); return; }
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = list; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); flash(btn, 'Copied \u2714'); } catch (e) { flash(btn, 'Copy failed'); }
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(list).then(function () { flash(btn, 'Copied \u2714'); }, fallback);
+    } else fallback();
+  });
+
+  function csvCell(v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; }
+  $('ulc-csv').addEventListener('click', function () {
+    var btn = this;
+    if (!rows.length) { flash(btn, 'Nothing to export'); return; }
+    var out = [['Page', 'Status', 'Type', 'Link URL', 'Anchor text', 'Nofollow', 'Sponsored', 'UGC'].map(csvCell).join(',')];
+    rows.forEach(function (r) {
+      var label = r.status === 'found' ? 'Link found' : r.status === 'notfound' ? 'Not found' : r.status === 'error' ? 'Unreachable' : 'Pending';
+      if (r.status === 'found') {
+        r.hits.forEach(function (h) {
+          out.push([r.url, label, h.type, h.href, h.text, h.nofollow ? 'yes' : 'no', h.sponsored ? 'yes' : 'no', h.ugc ? 'yes' : 'no'].map(csvCell).join(','));
+        });
+      } else out.push([r.url, label, '', '', '', '', '', ''].map(csvCell).join(','));
+    });
+    var blob = new Blob(['\ufeff' + out.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'link-check-results.csv';
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); document.body.removeChild(a); }, 500);
+    flash(btn, 'Downloaded \u2714');
+  });
+
+  /* ---------- Tabs ---------- */
+  var tabs = root.querySelectorAll('.ulc-tab');
+  Array.prototype.forEach.call(tabs, function (t) {
+    t.addEventListener('click', function () {
+      var name = t.getAttribute('data-tab');
+      Array.prototype.forEach.call(tabs, function (x) { x.className = 'ulc-tab' + (x === t ? ' is-on' : ''); });
+      ['site', 'list', 'web'].forEach(function (n) { $('ulc-p-' + n).className = 'ulc-panel' + (n === name ? ' is-on' : ''); });
+      showError('');
+      if (name === 'web') buildWeb();
+    });
+  });
+
+  /* ---------- Find on the web ---------- */
+  function buildWeb() {
+    var target = toURL($('ulc-target').value);
+    var box = $('ulc-engines'), vbox = $('ulc-variants');
+    if (!target) {
+      box.innerHTML = '';
+      vbox.innerHTML = '<div class="ulc-note">Enter the URL you want to track in step 1 above, and your search links will appear here.</div>';
+      return;
+    }
+    var host = normHost(target.hostname);
+    var noProto = host + (target.pathname === '/' ? '' : target.pathname.replace(/\/$/, '')) + target.search;
+    var exact = target.href.replace(/\/$/, '');
+    var base = '"' + (noProto) + '"';
+    var excl = $('ulc-excl').checked ? ' -site:' + host : '';
+    var variants = [
+      { label: 'Address without https://', q: base + excl },
+      { label: 'Full address', q: '"' + exact + '"' + excl }
+    ];
+    var engines = [
+      ['Google', 'Search on Google', function (q) { return 'https://www.google.com/search?q=' + encodeURIComponent(q); }],
+      ['Bing', 'Search on Bing', function (q) { return 'https://www.bing.com/search?q=' + encodeURIComponent(q); }],
+      ['DuckDuckGo', 'Search on DuckDuckGo', function (q) { return 'https://duckduckgo.com/?q=' + encodeURIComponent(q); }],
+      ['Brave', 'Search on Brave', function (q) { return 'https://search.brave.com/search?q=' + encodeURIComponent(q); }],
+      ['Yandex', 'Search on Yandex', function (q) { return 'https://yandex.com/search/?text=' + encodeURIComponent(q); }]
+    ];
+    var primary = variants[0].q;
+    box.innerHTML = engines.map(function (e) {
+      return '<a class="ulc-engine" target="_blank" rel="noopener noreferrer" href="' + esc(e[2](primary)) + '"><strong>' + e[0] + '</strong><span>' + e[1] + ' \u2197</span></a>';
+    }).join('');
+    vbox.innerHTML = '<div class="ulc-label" style="margin:0">Search phrases used</div>' + variants.map(function (v, i) {
+      return '<div class="ulc-variant"><code>' + esc(v.q) + '</code>' +
+        '<a class="ulc-btn ghost sm inline" target="_blank" rel="noopener noreferrer" href="' + esc(engines[0][2](v.q)) + '">Try on Google</a></div>';
+    }).join('');
+  }
+  $('ulc-excl').addEventListener('change', buildWeb);
+  $('ulc-target').addEventListener('input', function () {
+    if ($('ulc-p-web').className.indexOf('is-on') > -1) buildWeb();
+    // convenience: suggest the same website in the "scan a website" box
+  });
+
+  // Enter key support
+  $('ulc-target').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      var on = $('ulc-p-list').className.indexOf('is-on') > -1 ? 'ulc-go-list' : 'ulc-go-site';
+      if ($('ulc-p-web').className.indexOf('is-on') < 0) $(on).click();
+    }
+  });
+  $('ulc-site').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('ulc-go-site').click(); });
+})();
+</script>
