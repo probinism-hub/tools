@@ -224,8 +224,9 @@ $('#blc-tab-list').addEventListener('click',function(){setMode('list');});
 setMode('scan');
 /* ---------- helper-plugin API ---------- */
 function withTimeout(parent,ms){var c=new AbortController();var t=setTimeout(function(){c.abort();},ms);function onAbort(){c.abort();}if(parent)parent.addEventListener('abort',onAbort);return{signal:c.signal,done:function(){clearTimeout(t);if(parent)parent.removeEventListener('abort',onAbort);}};}
-function findApi(){if(apiBase)return Promise.resolve(apiBase);var cands=[];if(API_URL)cands.push(API_URL);cands.push(location.origin+'/wp-json/blc/v1/fetch');cands.push(location.origin+'/?rest_route=/blc/v1/fetch');var i=0;
-function next(){if(i>=cands.length)return Promise.reject(new Error('noapi'));var c=cands[i++];return fetch(c+(c.indexOf('?')>-1?'&':'?')+'mode=ping',{credentials:'same-origin'}).then(function(r){return r.json();}).then(function(j){if(j&&j.ok){apiBase=c;return c;}return next();},function(){return next();});}
+var apiTried=[];
+function findApi(){if(apiBase)return Promise.resolve(apiBase);apiTried=[];var cands=[];if(API_URL)cands.push(API_URL);cands.push(location.origin+'/wp-json/blc/v1/fetch');cands.push(location.origin+'/?rest_route=/blc/v1/fetch');var i=0;
+function next(){if(i>=cands.length)return Promise.reject(new Error('noapi'));var c=cands[i++],label=c.replace(location.origin,'');return fetch(c+(c.indexOf('?')>-1?'&':'?')+'mode=ping',{credentials:'same-origin'}).then(function(r){var st=r.status;return r.text().then(function(t){var j=null;try{j=JSON.parse(t);}catch(e){}if(j&&j.ok){apiBase=c;return c;}apiTried.push(label+' gave '+(j?(j.code||'an unexpected reply'):'HTTP '+st+(/<html|<!doctype/i.test(t)?' (a web page, not data)':'')));return next();});},function(){apiTried.push(label+' was blocked or unreachable');return next();});}
 return next();}
 function api(url,m){var t=withTimeout(ctrl.signal,CLIENT_TIMEOUT);
 return fetch(apiBase+(apiBase.indexOf('?')>-1?'&':'?')+'mode='+m+'&url='+enc(url),{signal:t.signal,credentials:'same-origin'}).then(function(r){t.done();if(r.status===429){var e=new Error('rate');e.rate=true;throw e;}if(!r.ok)throw new Error('api '+r.status);return r.json();}).then(function(j){apiFails=0;return j;},function(e){t.done();if(e&&e.rate){fatal='rate';if(ctrl)ctrl.abort();throw e;}if(!ctrl.signal.aborted){apiFails++;if(apiFails>=8){fatal='api';ctrl.abort();}}throw e;});}
@@ -315,7 +316,7 @@ if(items.length>MAX_LINKS){showMsg('Only the first '+MAX_LINKS+' links will be c
 ctrl=new AbortController();setRunning(true);el.res.className='blc-results blc-show';progress(0,'Connecting\u2026');render();
 findApi().then(function(){return mode==='scan'?runScan(startUrl):runList(items);},function(){fatal='noapi';}).then(function(){
 var n=results.length;
-if(fatal==='noapi')showMsg('The helper plugin was not found on this website. Please install and activate \u201cBroken Link Checker Helper\u201d (see the setup instructions), then reload this page.');
+if(fatal==='noapi')showMsg('The helper plugin was not found on this website. Please install and activate \u201cBroken Link Checker Helper\u201d (see the setup instructions), then reload this page. Details: '+apiTried.join('; '));
 else if(fatal==='rate')showMsg('Too many checks were made from your connection in the last hour. Please wait a while and try again.');
 else if(fatal==='api')showMsg('The website\u2019s server stopped responding to the checker. Please try again in a minute, or choose a slower speed.');
 else if(fatal&&fatal.indexOf('start:')===0)showMsg('We could not open that page ('+fatal.slice(6)+'). Check the address, and make sure the site is online.');
