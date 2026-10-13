@@ -1,0 +1,643 @@
+<!-- ============================================================
+  Link Shortener for modernconvert.com
+  Paste this ENTIRE file into an Elementor "HTML" widget.
+  Single file: HTML + CSS + JavaScript. No external libraries.
+  Short links are created by free public services (is.gd, v.gd,
+  TinyURL) called from the visitor's browser. QR codes come from
+  api.qrserver.com. History is saved only in the visitor's browser.
+============================================================ -->
+<style>
+.mc-ls, .mc-ls * { box-sizing: border-box; }
+.mc-ls {
+  --ls-primary: #5b4bff;
+  --ls-primary-dark: #4435d6;
+  --ls-primary-soft: #eeecff;
+  --ls-ink: #14142b;
+  --ls-text: #3b3b58;
+  --ls-muted: #666684;
+  --ls-line: #e3e3f0;
+  --ls-bg: #f6f6fc;
+  --ls-card: #ffffff;
+  --ls-green: #0f8a5b;
+  --ls-green-soft: #e3f7ee;
+  --ls-red: #d63a3f;
+  --ls-red-soft: #fdecec;
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ls-text);
+  -webkit-text-size-adjust: 100%;
+}
+.mc-ls h1, .mc-ls h2, .mc-ls h3, .mc-ls p, .mc-ls ul, .mc-ls li { margin: 0; padding: 0; }
+.mc-ls ul { list-style: none; }
+.mc-ls button, .mc-ls input, .mc-ls select { font-family: inherit; }
+.mc-ls [hidden] { display: none !important; }
+.mc-ls svg { display: block; flex: none; }
+
+/* ---------- Hero ---------- */
+.mc-ls .ls-hero {
+  background: linear-gradient(135deg, #5b4bff 0%, #8a4dff 55%, #c04dff 100%);
+  border-radius: 22px; padding: 40px 36px 72px; color: #fff; position: relative; overflow: hidden;
+}
+.mc-ls .ls-hero::after { content: ""; position: absolute; right: -80px; top: -80px; width: 280px; height: 280px; background: rgba(255,255,255,.12); border-radius: 50%; }
+.mc-ls .ls-hero::before { content: ""; position: absolute; left: -60px; bottom: -110px; width: 240px; height: 240px; background: rgba(255,255,255,.08); border-radius: 50%; }
+.mc-ls .ls-hero > * { position: relative; z-index: 1; }
+.mc-ls .ls-badge { display: inline-block; background: rgba(255,255,255,.2); color: #fff; font-weight: 600; font-size: 15px; padding: 5px 14px; border-radius: 999px; margin-bottom: 14px; }
+.mc-ls .ls-hero h1 { color: #fff; font-size: 38px; line-height: 1.15; font-weight: 800; letter-spacing: -.5px; margin-bottom: 10px; }
+.mc-ls .ls-hero p { color: rgba(255,255,255,.93); font-size: 17px; max-width: 660px; }
+
+/* ---------- Main card ---------- */
+.mc-ls .ls-card {
+  background: var(--ls-card); border: 1px solid var(--ls-line); border-radius: 18px; padding: 24px;
+  margin: -44px 24px 22px; position: relative; z-index: 2; box-shadow: 0 14px 38px rgba(40,30,120,.14);
+}
+.mc-ls .ls-label { display: block; font-size: 15px; font-weight: 700; color: var(--ls-ink); margin-bottom: 8px; }
+.mc-ls .ls-row { display: flex; gap: 12px; align-items: stretch; }
+.mc-ls .ls-input-wrap { position: relative; flex: 1 1 auto; min-width: 0; }
+.mc-ls .ls-input-wrap > svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; color: var(--ls-muted); pointer-events: none; }
+.mc-ls .ls-input, .mc-ls .ls-select {
+  width: 100%; height: 56px; padding: 0 16px; font-size: 17px; color: var(--ls-ink);
+  background: var(--ls-bg); border: 2px solid var(--ls-line); border-radius: 12px; outline: none;
+  transition: border-color .15s, box-shadow .15s, background .15s; margin: 0; box-shadow: none;
+}
+.mc-ls .ls-input.has-icon { padding-left: 48px; }
+.mc-ls .ls-input::placeholder { color: #84849f; opacity: 1; }
+.mc-ls .ls-input:focus, .mc-ls .ls-select:focus { border-color: var(--ls-primary); background: #fff; box-shadow: 0 0 0 4px rgba(91,75,255,.15); }
+.mc-ls .ls-input:disabled { opacity: .55; cursor: not-allowed; }
+.mc-ls .ls-select { appearance: none; -webkit-appearance: none; cursor: pointer; padding-right: 44px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23666684' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; }
+
+.mc-ls .ls-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 56px; padding: 0 28px;
+  font-size: 17px; font-weight: 700; color: #fff; background: var(--ls-primary); border: 0; border-radius: 12px;
+  cursor: pointer; white-space: nowrap; transition: background .15s, transform .1s, box-shadow .15s; box-shadow: 0 6px 16px rgba(91,75,255,.32);
+  text-decoration: none; line-height: 1;
+}
+.mc-ls .ls-btn:hover { background: var(--ls-primary-dark); color: #fff; }
+.mc-ls .ls-btn:active { transform: translateY(1px); }
+.mc-ls .ls-btn:focus-visible, .mc-ls .ls-ghost:focus-visible, .mc-ls .ls-icon-btn:focus-visible, .mc-ls .ls-link-btn:focus-visible { outline: 3px solid rgba(91,75,255,.45); outline-offset: 2px; }
+.mc-ls .ls-btn[disabled] { opacity: .7; cursor: progress; }
+.mc-ls .ls-btn svg { width: 20px; height: 20px; }
+.mc-ls .ls-spin { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: ls-rot .7s linear infinite; }
+@keyframes ls-rot { to { transform: rotate(360deg); } }
+
+.mc-ls .ls-options { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
+.mc-ls .ls-hint { font-size: 15px; color: var(--ls-muted); margin-top: 6px; }
+.mc-ls .ls-alias-wrap { display: flex; align-items: center; background: var(--ls-bg); border: 2px solid var(--ls-line); border-radius: 12px; height: 56px; transition: border-color .15s, box-shadow .15s, background .15s; }
+.mc-ls .ls-alias-wrap:focus-within { border-color: var(--ls-primary); background: #fff; box-shadow: 0 0 0 4px rgba(91,75,255,.15); }
+.mc-ls .ls-alias-wrap.is-off { opacity: .55; }
+.mc-ls .ls-alias-pre { padding: 0 0 0 16px; font-size: 17px; color: var(--ls-muted); white-space: nowrap; }
+.mc-ls .ls-alias-wrap .ls-input { border: 0; background: transparent; box-shadow: none !important; height: 52px; padding-left: 4px; }
+
+.mc-ls .ls-error { display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; padding: 12px 16px; background: var(--ls-red-soft); color: #9d2227; border-radius: 12px; font-size: 16px; font-weight: 500; }
+.mc-ls .ls-error svg { width: 22px; height: 22px; margin-top: 1px; }
+
+/* ---------- Result ---------- */
+.mc-ls .ls-result { margin: 0 24px 22px; background: var(--ls-card); border: 2px solid var(--ls-primary); border-radius: 18px; padding: 24px; display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; animation: ls-pop .35s ease; box-shadow: 0 10px 30px rgba(91,75,255,.15); }
+@keyframes ls-pop { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.mc-ls .ls-ok { display: inline-flex; align-items: center; gap: 8px; color: var(--ls-green); background: var(--ls-green-soft); font-weight: 700; font-size: 15px; padding: 5px 14px 5px 10px; border-radius: 999px; margin-bottom: 12px; }
+.mc-ls .ls-ok svg { width: 18px; height: 18px; }
+.mc-ls .ls-short { display: flex; gap: 10px; align-items: stretch; }
+.mc-ls .ls-short-url { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; background: var(--ls-primary-soft); border-radius: 12px; padding: 0 18px; min-height: 60px; font-size: 22px; font-weight: 800; color: var(--ls-primary-dark); text-decoration: none; word-break: break-all; line-height: 1.25; }
+.mc-ls .ls-short-url:hover { text-decoration: underline; color: var(--ls-primary-dark); }
+.mc-ls .ls-orig { margin-top: 10px; font-size: 15px; color: var(--ls-muted); word-break: break-all; }
+.mc-ls .ls-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.mc-ls .ls-ghost { display: inline-flex; align-items: center; gap: 8px; height: 46px; padding: 0 18px; font-size: 16px; font-weight: 600; color: var(--ls-ink); background: #fff; border: 2px solid var(--ls-line); border-radius: 12px; cursor: pointer; transition: border-color .15s, color .15s, background .15s; text-decoration: none; line-height: 1; }
+.mc-ls .ls-ghost:hover { border-color: var(--ls-primary); color: var(--ls-primary-dark); background: var(--ls-primary-soft); }
+.mc-ls .ls-ghost svg { width: 19px; height: 19px; }
+.mc-ls .ls-copy { height: 60px; padding: 0 22px; font-size: 17px; }
+.mc-ls .ls-copy.is-done { background: var(--ls-green); box-shadow: 0 6px 16px rgba(15,138,91,.3); }
+.mc-ls .ls-qr { text-align: center; }
+.mc-ls .ls-qr-box { width: 150px; height: 150px; background: #fff; border: 2px solid var(--ls-line); border-radius: 14px; padding: 8px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; }
+.mc-ls .ls-qr-box img { width: 100%; height: 100%; display: block; }
+.mc-ls .ls-qr a { font-size: 15px; font-weight: 600; color: var(--ls-primary-dark); }
+
+/* ---------- History ---------- */
+.mc-ls .ls-panel { margin: 0 24px 22px; background: var(--ls-card); border: 1px solid var(--ls-line); border-radius: 18px; padding: 24px; }
+.mc-ls .ls-panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.mc-ls .ls-panel h2 { font-size: 22px; font-weight: 800; color: var(--ls-ink); line-height: 1.25; }
+.mc-ls .ls-link-btn { background: none; border: 0; padding: 6px 4px; font-size: 15px; font-weight: 600; color: var(--ls-red); cursor: pointer; border-radius: 6px; }
+.mc-ls .ls-link-btn:hover { text-decoration: underline; }
+.mc-ls .ls-hist-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid var(--ls-line); }
+.mc-ls .ls-hist-item:first-child { border-top: 0; }
+.mc-ls .ls-hist-main { flex: 1 1 auto; min-width: 0; }
+.mc-ls .ls-hist-short { font-size: 17px; font-weight: 700; color: var(--ls-primary-dark); text-decoration: none; word-break: break-all; }
+.mc-ls .ls-hist-short:hover { text-decoration: underline; }
+.mc-ls .ls-hist-long { font-size: 15px; color: var(--ls-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mc-ls .ls-hist-btns { display: flex; gap: 8px; flex: none; }
+.mc-ls .ls-icon-btn { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; background: #fff; border: 2px solid var(--ls-line); border-radius: 10px; color: var(--ls-text); cursor: pointer; transition: border-color .15s, color .15s, background .15s; padding: 0; }
+.mc-ls .ls-icon-btn:hover { border-color: var(--ls-primary); color: var(--ls-primary-dark); background: var(--ls-primary-soft); }
+.mc-ls .ls-icon-btn.is-del:hover { border-color: var(--ls-red); color: var(--ls-red); background: var(--ls-red-soft); }
+.mc-ls .ls-icon-btn svg { width: 20px; height: 20px; }
+.mc-ls .ls-empty { text-align: center; padding: 28px 12px; color: var(--ls-muted); font-size: 16px; }
+
+/* ---------- Features ---------- */
+.mc-ls .ls-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 0 24px 22px; }
+.mc-ls .ls-feat { background: var(--ls-card); border: 1px solid var(--ls-line); border-radius: 16px; padding: 22px; }
+.mc-ls .ls-feat-ic { width: 46px; height: 46px; border-radius: 12px; background: var(--ls-primary-soft); color: var(--ls-primary); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+.mc-ls .ls-feat-ic svg { width: 24px; height: 24px; }
+.mc-ls .ls-feat h3 { font-size: 18px; font-weight: 700; color: var(--ls-ink); margin-bottom: 4px; }
+.mc-ls .ls-feat p { font-size: 16px; color: var(--ls-text); }
+
+/* ---------- FAQ ---------- */
+.mc-ls .ls-faq details { border-top: 1px solid var(--ls-line); padding: 14px 0; }
+.mc-ls .ls-faq details:first-of-type { border-top: 0; }
+.mc-ls .ls-faq summary { cursor: pointer; font-size: 17px; font-weight: 700; color: var(--ls-ink); list-style: none; display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.mc-ls .ls-faq summary::-webkit-details-marker { display: none; }
+.mc-ls .ls-faq summary::after { content: "+"; font-size: 24px; font-weight: 600; color: var(--ls-primary); line-height: 1; }
+.mc-ls .ls-faq details[open] summary::after { content: "\2212"; }
+.mc-ls .ls-faq details p { margin-top: 8px; font-size: 16px; color: var(--ls-text); }
+
+/* ---------- Toast ---------- */
+.mc-ls .ls-toast { position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px); background: var(--ls-ink); color: #fff; padding: 12px 22px; border-radius: 999px; font-size: 16px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 99999; max-width: calc(100vw - 32px); text-align: center; }
+.mc-ls .ls-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .mc-ls .ls-features { grid-template-columns: 1fr; }
+  .mc-ls .ls-result { grid-template-columns: 1fr; }
+  .mc-ls .ls-qr { display: flex; align-items: center; gap: 16px; text-align: left; }
+  .mc-ls .ls-qr-box { margin: 0; flex: none; }
+}
+@media (max-width: 767px) {
+  .mc-ls .ls-hero { padding: 30px 20px 64px; border-radius: 18px; }
+  .mc-ls .ls-hero h1 { font-size: 30px; }
+  .mc-ls .ls-card, .mc-ls .ls-result, .mc-ls .ls-panel, .mc-ls .ls-features { margin-left: 10px; margin-right: 10px; }
+  .mc-ls .ls-card, .mc-ls .ls-result, .mc-ls .ls-panel { padding: 18px; }
+  .mc-ls .ls-row { flex-direction: column; }
+  .mc-ls .ls-btn { width: 100%; }
+  .mc-ls .ls-options { grid-template-columns: 1fr; }
+  .mc-ls .ls-short { flex-direction: column; }
+  .mc-ls .ls-short-url { font-size: 19px; min-height: 56px; padding: 10px 14px; }
+  .mc-ls .ls-copy { width: 100%; justify-content: center; height: 56px; }
+  .mc-ls .ls-actions .ls-ghost { flex: 1 1 calc(50% - 5px); justify-content: center; }
+  .mc-ls .ls-hist-item { flex-wrap: wrap; }
+  .mc-ls .ls-hist-main { flex-basis: 100%; }
+  .mc-ls .ls-hist-btns { width: 100%; }
+  .mc-ls .ls-hist-btns .ls-icon-btn { flex: 1; width: auto; }
+  .mc-ls .ls-qr { flex-direction: column; text-align: center; }
+  .mc-ls .ls-qr-box { margin: 0 auto 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mc-ls * { animation: none !important; transition: none !important; }
+}
+</style>
+
+<div class="mc-ls" id="mcLs">
+
+  <!-- Hero -->
+  <div class="ls-hero">
+    <span class="ls-badge">Free &bull; No sign-up</span>
+    <h1>Link Shortener</h1>
+    <p>Turn long, messy URLs into short, clean links you can share anywhere. Add a custom name, copy in one click, and get a QR code instantly.</p>
+  </div>
+
+  <!-- Form -->
+  <form class="ls-card" id="lsForm" novalidate>
+    <label class="ls-label" for="lsUrl">Paste your long link</label>
+    <div class="ls-row">
+      <div class="ls-input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        <input class="ls-input has-icon" id="lsUrl" type="text" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://example.com/your-very-long-link">
+      </div>
+      <button class="ls-btn" id="lsGo" type="submit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span id="lsGoText">Shorten</span>
+      </button>
+    </div>
+
+    <div class="ls-options">
+      <div>
+        <label class="ls-label" for="lsProvider">Short link service</label>
+        <select class="ls-select" id="lsProvider">
+          <option value="isgd">is.gd (shortest links)</option>
+          <option value="vgd">v.gd (safety preview)</option>
+          <option value="tinyurl">TinyURL (well known)</option>
+        </select>
+        <p class="ls-hint">If one service is busy, we automatically try the others.</p>
+      </div>
+      <div>
+        <label class="ls-label" for="lsAlias">Custom name <span style="font-weight:500;color:var(--ls-muted)">(optional)</span></label>
+        <div class="ls-alias-wrap" id="lsAliasWrap">
+          <span class="ls-alias-pre" id="lsAliasPre">is.gd/</span>
+          <input class="ls-input" id="lsAlias" type="text" maxlength="30" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="my-brand-link">
+        </div>
+        <p class="ls-hint" id="lsAliasHint">Letters, numbers and underscores only (5&ndash;30 characters).</p>
+      </div>
+    </div>
+
+    <div class="ls-error" id="lsError" role="alert" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <span id="lsErrorText"></span>
+    </div>
+  </form>
+
+  <!-- Result -->
+  <div class="ls-result" id="lsResult" hidden>
+    <div>
+      <span class="ls-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>Your short link is ready</span>
+      <div class="ls-short">
+        <a class="ls-short-url" id="lsShortUrl" href="#" target="_blank" rel="noopener noreferrer"></a>
+        <button class="ls-btn ls-copy" id="lsCopy" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span>Copy</span>
+        </button>
+      </div>
+      <p class="ls-orig" id="lsOrig"></p>
+      <div class="ls-actions">
+        <a class="ls-ghost" id="lsOpen" href="#" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="m15 3 6 0 0 6M10 14 21 3"/></svg>Open link</a>
+        <button class="ls-ghost" id="lsShare" type="button" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>Share</button>
+        <button class="ls-ghost" id="lsAnother" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Shorten another</button>
+      </div>
+    </div>
+    <div class="ls-qr" id="lsQrWrap">
+      <div class="ls-qr-box"><img id="lsQr" alt="QR code for your short link" width="134" height="134"></div>
+      <div><a id="lsQrDl" href="#" target="_blank" rel="noopener noreferrer" download="qr-code.png">Download QR code</a></div>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="ls-panel">
+    <div class="ls-panel-head">
+      <h2>Your recent links</h2>
+      <button class="ls-link-btn" id="lsClear" type="button" hidden>Clear all</button>
+    </div>
+    <ul id="lsHist"></ul>
+    <p class="ls-empty" id="lsEmpty">No links yet. Your shortened links will appear here (saved only on this device).</p>
+  </div>
+
+  <!-- Features -->
+  <div class="ls-features">
+    <div class="ls-feat">
+      <div class="ls-feat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+      <h3>Fast &amp; simple</h3>
+      <p>Paste, click, done. No account or email needed to create a link.</p>
+    </div>
+    <div class="ls-feat">
+      <div class="ls-feat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/></svg></div>
+      <h3>Custom names</h3>
+      <p>Pick your own ending, like is.gd/my-sale, so your link is easy to remember.</p>
+    </div>
+    <div class="ls-feat">
+      <div class="ls-feat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v.01M14 20v.01M20 20h.01M17 20v.01"/></svg></div>
+      <h3>QR codes</h3>
+      <p>Every short link comes with a QR code you can download and print.</p>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="ls-panel ls-faq">
+    <h2 style="margin-bottom:8px">Frequently asked questions</h2>
+    <details>
+      <summary>Do my short links expire?</summary>
+      <p>Links are created by third-party services (is.gd, v.gd, TinyURL). Their policies decide how long a link lasts, so keep your original URL somewhere safe for important links.</p>
+    </details>
+    <details>
+      <summary>Can I see how many people clicked my link?</summary>
+      <p>This tool does not track clicks. Some services offer basic statistics on their own websites, but this tool does not connect to them.</p>
+    </details>
+    <details>
+      <summary>Where is my link history stored?</summary>
+      <p>Only in your own browser on this device. We do not keep a copy. Clearing your browser data will remove it.</p>
+    </details>
+    <details>
+      <summary>Why did my custom name not work?</summary>
+      <p>Custom names must be unique. If someone already uses that name, try a different one. TinyURL does not support custom names here, so choose is.gd or v.gd.</p>
+    </details>
+  </div>
+
+  <div class="ls-toast" id="lsToast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+(function () {
+  var root = document.getElementById('mcLs');
+  if (!root) return;
+  function $(id) { return document.getElementById(id); }
+
+  var form = $('lsForm'), urlIn = $('lsUrl'), goBtn = $('lsGo'), goText = $('lsGoText');
+  var providerSel = $('lsProvider'), aliasIn = $('lsAlias'), aliasWrap = $('lsAliasWrap');
+  var aliasPre = $('lsAliasPre'), aliasHint = $('lsAliasHint');
+  var errBox = $('lsError'), errText = $('lsErrorText');
+  var resBox = $('lsResult'), shortA = $('lsShortUrl'), origP = $('lsOrig'), openA = $('lsOpen');
+  var copyBtn = $('lsCopy'), shareBtn = $('lsShare'), againBtn = $('lsAnother');
+  var qrImg = $('lsQr'), qrWrap = $('lsQrWrap'), qrDl = $('lsQrDl');
+  var histUl = $('lsHist'), histEmpty = $('lsEmpty'), clearBtn = $('lsClear'), toastEl = $('lsToast');
+
+  var STORE_KEY = 'mc_link_shortener_history_v1';
+  var MAX_HISTORY = 20;
+  var providers = {
+    isgd:    { name: 'is.gd',   host: 'is.gd',   alias: true,  api: 'https://is.gd/create.php' },
+    vgd:     { name: 'v.gd',    host: 'v.gd',    alias: true,  api: 'https://v.gd/create.php' },
+    tinyurl: { name: 'TinyURL', host: 'tinyurl.com', alias: false, api: 'https://tinyurl.com/api-create.php' }
+  };
+  var history = [];
+  var current = null;
+  var toastTimer = null;
+
+  /* ---------- storage (safe) ---------- */
+  function loadHistory() {
+    try {
+      var raw = window.localStorage.getItem(STORE_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      history = Array.isArray(arr) ? arr.filter(function (x) { return x && typeof x.short === 'string' && typeof x.long === 'string'; }) : [];
+    } catch (e) { history = []; }
+  }
+  function saveHistory() {
+    try { window.localStorage.setItem(STORE_KEY, JSON.stringify(history)); } catch (e) {}
+  }
+
+  /* ---------- helpers ---------- */
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 2200);
+  }
+  function showError(msg) { errText.textContent = msg; errBox.hidden = false; }
+  function hideError() { errBox.hidden = true; }
+
+  function normalizeUrl(input) {
+    var v = (input || '').trim();
+    if (!v) return { error: 'Please paste a link to shorten.' };
+    if (/\s/.test(v)) return { error: 'The link should not contain spaces.' };
+    if (!/^[a-z][a-z0-9+.\-]*:\/\//i.test(v)) {
+      if (/^(javascript|data|file|mailto|tel):/i.test(v)) return { error: 'Only web links starting with http:// or https:// can be shortened.' };
+      v = 'https://' + v;
+    }
+    var u;
+    try { u = new URL(v); } catch (e) { return { error: 'That does not look like a valid link. Example: https://example.com/page' }; }
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') return { error: 'Only web links starting with http:// or https:// can be shortened.' };
+    if (u.hostname.indexOf('.') === -1 || /\.$/.test(u.hostname)) return { error: 'Please enter a full web address, for example example.com.' };
+    for (var k in providers) {
+      var h = providers[k].host;
+      if (u.hostname === h || u.hostname === 'www.' + h) return { error: 'That link is already shortened. Please paste the original long link.' };
+    }
+    return { url: u.href };
+  }
+
+  function validAlias(a) {
+    if (!a) return null;
+    if (!/^[A-Za-z0-9_]+$/.test(a)) return 'Custom name can only use letters, numbers and underscores.';
+    if (a.length < 5) return 'Custom name must be at least 5 characters.';
+    return null;
+  }
+
+  /* ---------- network ---------- */
+  function withTimeout(promise, ms) {
+    return new Promise(function (resolve, reject) {
+      var t = setTimeout(function () { reject(new Error('timeout')); }, ms);
+      promise.then(function (v) { clearTimeout(t); resolve(v); }, function (e) { clearTimeout(t); reject(e); });
+    });
+  }
+
+  // is.gd / v.gd: try normal request first, then JSONP (works even without CORS).
+  function viaJsonp(base, params) {
+    return new Promise(function (resolve, reject) {
+      var cb = 'mcLsCb' + Date.now() + Math.floor(Math.random() * 1000);
+      var s = document.createElement('script');
+      var done = false;
+      function cleanup() { done = true; try { delete window[cb]; } catch (e) { window[cb] = undefined; } if (s.parentNode) s.parentNode.removeChild(s); }
+      window[cb] = function (data) { if (!done) { cleanup(); resolve(data); } };
+      s.onerror = function () { if (!done) { cleanup(); reject(new Error('network')); } };
+      s.src = base + '?' + params + '&callback=' + cb;
+      document.head.appendChild(s);
+    });
+  }
+  function viaFetch(base, params) {
+    return fetch(base + '?' + params, { method: 'GET' }).then(function (r) { return r.text(); }).then(function (t) {
+      try { return JSON.parse(t); } catch (e) { throw new Error('badresponse'); }
+    });
+  }
+
+  function shortenGd(p, longUrl, alias) {
+    var params = 'format=json&url=' + encodeURIComponent(longUrl);
+    if (alias) params += '&shorturl=' + encodeURIComponent(alias);
+    return withTimeout(viaFetch(p.api, params).catch(function () { return viaJsonp(p.api, params); }), 12000).then(function (d) {
+      if (d && d.shorturl) return d.shorturl;
+      var e = new Error((d && d.errormessage) || 'Service error');
+      e.userFacing = true;
+      e.code = d && d.errorcode;
+      throw e;
+    });
+  }
+  function shortenTiny(p, longUrl) {
+    var q = '?url=' + encodeURIComponent(longUrl);
+    return withTimeout(fetch(p.api + q).then(function (r) {
+      return r.text().then(function (t) {
+        t = (t || '').trim();
+        if (/^https?:\/\/tinyurl\.com\/\S+$/i.test(t)) return t;
+        throw new Error('badresponse');
+      });
+    }), 12000);
+  }
+
+  function shortenWith(key, longUrl, alias) {
+    var p = providers[key];
+    if (key === 'tinyurl') return shortenTiny(p, longUrl);
+    return shortenGd(p, longUrl, alias);
+  }
+
+  // Try the chosen service first, then the others (only when no custom name was asked for).
+  function shortenAny(chosen, longUrl, alias) {
+    var order = [chosen];
+    Object.keys(providers).forEach(function (k) { if (k !== chosen) order.push(k); });
+    var lastErr = null;
+    function attempt(i) {
+      if (i >= order.length) return Promise.reject(lastErr || new Error('failed'));
+      var key = order[i];
+      var useAlias = (key === chosen && providers[key].alias) ? alias : '';
+      if (i > 0 && alias) return Promise.reject(lastErr); // never silently drop a custom name
+      return shortenWith(key, longUrl, useAlias).then(function (short) {
+        return { short: short, provider: key };
+      }, function (err) {
+        lastErr = err;
+        if (err && err.userFacing && alias && key === chosen) throw err; // e.g. name taken
+        return attempt(i + 1);
+      });
+    }
+    return attempt(0);
+  }
+
+  /* ---------- render ---------- */
+  function showResult(item) {
+    current = item;
+    shortA.textContent = item.short.replace(/^https?:\/\//, '');
+    shortA.href = item.short;
+    openA.href = item.short;
+    origP.textContent = 'Original: ' + item.long;
+    var qr = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data=' + encodeURIComponent(item.short);
+    qrWrap.hidden = false;
+    qrImg.onerror = function () { qrWrap.hidden = true; };
+    qrImg.src = qr;
+    qrDl.href = qr;
+    copyBtn.classList.remove('is-done');
+    copyBtn.querySelector('span').textContent = 'Copy';
+    resBox.hidden = false;
+    resBox.style.animation = 'none'; void resBox.offsetWidth; resBox.style.animation = '';
+  }
+
+  function iconCopy() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>'; }
+  function iconTrash() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg>'; }
+
+  function renderHistory() {
+    histUl.innerHTML = '';
+    histEmpty.hidden = history.length > 0;
+    clearBtn.hidden = history.length === 0;
+    history.forEach(function (item, idx) {
+      var li = document.createElement('li');
+      li.className = 'ls-hist-item';
+
+      var main = document.createElement('div');
+      main.className = 'ls-hist-main';
+      var a = document.createElement('a');
+      a.className = 'ls-hist-short';
+      a.href = item.short; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      a.textContent = item.short.replace(/^https?:\/\//, '');
+      var long = document.createElement('div');
+      long.className = 'ls-hist-long';
+      long.textContent = item.long; long.title = item.long;
+      main.appendChild(a); main.appendChild(long);
+
+      var btns = document.createElement('div');
+      btns.className = 'ls-hist-btns';
+      var c = document.createElement('button');
+      c.type = 'button'; c.className = 'ls-icon-btn'; c.setAttribute('aria-label', 'Copy ' + a.textContent); c.title = 'Copy';
+      c.innerHTML = iconCopy();
+      c.addEventListener('click', function () { copyText(item.short); });
+      var d = document.createElement('button');
+      d.type = 'button'; d.className = 'ls-icon-btn is-del'; d.setAttribute('aria-label', 'Delete ' + a.textContent); d.title = 'Delete';
+      d.innerHTML = iconTrash();
+      d.addEventListener('click', function () { history.splice(idx, 1); saveHistory(); renderHistory(); });
+      btns.appendChild(c); btns.appendChild(d);
+
+      li.appendChild(main); li.appendChild(btns);
+      histUl.appendChild(li);
+    });
+  }
+
+  function addHistory(item) {
+    history = history.filter(function (h) { return h.short !== item.short; });
+    history.unshift({ short: item.short, long: item.long, provider: item.provider, t: Date.now() });
+    if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
+    saveHistory();
+    renderHistory();
+  }
+
+  /* ---------- clipboard ---------- */
+  function copyText(text) {
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;font-size:16px;';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+      showToast(ok ? 'Copied to clipboard' : 'Press Ctrl+C to copy');
+      return ok;
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function () { showToast('Copied to clipboard'); }, fallback);
+    } else { fallback(); }
+  }
+
+  /* ---------- provider UI ---------- */
+  function syncProviderUi() {
+    var p = providers[providerSel.value];
+    aliasPre.textContent = p.host + '/';
+    if (p.alias) {
+      aliasIn.disabled = false; aliasWrap.classList.remove('is-off');
+      aliasHint.textContent = 'Letters, numbers and underscores only (5–30 characters).';
+    } else {
+      aliasIn.disabled = true; aliasIn.value = ''; aliasWrap.classList.add('is-off');
+      aliasHint.textContent = 'Custom names are not available with TinyURL. Choose is.gd or v.gd.';
+    }
+  }
+
+  /* ---------- events ---------- */
+  providerSel.addEventListener('change', syncProviderUi);
+  aliasIn.addEventListener('input', function () { aliasIn.value = aliasIn.value.replace(/[^A-Za-z0-9_]/g, ''); });
+  urlIn.addEventListener('input', hideError);
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    hideError();
+    if (goBtn.disabled) return;
+    var n = normalizeUrl(urlIn.value);
+    if (n.error) { showError(n.error); urlIn.focus(); return; }
+    var alias = providers[providerSel.value].alias ? aliasIn.value.trim() : '';
+    var aErr = validAlias(alias);
+    if (aErr) { showError(aErr); aliasIn.focus(); return; }
+
+    goBtn.disabled = true;
+    var oldHtml = goBtn.innerHTML;
+    goBtn.innerHTML = '<span class="ls-spin"></span><span>Shortening…</span>';
+
+    shortenAny(providerSel.value, n.url, alias).then(function (r) {
+      var item = { short: r.short, long: n.url, provider: r.provider };
+      urlIn.value = n.url;
+      showResult(item);
+      addHistory(item);
+      if (r.provider !== providerSel.value) showToast('Created with ' + providers[r.provider].name);
+      try { resBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
+    }).catch(function (err) {
+      var msg;
+      if (err && err.userFacing) {
+        msg = err.message;
+        if (alias && /taken|already|exist|use/i.test(msg)) msg = 'That custom name is already taken. Please try a different one.';
+      } else if (alias) {
+        msg = 'Could not create the link with your custom name. Please check your connection and try again.';
+      } else {
+        msg = 'Sorry, we could not create the short link right now. Please check your internet connection and try again in a moment.';
+      }
+      showError(msg);
+    }).then(function () {
+      goBtn.disabled = false;
+      goBtn.innerHTML = oldHtml;
+    });
+  });
+
+  copyBtn.addEventListener('click', function () {
+    if (!current) return;
+    copyText(current.short);
+    copyBtn.classList.add('is-done');
+    copyBtn.querySelector('span').textContent = 'Copied!';
+    setTimeout(function () { copyBtn.classList.remove('is-done'); copyBtn.querySelector('span').textContent = 'Copy'; }, 2000);
+  });
+
+  if (navigator.share) {
+    shareBtn.hidden = false;
+    shareBtn.addEventListener('click', function () {
+      if (!current) return;
+      navigator.share({ title: 'Short link', url: current.short }).catch(function () {});
+    });
+  }
+
+  againBtn.addEventListener('click', function () {
+    resBox.hidden = true; current = null; urlIn.value = ''; aliasIn.value = '';
+    hideError();
+    try { form.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+    urlIn.focus();
+  });
+
+  clearBtn.addEventListener('click', function () {
+    if (window.confirm('Remove all links from your history on this device? The short links themselves will keep working.')) {
+      history = []; saveHistory(); renderHistory();
+    }
+  });
+
+  loadHistory();
+  renderHistory();
+  syncProviderUi();
+})();
+</script>
