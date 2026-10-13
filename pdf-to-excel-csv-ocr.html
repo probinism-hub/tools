@@ -1,0 +1,1075 @@
+<!-- ============================================================
+  PDF to Excel / CSV Converter (with OCR for scanned tables)
+  Paste this ENTIRE file into an Elementor "HTML" widget.
+  Single file: HTML + CSS + JavaScript.
+  Libraries (loaded automatically from public CDNs when needed):
+  pdf.js (read PDFs), Tesseract.js (OCR), SheetJS (Excel export).
+  Privacy: the PDF is processed inside the visitor's browser and is never uploaded.
+============================================================ -->
+<div id="p2x-app">
+<style>
+#p2x-app, #p2x-app * { box-sizing: border-box; }
+#p2x-app {
+  --p-primary: #4f46e5;
+  --p-primary-dark: #3730a3;
+  --p-primary-soft: #eef0ff;
+  --p-accent: #0ea5e9;
+  --p-ink: #111827;
+  --p-text: #374151;
+  --p-muted: #5b6475;
+  --p-line: #e2e5ee;
+  --p-bg: #f5f6fb;
+  --p-card: #ffffff;
+  --p-green: #15803d;
+  --p-green-soft: #e8f7ee;
+  --p-red: #b91c1c;
+  --p-red-soft: #fdecec;
+  --p-amber-soft: #fff7e0;
+  width: 100%; max-width: 1140px; margin: 0 auto; padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px; line-height: 1.55; color: var(--p-text); text-align: left;
+  -webkit-text-size-adjust: 100%;
+}
+#p2x-app h2, #p2x-app h3, #p2x-app h4, #p2x-app p, #p2x-app ul, #p2x-app ol, #p2x-app li { margin: 0; padding: 0; }
+#p2x-app ul, #p2x-app ol { list-style: none; }
+#p2x-app [hidden] { display: none !important; }
+#p2x-app button, #p2x-app input, #p2x-app select { font-family: inherit; font-size: 16px; line-height: 1.4; }
+#p2x-app svg { display: block; flex-shrink: 0; }
+
+/* ---------- Hero ---------- */
+#p2x-app .p-hero {
+  position: relative; overflow: hidden; color: #fff; border-radius: 22px; padding: 40px 36px 72px;
+  background: linear-gradient(135deg, #312e81 0%, #4f46e5 55%, #0ea5e9 100%);
+}
+#p2x-app .p-hero::after { content: ""; position: absolute; right: -90px; top: -90px; width: 300px; height: 300px; border-radius: 50%; background: rgba(255,255,255,.12); }
+#p2x-app .p-hero::before { content: ""; position: absolute; left: -70px; bottom: -110px; width: 260px; height: 260px; border-radius: 50%; background: rgba(255,255,255,.08); }
+#p2x-app .p-hero > * { position: relative; z-index: 1; }
+#p2x-app .p-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; background: rgba(255,255,255,.18); font-size: 15px; font-weight: 600; }
+#p2x-app .p-hero h2 { margin: 14px 0 10px; color: #fff; font-size: clamp(27px, 4.2vw, 42px); line-height: 1.15; font-weight: 800; letter-spacing: -.5px; }
+#p2x-app .p-hero p { max-width: 700px; color: rgba(255,255,255,.92); font-size: 17px; }
+#p2x-app .p-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+#p2x-app .p-chips li { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px; background: rgba(255,255,255,.16); font-size: 15px; font-weight: 600; color: #fff; }
+
+/* ---------- Layout ---------- */
+#p2x-app .p-main { margin-top: -44px; position: relative; z-index: 2; padding: 0 18px; }
+#p2x-app .p-steps { display: flex; gap: 10px; margin-bottom: 18px; }
+#p2x-app .p-step { flex: 1; display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 14px; background: var(--p-card); border: 1px solid var(--p-line); color: var(--p-muted); font-weight: 600; font-size: 15px; box-shadow: 0 4px 14px rgba(30,30,80,.06); }
+#p2x-app .p-step b { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #eceef5; color: var(--p-muted); font-size: 15px; flex-shrink: 0; }
+#p2x-app .p-step.is-active { color: var(--p-primary-dark); border-color: #c7caff; }
+#p2x-app .p-step.is-active b { background: var(--p-primary); color: #fff; }
+#p2x-app .p-step.is-done b { background: var(--p-green); color: #fff; }
+#p2x-app .p-card { background: var(--p-card); border: 1px solid var(--p-line); border-radius: 20px; padding: 28px; margin-bottom: 18px; box-shadow: 0 8px 28px rgba(30,30,80,.07); }
+#p2x-app .p-card h3 { color: var(--p-ink); font-size: 21px; line-height: 1.3; font-weight: 800; margin-bottom: 4px; }
+#p2x-app .p-sub { color: var(--p-muted); font-size: 15px; margin-bottom: 18px; }
+
+/* ---------- Drop zone ---------- */
+#p2x-app .p-drop { position: relative; display: block; text-align: center; padding: 44px 20px; border: 2px dashed #b9bdf5; border-radius: 18px; background: var(--p-primary-soft); cursor: pointer; transition: .2s; }
+#p2x-app .p-drop:hover, #p2x-app .p-drop.is-over, #p2x-app .p-drop:focus-within { border-color: var(--p-primary); background: #e4e7ff; box-shadow: 0 0 0 4px rgba(79,70,229,.15); }
+#p2x-app .p-drop input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+#p2x-app .p-drop-ico { display: grid; place-items: center; width: 68px; height: 68px; margin: 0 auto 14px; border-radius: 20px; background: linear-gradient(135deg, #4f46e5, #0ea5e9); color: #fff; box-shadow: 0 10px 22px rgba(79,70,229,.3); }
+#p2x-app .p-drop strong { display: block; color: var(--p-ink); font-size: 20px; margin-bottom: 4px; }
+#p2x-app .p-drop span { color: var(--p-muted); font-size: 15px; }
+#p2x-app .p-drop .p-fake-btn { display: inline-block; margin-top: 16px; padding: 12px 26px; border-radius: 12px; background: var(--p-primary); color: #fff; font-weight: 700; font-size: 16px; }
+
+#p2x-app .p-file { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 14px; background: var(--p-primary-soft); border: 1px solid #d3d6ff; margin-bottom: 22px; }
+#p2x-app .p-file-ico { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 12px; background: #fff; color: #dc2626; flex-shrink: 0; }
+#p2x-app .p-file-info { flex: 1; min-width: 0; }
+#p2x-app .p-file-info b { display: block; color: var(--p-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#p2x-app .p-file-info span { color: var(--p-muted); font-size: 15px; }
+
+/* ---------- Buttons ---------- */
+#p2x-app .p-btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 48px; padding: 12px 24px; border: 2px solid transparent; border-radius: 12px; background: var(--p-primary); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; text-decoration: none; transition: .15s; box-shadow: none; }
+#p2x-app .p-btn:hover { background: var(--p-primary-dark); color: #fff; }
+#p2x-app .p-btn:focus-visible, #p2x-app .p-tab:focus-visible, #p2x-app .p-mode input:focus-visible + .p-mode-box { outline: 3px solid #a5b4fc; outline-offset: 2px; }
+#p2x-app .p-btn:disabled { opacity: .55; cursor: not-allowed; }
+#p2x-app .p-btn.is-ghost { background: #fff; color: var(--p-primary-dark); border-color: #c7caff; }
+#p2x-app .p-btn.is-ghost:hover { background: var(--p-primary-soft); }
+#p2x-app .p-btn.is-green { background: var(--p-green); }
+#p2x-app .p-btn.is-green:hover { background: #166534; }
+#p2x-app .p-btn.is-danger { background: #fff; color: var(--p-red); border-color: #f3b4b4; }
+#p2x-app .p-btn.is-danger:hover { background: var(--p-red-soft); }
+#p2x-app .p-btn.is-small { min-height: 42px; padding: 8px 16px; }
+#p2x-app .p-btn.is-big { min-height: 56px; padding: 14px 32px; font-size: 18px; }
+
+/* ---------- Options ---------- */
+#p2x-app .p-label { display: block; margin-bottom: 8px; color: var(--p-ink); font-weight: 700; font-size: 16px; }
+#p2x-app .p-hint { display: block; margin-top: 6px; color: var(--p-muted); font-size: 15px; font-weight: 400; }
+#p2x-app .p-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 22px; }
+#p2x-app .p-mode { position: relative; display: block; cursor: pointer; }
+#p2x-app .p-mode input { position: absolute; opacity: 0; inset: 0; }
+#p2x-app .p-mode-box { display: block; height: 100%; padding: 16px; border: 2px solid var(--p-line); border-radius: 14px; background: #fff; transition: .15s; }
+#p2x-app .p-mode-box strong { display: flex; align-items: center; gap: 8px; color: var(--p-ink); font-size: 16px; margin-bottom: 4px; }
+#p2x-app .p-mode-box span { display: block; color: var(--p-muted); font-size: 15px; line-height: 1.45; }
+#p2x-app .p-mode:hover .p-mode-box { border-color: #b9bdf5; }
+#p2x-app .p-mode input:checked + .p-mode-box { border-color: var(--p-primary); background: var(--p-primary-soft); box-shadow: 0 0 0 3px rgba(79,70,229,.15); }
+#p2x-app .p-tag { padding: 2px 9px; border-radius: 999px; background: var(--p-green-soft); color: var(--p-green); font-size: 15px; font-weight: 700; }
+#p2x-app .p-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 24px; }
+#p2x-app .p-field input[type=text], #p2x-app .p-field input[type=password], #p2x-app .p-field select { width: 100%; min-height: 48px; padding: 10px 14px; border: 2px solid var(--p-line); border-radius: 12px; background: #fff; color: var(--p-ink); box-shadow: none; margin: 0; }
+#p2x-app .p-field input:focus, #p2x-app .p-field select:focus { outline: none; border-color: var(--p-primary); box-shadow: 0 0 0 3px rgba(79,70,229,.18); }
+#p2x-app .p-check { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; color: var(--p-text); font-size: 16px; }
+#p2x-app .p-check input { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--p-primary); flex-shrink: 0; cursor: pointer; }
+#p2x-app .p-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+/* ---------- Progress / messages ---------- */
+#p2x-app .p-bar { height: 14px; border-radius: 999px; background: #e6e8f5; overflow: hidden; margin: 14px 0 12px; }
+#p2x-app .p-bar i { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #4f46e5, #0ea5e9); transition: width .25s; }
+#p2x-app .p-status { color: var(--p-ink); font-weight: 600; }
+#p2x-app .p-msg { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; margin-bottom: 18px; border-radius: 14px; font-size: 16px; }
+#p2x-app .p-msg.is-error { background: var(--p-red-soft); color: #7f1d1d; border: 1px solid #f5b5b5; }
+#p2x-app .p-msg.is-info { background: var(--p-amber-soft); color: #6b4e00; border: 1px solid #f1dc9a; }
+#p2x-app .p-msg.is-ok { background: var(--p-green-soft); color: #14532d; border: 1px solid #b7e4c7; }
+
+/* ---------- Results ---------- */
+#p2x-app .p-summary { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0 20px; }
+#p2x-app .p-stat { padding: 8px 14px; border-radius: 12px; background: var(--p-primary-soft); color: var(--p-primary-dark); font-weight: 700; font-size: 15px; }
+#p2x-app .p-tune { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 24px; padding: 18px; margin-bottom: 20px; border: 1px solid var(--p-line); border-radius: 14px; background: #fafbff; }
+#p2x-app .p-tune .p-field { grid-column: 1 / -1; }
+#p2x-app .p-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 10px; margin-bottom: 4px; -webkit-overflow-scrolling: touch; }
+#p2x-app .p-tab { flex-shrink: 0; min-height: 44px; padding: 8px 16px; border: 2px solid var(--p-line); border-radius: 12px; background: #fff; color: var(--p-text); font-weight: 600; font-size: 15px; cursor: pointer; white-space: nowrap; box-shadow: none; }
+#p2x-app .p-tab:hover { border-color: #b9bdf5; }
+#p2x-app .p-tab.is-on { background: var(--p-primary); border-color: var(--p-primary); color: #fff; }
+#p2x-app .p-tbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin: 8px 0 12px; }
+#p2x-app .p-tbar b { color: var(--p-ink); }
+#p2x-app .p-scroll { max-height: 520px; overflow: auto; border: 1px solid var(--p-line); border-radius: 14px; background: #fff; -webkit-overflow-scrolling: touch; }
+#p2x-app table.p-grid-t { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; margin: 0; font-size: 15px; background: #fff; }
+#p2x-app table.p-grid-t th, #p2x-app table.p-grid-t td { padding: 9px 13px; border-right: 1px solid #e9ebf3; border-bottom: 1px solid #e9ebf3; text-align: left; color: var(--p-ink); font-size: 15px; line-height: 1.4; vertical-align: top; background: #fff; min-width: 90px; }
+#p2x-app table.p-grid-t thead th { position: sticky; top: 0; z-index: 2; background: #eef0ff; color: var(--p-primary-dark); text-align: center; font-weight: 700; border-bottom: 2px solid #c7caff; }
+#p2x-app table.p-grid-t th.p-rn, #p2x-app table.p-grid-t td.p-rn { position: sticky; left: 0; z-index: 1; min-width: 52px; width: 52px; text-align: center; background: #f4f5fb; color: var(--p-muted); font-weight: 600; }
+#p2x-app table.p-grid-t thead th.p-rn { z-index: 3; }
+#p2x-app table.p-grid-t td[contenteditable]:focus { outline: 2px solid var(--p-primary); outline-offset: -2px; background: #fbfbff; }
+#p2x-app table.p-grid-t tbody tr:first-child td:not(.p-rn) { font-weight: 700; background: #fafbff; }
+#p2x-app .p-more { padding: 12px 14px; color: var(--p-muted); font-size: 15px; }
+#p2x-app .p-orig { margin-top: 14px; border: 1px solid var(--p-line); border-radius: 14px; background: #fafbff; }
+#p2x-app .p-orig summary { padding: 13px 16px; cursor: pointer; font-weight: 700; color: var(--p-primary-dark); }
+#p2x-app .p-orig-body { padding: 0 16px 16px; text-align: center; }
+#p2x-app .p-orig-body img { max-width: 100%; height: auto; border: 1px solid var(--p-line); border-radius: 10px; background: #fff; }
+
+#p2x-app .p-dl { margin-top: 22px; padding: 22px; border-radius: 16px; background: linear-gradient(135deg, #f0f2ff, #e8f6ff); border: 1px solid #d3d9ff; }
+#p2x-app .p-dl h4 { color: var(--p-ink); font-size: 18px; font-weight: 800; margin-bottom: 14px; }
+#p2x-app .p-dl-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 24px; margin-bottom: 18px; }
+#p2x-app .p-foot { text-align: center; color: var(--p-muted); font-size: 15px; padding: 6px 12px 0; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  #p2x-app .p-modes, #p2x-app .p-grid { grid-template-columns: 1fr; }
+  #p2x-app .p-steps { gap: 6px; }
+  #p2x-app .p-step span { display: none; }
+  #p2x-app .p-step { justify-content: center; padding: 10px; }
+}
+@media (max-width: 640px) {
+  #p2x-app .p-hero { padding: 28px 20px 64px; border-radius: 18px; }
+  #p2x-app .p-main { padding: 0 8px; }
+  #p2x-app .p-card { padding: 20px 16px; border-radius: 16px; }
+  #p2x-app .p-drop { padding: 32px 14px; }
+  #p2x-app .p-tune, #p2x-app .p-dl-grid { grid-template-columns: 1fr; }
+  #p2x-app .p-actions .p-btn, #p2x-app .p-dl .p-btn { width: 100%; }
+  #p2x-app .p-tbar .p-btn { width: 100%; }
+  #p2x-app .p-file { flex-wrap: wrap; }
+  #p2x-app .p-file .p-btn { width: 100%; }
+}
+</style>
+
+<header class="p-hero">
+  <span class="p-badge">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg>
+    Free PDF Table Extractor
+  </span>
+  <h2>PDF to Excel, CSV &amp; Markdown Converter</h2>
+  <p>Turn tables inside PDFs &mdash; including scanned pages &mdash; into clean Excel or CSV spreadsheets. Review and fix the result before you download it.</p>
+  <ul class="p-chips">
+    <li>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Private: files stay in your browser
+    </li>
+    <li>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"/></svg>
+      OCR for scanned PDFs
+    </li>
+    <li>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+      Excel, CSV &amp; Markdown
+    </li>
+  </ul>
+</header>
+
+<div class="p-main">
+  <ol class="p-steps" aria-label="Progress">
+    <li class="p-step is-active" data-step="1"><b>1</b><span>Upload PDF</span></li>
+    <li class="p-step" data-step="2"><b>2</b><span>Choose options</span></li>
+    <li class="p-step" data-step="3"><b>3</b><span>Review &amp; download</span></li>
+  </ol>
+
+  <div class="p-msg is-error" id="p-error" role="alert" hidden></div>
+
+  <!-- STEP 1: Upload -->
+  <section class="p-card" id="p-upload">
+    <h3>Upload your PDF</h3>
+    <p class="p-sub">Works with text PDFs (invoices, reports, statements) and scanned or photographed pages.</p>
+    <label class="p-drop" id="p-drop">
+      <input type="file" id="p-file" accept="application/pdf,.pdf" aria-label="Choose a PDF file">
+      <div class="p-drop-ico">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      </div>
+      <strong>Drag &amp; drop your PDF here</strong>
+      <span>or tap to browse your device</span><br>
+      <span class="p-fake-btn">Choose PDF file</span>
+    </label>
+  </section>
+
+  <!-- STEP 2: Options -->
+  <section class="p-card" id="p-options" hidden>
+    <h3>Conversion options</h3>
+    <p class="p-sub">The defaults work for most files. Just press Convert.</p>
+
+    <div class="p-file">
+      <div class="p-file-ico">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+      </div>
+      <div class="p-file-info"><b id="p-fname">file.pdf</b><span id="p-fmeta"></span></div>
+      <button type="button" class="p-btn is-ghost is-small" id="p-change">Change file</button>
+    </div>
+
+    <span class="p-label" id="p-mode-label">How should the PDF be read?</span>
+    <div class="p-modes" role="radiogroup" aria-labelledby="p-mode-label">
+      <label class="p-mode">
+        <input type="radio" name="p-mode" value="auto" checked>
+        <span class="p-mode-box"><strong>Smart auto <span class="p-tag">Recommended</span></strong><span>Uses the PDF text when it exists and switches to OCR for scanned pages.</span></span>
+      </label>
+      <label class="p-mode">
+        <input type="radio" name="p-mode" value="text">
+        <span class="p-mode-box"><strong>Text PDF only</strong><span>Fastest. For PDFs created on a computer (not scanned).</span></span>
+      </label>
+      <label class="p-mode">
+        <input type="radio" name="p-mode" value="ocr">
+        <span class="p-mode-box"><strong>Scanned / image (OCR)</strong><span>Reads every page as a picture. Slower but works on scans and photos.</span></span>
+      </label>
+    </div>
+
+    <div class="p-grid">
+      <div class="p-field" id="p-lang-wrap">
+        <label class="p-label" for="p-lang">OCR language</label>
+        <select id="p-lang">
+          <option value="eng">English</option>
+          <option value="spa">Spanish</option>
+          <option value="fra">French</option>
+          <option value="deu">German</option>
+          <option value="ita">Italian</option>
+          <option value="por">Portuguese</option>
+          <option value="nld">Dutch</option>
+          <option value="pol">Polish</option>
+          <option value="tur">Turkish</option>
+          <option value="rus">Russian</option>
+          <option value="ukr">Ukrainian</option>
+          <option value="ell">Greek</option>
+          <option value="ara">Arabic</option>
+          <option value="hin">Hindi</option>
+          <option value="ind">Indonesian</option>
+          <option value="vie">Vietnamese</option>
+          <option value="chi_sim">Chinese (Simplified)</option>
+          <option value="chi_tra">Chinese (Traditional)</option>
+          <option value="jpn">Japanese</option>
+          <option value="kor">Korean</option>
+        </select>
+        <span class="p-hint">Pick the language written in the document.</span>
+      </div>
+      <div class="p-field">
+        <label class="p-label" for="p-pages">Pages to convert</label>
+        <input type="text" id="p-pages" placeholder="All pages" autocomplete="off">
+        <span class="p-hint">Leave empty for all, or type e.g. 1-3, 5, 8-10</span>
+      </div>
+      <div class="p-field" id="p-pw-wrap" hidden>
+        <label class="p-label" for="p-pw">PDF password</label>
+        <input type="password" id="p-pw" autocomplete="off" placeholder="Enter password">
+        <span class="p-hint">This PDF is protected.</span>
+      </div>
+    </div>
+
+    <div class="p-actions">
+      <button type="button" class="p-btn is-big" id="p-convert">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        Convert PDF
+      </button>
+    </div>
+  </section>
+
+  <!-- Progress -->
+  <section class="p-card" id="p-progress" hidden>
+    <h3>Converting&hellip;</h3>
+    <div class="p-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="p-barwrap"><i id="p-bari"></i></div>
+    <p class="p-status" id="p-status" aria-live="polite">Starting&hellip;</p>
+    <p class="p-sub" style="margin:8px 0 16px">OCR can take a little while on large scans. Please keep this tab open.</p>
+    <button type="button" class="p-btn is-danger is-small" id="p-cancel">Cancel</button>
+  </section>
+
+  <!-- STEP 3: Results -->
+  <section class="p-card" id="p-results" hidden>
+    <h3>Review &amp; download</h3>
+    <p class="p-sub">Click any cell to correct it. Changes are included in your download.</p>
+    <div class="p-summary" id="p-summary"></div>
+    <div class="p-msg is-info" id="p-note" hidden></div>
+
+    <div class="p-tune">
+      <div class="p-field">
+        <label class="p-label" for="p-sens">Column detection</label>
+        <select id="p-sens">
+          <option value="0.55">Sensitive &ndash; splits into more columns</option>
+          <option value="0.9" selected>Balanced (recommended)</option>
+          <option value="1.5">Cautious &ndash; fewer, wider columns</option>
+        </select>
+        <span class="p-hint">If words are glued together or split wrongly, try another setting.</span>
+      </div>
+      <label class="p-check"><input type="checkbox" id="p-join" checked> <span>Join tables that continue across pages</span></label>
+      <label class="p-check"><input type="checkbox" id="p-text"> <span>Also include text outside tables</span></label>
+      <label class="p-check"><input type="checkbox" id="p-trim" checked> <span>Remove empty rows &amp; columns</span></label>
+    </div>
+
+    <div class="p-tabs" id="p-tabs" role="tablist" aria-label="Detected tables"></div>
+    <div class="p-tbar">
+      <span id="p-tinfo"></span>
+      <button type="button" class="p-btn is-danger is-small" id="p-del">Delete this table</button>
+    </div>
+    <div class="p-scroll" id="p-scroll" tabindex="0" aria-label="Table preview"></div>
+    <details class="p-orig" id="p-orig">
+      <summary>Compare with the original page</summary>
+      <div class="p-orig-body" id="p-orig-body"></div>
+    </details>
+
+    <div class="p-dl">
+      <h4>Download</h4>
+      <div class="p-dl-grid">
+        <div class="p-field">
+          <label class="p-label" for="p-xlayout">Excel layout</label>
+          <select id="p-xlayout">
+            <option value="table">One sheet per table</option>
+            <option value="page">One sheet per PDF page</option>
+            <option value="one">Everything on a single sheet</option>
+          </select>
+        </div>
+        <div class="p-field">
+          <label class="p-label" for="p-cscope">CSV &amp; Markdown content</label>
+          <select id="p-cscope">
+            <option value="current">Only the table shown above</option>
+            <option value="all">All tables in one file</option>
+          </select>
+        </div>
+        <label class="p-check" style="grid-column:1/-1"><input type="checkbox" id="p-num" checked> <span>Save numbers as real numbers in Excel (so you can add them up). Codes like 00123 stay as text.</span></label>
+      </div>
+      <div class="p-actions">
+        <button type="button" class="p-btn is-green is-big" id="p-xlsx">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+          Download Excel (.xlsx)
+        </button>
+        <button type="button" class="p-btn is-big" id="p-csv">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+          Download CSV
+        </button>
+        <button type="button" class="p-btn is-big" id="p-md">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+          Download Markdown (.md)
+        </button>
+        <button type="button" class="p-btn is-ghost is-big" id="p-copy">Copy table</button>
+      </div>
+    </div>
+
+    <div class="p-actions" style="margin-top:22px">
+      <button type="button" class="p-btn is-ghost" id="p-reset">Convert another PDF</button>
+    </div>
+  </section>
+
+  <p class="p-foot">Your PDF is never uploaded. Results depend on the quality of the document &mdash; always double-check important numbers.</p>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var root = document.getElementById('p2x-app');
+  if (!root || root.getAttribute('data-ready')) return;
+  root.setAttribute('data-ready', '1');
+
+  function $(s) { return root.querySelector(s); }
+  function $$(s) { return Array.prototype.slice.call(root.querySelectorAll(s)); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  /* ---------- Library loader (CDN with fallback) ---------- */
+  var LIBS = {
+    pdf: ['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js', 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js'],
+    xlsx: ['https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'],
+    tess: ['https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.4/tesseract.min.js', 'https://cdn.jsdelivr.net/npm/tesseract.js@5.0.4/dist/tesseract.min.js']
+  };
+  var WORKER_URLS = ['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js', 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js'];
+  var CHECK = { pdf: function () { return window.pdfjsLib; }, xlsx: function () { return window.XLSX; }, tess: function () { return window.Tesseract; } };
+  var NAMES = { pdf: 'the PDF reader', xlsx: 'the Excel exporter', tess: 'the OCR engine' };
+  var loading = {};
+
+  function loadLib(key) {
+    if (CHECK[key]()) return Promise.resolve();
+    if (loading[key]) return loading[key];
+    loading[key] = new Promise(function (resolve, reject) {
+      var i = 0;
+      (function next() {
+        if (i >= LIBS[key].length) { delete loading[key]; return reject(new Error('Could not load ' + NAMES[key] + '. Please check your internet connection and try again.')); }
+        var s = document.createElement('script');
+        s.src = LIBS[key][i++];
+        s.async = true;
+        s.onload = function () { CHECK[key]() ? resolve() : (s.remove(), next()); };
+        s.onerror = function () { s.remove(); next(); };
+        document.head.appendChild(s);
+      })();
+    }).then(function () {
+      if (key === 'pdf' && !window.pdfjsLib.GlobalWorkerOptions.workerSrc) window.pdfjsLib.GlobalWorkerOptions.workerSrc = WORKER_URLS[0];
+    });
+    return loading[key];
+  }
+
+  /* ---------- State ---------- */
+  var state = { file: null, pdf: null, numPages: 0, pages: [], tables: [], active: 0, running: false, cancel: false, worker: null, ocrPages: 0, lastLang: '' };
+
+  /* ---------- UI helpers ---------- */
+  function setStep(n) {
+    $$('.p-step').forEach(function (el) {
+      var k = +el.getAttribute('data-step');
+      el.className = 'p-step' + (k === n ? ' is-active' : (k < n ? ' is-done' : ''));
+    });
+  }
+  function show(id, on) { $(id).hidden = !on; }
+  function showError(msg) { var e = $('#p-error'); e.textContent = msg; e.hidden = false; e.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+  function clearError() { $('#p-error').hidden = true; }
+  function setProgress(frac, text) {
+    var pct = Math.max(0, Math.min(100, Math.round(frac * 100)));
+    $('#p-bari').style.width = pct + '%';
+    $('#p-barwrap').setAttribute('aria-valuenow', pct);
+    if (text) $('#p-status').textContent = text + ' (' + pct + '%)';
+  }
+  function fmtSize(b) { return b > 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
+  function mode() { return ($('input[name=p-mode]:checked') || {}).value || 'auto'; }
+  function updateModeUi() { show('#p-lang-wrap', mode() !== 'text'); }
+  function colName(i) { var s = ''; i++; while (i > 0) { var m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; }
+
+  /* ---------- File selection ---------- */
+  function resetAll() {
+    cleanupPdf();
+    state.file = null; state.pages = []; state.tables = []; state.numPages = 0;
+    $('#p-file').value = ''; $('#p-pages').value = ''; $('#p-pw').value = ''; show('#p-pw-wrap', false);
+    clearError();
+    show('#p-upload', true); show('#p-options', false); show('#p-progress', false); show('#p-results', false);
+    setStep(1);
+  }
+  function cleanupPdf() { if (state.pdf) { try { state.pdf.destroy(); } catch (e) {} } state.pdf = null; }
+
+  function acceptFile(f) {
+    clearError();
+    if (!f) return;
+    if (!(f.type === 'application/pdf' || /\.pdf$/i.test(f.name))) { showError('That file is not a PDF. Please choose a file ending in .pdf'); return; }
+    state.file = f;
+    $('#p-fname').textContent = f.name;
+    $('#p-fmeta').textContent = fmtSize(f.size) + ' · reading…';
+    show('#p-upload', false); show('#p-options', true); show('#p-results', false); show('#p-progress', false);
+    setStep(2);
+    updateModeUi();
+    inspectFile();
+  }
+
+  function openPdf() {
+    return loadLib('pdf').then(function () { return state.file.arrayBuffer(); }).then(function (buf) {
+      var pw = $('#p-pw').value;
+      var params = { data: buf };
+      if (pw) params.password = pw;
+      return window.pdfjsLib.getDocument(params).promise;
+    });
+  }
+
+  function handleOpenError(err) {
+    if (err && err.name === 'PasswordException') {
+      show('#p-pw-wrap', true);
+      $('#p-fmeta').textContent = fmtSize(state.file.size) + ' · password protected';
+      showError(err.code === 2 ? 'Wrong password. Please try again.' : 'This PDF is password protected. Enter the password below, then press Convert.');
+      $('#p-pw').focus();
+      return;
+    }
+    showError(err && err.name === 'InvalidPDFException' ? 'This PDF looks damaged or is not a valid PDF file.' : ((err && err.message) || 'Sorry, this file could not be opened.'));
+  }
+
+  function inspectFile() {
+    var f = state.file;
+    cleanupPdf();
+    openPdf().then(function (pdf) {
+      if (state.file !== f) { pdf.destroy(); return; }
+      state.pdf = pdf; state.numPages = pdf.numPages;
+      $('#p-fmeta').textContent = fmtSize(f.size) + ' · ' + pdf.numPages + (pdf.numPages === 1 ? ' page' : ' pages');
+      $('#p-pages').placeholder = 'All ' + pdf.numPages + ' pages';
+    }).catch(handleOpenError);
+  }
+
+  function parsePages(str, max) {
+    str = (str || '').replace(/\s+/g, '');
+    var out = [], seen = {};
+    if (!str) { for (var i = 1; i <= max; i++) out.push(i); return out; }
+    var parts = str.split(',');
+    for (var p = 0; p < parts.length; p++) {
+      if (!parts[p]) continue;
+      var m = parts[p].match(/^(\d*)-(\d*)$/), a, b;
+      if (m) { a = m[1] ? +m[1] : 1; b = m[2] ? +m[2] : max; }
+      else if (/^\d+$/.test(parts[p])) { a = b = +parts[p]; }
+      else return null;
+      if (a > b) { var t = a; a = b; b = t; }
+      for (var n = Math.max(1, a); n <= Math.min(max, b); n++) if (!seen[n]) { seen[n] = 1; out.push(n); }
+    }
+    return out.length ? out.sort(function (x, y) { return x - y; }) : null;
+  }
+
+  /* ---------- Extraction ---------- */
+  function ensureWorker(lang, onLog) {
+    if (state.worker && state.lastLang === lang) return Promise.resolve(state.worker);
+    var kill = state.worker ? state.worker.terminate().catch(function () {}) : Promise.resolve();
+    state.worker = null;
+    return kill.then(function () { return loadLib('tess'); }).then(function () {
+      return window.Tesseract.createWorker(lang, 1, { logger: onLog });
+    }).then(function (w) { state.worker = w; state.lastLang = lang; return w; });
+  }
+  function killWorker() { if (state.worker) { try { state.worker.terminate(); } catch (e) {} state.worker = null; state.lastLang = ''; } }
+
+  function extractTextItems(page, vp) {
+    return page.getTextContent().then(function (tc) {
+      var items = [];
+      tc.items.forEach(function (it) {
+        if (!it.str || !it.str.trim()) return;
+        var t = window.pdfjsLib.Util.transform(vp.transform, it.transform);
+        var h = Math.hypot(t[2], t[3]) || it.height || 10;
+        var w = it.width * vp.scale;
+        items.push({ s: it.str, x0: t[4], x1: t[4] + w, y0: t[5] - h, y1: t[5], ocr: false });
+      });
+      return items;
+    });
+  }
+
+  function ocrPage(page, vp, lang, log) {
+    var scale = Math.min(3.2, Math.max(1.6, 2200 / vp.width));
+    var v = page.getViewport({ scale: scale });
+    var canvas = document.createElement('canvas');
+    canvas.width = Math.floor(v.width); canvas.height = Math.floor(v.height);
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    return page.render({ canvasContext: ctx, viewport: v }).promise.then(function () {
+      return ensureWorker(lang, log);
+    }).then(function (w) {
+      return w.recognize(canvas);
+    }).then(function (res) {
+      canvas.width = canvas.height = 0;
+      var d = res.data, words = d.words;
+      if (!words || !words.length) {
+        words = [];
+        (d.blocks || []).forEach(function (b) { (b.paragraphs || []).forEach(function (p) { (p.lines || []).forEach(function (l) { (l.words || []).forEach(function (wd) { words.push(wd); }); }); }); });
+      }
+      var items = [];
+      words.forEach(function (wd) {
+        var t = (wd.text || '').trim();
+        if (!t || (wd.confidence !== undefined && wd.confidence < 25)) return;
+        var b = wd.bbox;
+        items.push({ s: t, x0: b.x0 / scale, x1: b.x1 / scale, y0: b.y0 / scale, y1: b.y1 / scale, ocr: true });
+      });
+      return items;
+    });
+  }
+
+  function runConversion() {
+    if (state.running || !state.file) return;
+    clearError();
+    var m = mode(), lang = $('#p-lang').value;
+    state.running = true; state.cancel = false; state.pages = []; state.ocrPages = 0;
+    show('#p-options', false); show('#p-results', false); show('#p-progress', true);
+    setProgress(0, 'Opening PDF');
+    var pageList;
+
+    cleanupPdf();
+    openPdf().then(function (pdf) {
+      state.pdf = pdf; state.numPages = pdf.numPages;
+      pageList = parsePages($('#p-pages').value, pdf.numPages);
+      if (!pageList) throw new Error('Please check the page range. Use numbers like 1-3, 5 within 1 to ' + pdf.numPages + '.');
+      var idx = 0;
+      function step() {
+        if (state.cancel) throw { cancelled: true };
+        if (idx >= pageList.length) return Promise.resolve();
+        var n = pageList[idx], cur = idx, total = pageList.length;
+        setProgress(cur / total, 'Reading page ' + n + ' (' + (cur + 1) + ' of ' + total + ')');
+        return pdf.getPage(n).then(function (page) {
+          var vp = page.getViewport({ scale: 1 });
+          var textP = m === 'ocr' ? Promise.resolve([]) : extractTextItems(page, vp);
+          return textP.then(function (items) {
+            var chars = items.reduce(function (a, it) { return a + it.s.length; }, 0);
+            var needOcr = m === 'ocr' || (m === 'auto' && chars < 12);
+            if (!needOcr) return { items: items, ocr: false };
+            setProgress(cur / total, 'Preparing OCR for page ' + n + ' (first time may take a moment)');
+            return ocrPage(page, vp, lang, function (msg) {
+              if (msg.status === 'recognizing text') setProgress((cur + msg.progress) / total, 'Running OCR on page ' + n + ' (' + (cur + 1) + ' of ' + total + ')');
+              else if (/loading|initializ/.test(msg.status)) setProgress(cur / total, 'Loading OCR engine and language data');
+            }).then(function (it) { return { items: it, ocr: true }; });
+          }).then(function (r) {
+            state.pages.push({ n: n, items: r.items, ocr: r.ocr, w: vp.width, h: vp.height });
+            if (r.ocr) state.ocrPages++;
+            page.cleanup();
+            idx++;
+            return step();
+          });
+        });
+      }
+      return step();
+    }).then(function () {
+      setProgress(1, 'Building tables');
+      state.running = false;
+      killWorker();
+      show('#p-progress', false);
+      finishConversion(m);
+    }).catch(function (err) {
+      state.running = false;
+      killWorker();
+      show('#p-progress', false);
+      if (err && err.cancelled) { show('#p-options', true); setStep(2); return; }
+      show('#p-options', true); setStep(2);
+      if (err && err.name === 'PasswordException') return handleOpenError(err);
+      var msg = (err && err.message) || 'Something went wrong while converting this PDF.';
+      if (/Tesseract|worker|traineddata|network|fetch|NetworkError|Failed/i.test(msg)) msg += ' (OCR needs an internet connection to download its language data the first time.)';
+      showError(msg);
+    });
+  }
+
+  /* ---------- Table analysis ---------- */
+  function median(arr) {
+    if (!arr.length) return 0;
+    var a = arr.slice().sort(function (x, y) { return x - y; });
+    return a[Math.floor(a.length / 2)];
+  }
+
+  function analyzePage(page, factor) {
+    var items = page.items;
+    if (!items.length) return [];
+    var mh = median(items.map(function (i) { return i.y1 - i.y0; })) || 10;
+    var gapT = mh * factor;
+
+    // 1) group items into lines
+    var sorted = items.slice().sort(function (a, b) { return (a.y0 + a.y1) - (b.y0 + b.y1); });
+    var lines = [];
+    sorted.forEach(function (it) {
+      var cy = (it.y0 + it.y1) / 2, h = it.y1 - it.y0;
+      var L = lines[lines.length - 1];
+      if (L && Math.abs(cy - L.cy) <= 0.5 * Math.max(h, L.h)) {
+        L.items.push(it); L.cy = (L.cy * L.n + cy) / (L.n + 1); L.h = (L.h * L.n + h) / (L.n + 1); L.n++;
+      } else lines.push({ items: [it], cy: cy, h: h, n: 1 });
+    });
+
+    // 2) merge items into cells
+    lines.forEach(function (L) {
+      L.items.sort(function (a, b) { return a.x0 - b.x0; });
+      var cells = [], cur = null;
+      L.items.forEach(function (it) {
+        if (cur && it.x0 - cur.x1 <= gapT) {
+          var gap = it.x0 - cur.x1;
+          var join = (it.ocr || gap > mh * 0.12 || /\s$/.test(cur.text) || /^\s/.test(it.s)) ? ' ' : '';
+          cur.text += join + it.s; cur.x1 = Math.max(cur.x1, it.x1);
+        } else {
+          cur = { x0: it.x0, x1: it.x1, text: it.s };
+          cells.push(cur);
+        }
+      });
+      cells.forEach(function (c) { c.text = c.text.replace(/\s+/g, ' ').trim(); });
+      L.cells = cells;
+      L.multi = cells.length >= 2;
+    });
+
+    // 3) split into vertical blocks, then table / text segments
+    var pitches = [];
+    for (var i = 1; i < lines.length; i++) pitches.push(lines[i].cy - lines[i - 1].cy);
+    var maxGap = Math.max(median(pitches) * 2.4, mh * 2.6);
+    var groups = [], g = null;
+    lines.forEach(function (L, k) {
+      if (!g || L.cy - lines[k - 1].cy > maxGap) { g = []; groups.push(g); }
+      g.push(L);
+    });
+
+    var blocks = [];
+    groups.forEach(function (gl) {
+      var i = 0;
+      while (i < gl.length) {
+        if (!gl[i].multi) {
+          var j = i; while (j < gl.length && !gl[j].multi) j++;
+          blocks.push({ type: 'text', lines: gl.slice(i, j) }); i = j; continue;
+        }
+        var end = i, k = i + 1, singles = 0;
+        while (k < gl.length) { if (gl[k].multi) { end = k; singles = 0; } else if (++singles > 2) break; k++; }
+        var run = gl.slice(i, end + 1);
+        var mc = run.filter(function (l) { return l.multi; }).length;
+        blocks.push({ type: mc >= 2 ? 'table' : 'text', lines: run });
+        i = end + 1;
+      }
+    });
+
+    return blocks.map(function (b) {
+      if (b.type === 'text') return { type: 'text', rows: b.lines.map(function (l) { return [l.cells.map(function (c) { return c.text; }).join(' ')]; }) };
+      return { type: 'table', rows: buildGrid(b.lines, Math.ceil(page.w)) };
+    });
+  }
+
+  function buildGrid(lines, width) {
+    var multi = lines.filter(function (l) { return l.multi; });
+    var n = multi.length;
+    var bins = new Int32Array(width + 4);
+    multi.forEach(function (l) {
+      var mark = new Uint8Array(width + 4);
+      l.cells.forEach(function (c) {
+        for (var x = Math.max(0, Math.floor(c.x0)); x <= Math.min(width + 3, Math.ceil(c.x1)); x++) mark[x] = 1;
+      });
+      for (var x = 0; x < mark.length; x++) bins[x] += mark[x];
+    });
+    var tol = n >= 6 ? Math.floor(n * 0.12) : 0;
+    // columns = runs of covered bins separated by gutters (>= 2 bins wide)
+    var cols = [], start = -1, gut = 0;
+    for (var x = 0; x < bins.length; x++) {
+      if (bins[x] > tol) { if (start < 0) start = x; gut = 0; }
+      else if (start >= 0) {
+        gut++;
+        if (gut >= 2) { cols.push({ x0: start, x1: x - gut }); start = -1; gut = 0; }
+      }
+    }
+    if (start >= 0) cols.push({ x0: start, x1: bins.length - 1 });
+    if (!cols.length) cols.push({ x0: 0, x1: width });
+
+    function colOf(c) {
+      var best = -1, bestOv = 0, k;
+      for (k = 0; k < cols.length; k++) {
+        var ov = Math.min(c.x1, cols[k].x1) - Math.max(c.x0, cols[k].x0);
+        if (ov > bestOv && (best < 0 || c.x0 <= cols[k].x1)) { best = k; bestOv = ov; if (c.x0 >= cols[k].x0 - 1 && c.x0 <= cols[k].x1) break; }
+      }
+      if (best >= 0) return best;
+      var cx = (c.x0 + c.x1) / 2, bd = 1e9;
+      for (k = 0; k < cols.length; k++) { var d = Math.abs(cx - (cols[k].x0 + cols[k].x1) / 2); if (d < bd) { bd = d; best = k; } }
+      return best;
+    }
+    var rows = lines.map(function (l) {
+      var row = new Array(cols.length).fill('');
+      l.cells.forEach(function (c) { var k = colOf(c); row[k] = row[k] ? row[k] + ' ' + c.text : c.text; });
+      return row;
+    });
+    return rows;
+  }
+
+  /* ---------- Build final tables from analyzed pages ---------- */
+  function trimGrid(rows) {
+    rows = rows.filter(function (r) { return r.some(function (c) { return String(c).trim() !== ''; }); });
+    if (!rows.length) return rows;
+    var w = Math.max.apply(null, rows.map(function (r) { return r.length; }));
+    var keep = [];
+    for (var c = 0; c < w; c++) if (rows.some(function (r) { return r[c] !== undefined && String(r[c]).trim() !== ''; })) keep.push(c);
+    return rows.map(function (r) { return keep.map(function (c) { return r[c] === undefined ? '' : r[c]; }); });
+  }
+  function cloneRows(rows) { return rows.map(function (r) { return r.slice(); }); }
+  function normRow(r) { return r.map(function (c) { return String(c).trim().toLowerCase(); }).join('|'); }
+
+  function deriveTables() {
+    var includeText = $('#p-text').checked, join = $('#p-join').checked, trim = $('#p-trim').checked;
+    var any = state.pages.some(function (p) { return p.blocks.some(function (b) { return b.type === 'table'; }); });
+    var forcedText = !any;
+    var list = [];
+    state.pages.forEach(function (p) {
+      var pending = null;
+      function flush() { if (pending) { list.push(pending); pending = null; } }
+      p.blocks.forEach(function (b) {
+        if (b.type === 'table') { flush(); list.push({ type: 'table', pages: [p.n], rows: cloneRows(b.rows) }); }
+        else if (includeText || forcedText) {
+          if (!pending) pending = { type: 'text', pages: [p.n], rows: [] };
+          pending.rows = pending.rows.concat(cloneRows(b.rows));
+        }
+      });
+      flush();
+    });
+    if (join) {
+      var merged = [];
+      list.forEach(function (t) {
+        var prev = merged[merged.length - 1];
+        if (prev && prev.type === 'table' && t.type === 'table' && t.pages[0] === prev.pages[prev.pages.length - 1] + 1 &&
+            prev.rows[0] && t.rows[0] && prev.rows[0].length === t.rows[0].length) {
+          var rows = t.rows;
+          if (rows.length && normRow(rows[0]) === normRow(prev.rows[0])) rows = rows.slice(1);
+          prev.rows = prev.rows.concat(rows); prev.pages.push(t.pages[0]);
+        } else merged.push(t);
+      });
+      list = merged;
+    }
+    list.forEach(function (t, i) {
+      if (trim) t.rows = trimGrid(t.rows);
+      t.id = i + 1;
+    });
+    list = list.filter(function (t) { return t.rows.length; });
+    var tc = 0;
+    list.forEach(function (t) { t.name = t.type === 'text' ? 'Text' : 'Table ' + (++tc); });
+    state.tables = list; state.active = Math.min(state.active, Math.max(0, list.length - 1));
+    state.forcedText = forcedText;
+  }
+
+  function analyzeAll() {
+    var f = parseFloat($('#p-sens').value) || 0.9;
+    state.pages.forEach(function (p) { p.blocks = analyzePage(p, f); });
+  }
+
+  function finishConversion(m) {
+    var empty = state.pages.every(function (p) { return !p.items.length; });
+    if (empty) {
+      show('#p-options', true); setStep(2);
+      showError(m === 'text' ? 'No readable text was found in this PDF. It is probably a scan. Choose "Scanned / image (OCR)" or "Smart auto" and convert again.' : 'No text could be recognised on the selected pages. Try a clearer file or a different OCR language.');
+      return;
+    }
+    state.active = 0;
+    analyzeAll();
+    deriveTables();
+    renderResults(true);
+    show('#p-results', true);
+    setStep(3);
+    $('#p-results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /* ---------- Rendering results ---------- */
+  var MAX_ROWS = 400;
+
+  function renderResults(fresh) {
+    var tabs = $('#p-tabs'), t = state.tables;
+    var np = state.pages.length;
+    var sum = '<span class="p-stat">' + t.length + (t.length === 1 ? ' table' : ' tables') + '</span><span class="p-stat">' + np + (np === 1 ? ' page' : ' pages') + ' read</span>';
+    if (state.ocrPages) sum += '<span class="p-stat">' + state.ocrPages + ' with OCR</span>';
+    $('#p-summary').innerHTML = sum;
+
+    var note = $('#p-note');
+    if (state.forcedText && t.length) { note.textContent = 'No clear tables were found, so all text is shown. Try changing "Column detection" below if you expected columns.'; note.hidden = false; }
+    else note.hidden = true;
+
+    if (!t.length) {
+      tabs.innerHTML = ''; $('#p-tinfo').textContent = ''; $('#p-del').hidden = true; $('#p-orig').hidden = true;
+      $('#p-scroll').innerHTML = '<div class="p-more">Nothing to show. Turn on "Also include text outside tables" or change the column detection.</div>';
+      setDownloads(false);
+      return;
+    }
+    $('#p-del').hidden = false;
+    setDownloads(true);
+    tabs.innerHTML = t.map(function (tb, i) {
+      var pg = tb.pages.length > 1 ? 'pp. ' + tb.pages[0] + '–' + tb.pages[tb.pages.length - 1] : 'p. ' + tb.pages[0];
+      return '<button type="button" class="p-tab' + (i === state.active ? ' is-on' : '') + '" role="tab" aria-selected="' + (i === state.active) + '" data-i="' + i + '">' + esc(tb.name) + ' · ' + pg + '</button>';
+    }).join('');
+    renderTable();
+  }
+
+  function setDownloads(on) { ['#p-xlsx', '#p-csv', '#p-md', '#p-copy'].forEach(function (id) { $(id).disabled = !on; }); }
+
+  function renderTable() {
+    var tb = state.tables[state.active];
+    if (!tb) return;
+    var w = Math.max.apply(null, tb.rows.map(function (r) { return r.length; }));
+    var head = '<tr><th class="p-rn"></th>';
+    for (var c = 0; c < w; c++) head += '<th scope="col">' + colName(c) + '</th>';
+    head += '</tr>';
+    var body = '', shown = Math.min(tb.rows.length, MAX_ROWS);
+    for (var r = 0; r < shown; r++) {
+      body += '<tr><td class="p-rn">' + (r + 1) + '</td>';
+      for (c = 0; c < w; c++) body += '<td contenteditable="true" spellcheck="false" data-r="' + r + '" data-c="' + c + '">' + esc(tb.rows[r][c] === undefined ? '' : tb.rows[r][c]) + '</td>';
+      body += '</tr>';
+    }
+    var more = tb.rows.length > shown ? '<div class="p-more">Showing the first ' + shown + ' of ' + tb.rows.length + ' rows. Your download contains all rows.</div>' : '';
+    $('#p-scroll').innerHTML = '<table class="p-grid-t"><thead>' + head + '</thead><tbody>' + body + '</tbody></table>' + more;
+    $('#p-tinfo').innerHTML = '<b>' + esc(tb.name) + '</b> · ' + tb.rows.length + ' rows × ' + w + ' columns';
+    $$('#p-tabs .p-tab').forEach(function (b, i) { b.className = 'p-tab' + (i === state.active ? ' is-on' : ''); b.setAttribute('aria-selected', i === state.active); });
+    var od = $('#p-orig'); od.hidden = false; od.open = false; $('#p-orig-body').innerHTML = '';
+  }
+
+  function renderOriginal() {
+    var tb = state.tables[state.active], box = $('#p-orig-body');
+    if (!tb || !state.pdf || box.firstChild) return;
+    box.innerHTML = '<p class="p-sub">Loading page ' + tb.pages[0] + '&hellip;</p>';
+    state.pdf.getPage(tb.pages[0]).then(function (page) {
+      var vp0 = page.getViewport({ scale: 1 });
+      var v = page.getViewport({ scale: Math.min(2, 1000 / vp0.width) });
+      var cv = document.createElement('canvas');
+      cv.width = v.width; cv.height = v.height;
+      var ctx = cv.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
+      return page.render({ canvasContext: ctx, viewport: v }).promise.then(function () {
+        box.innerHTML = '<img alt="Original PDF page ' + tb.pages[0] + '" src="' + cv.toDataURL('image/jpeg', 0.8) + '">';
+      });
+    }).catch(function () { box.innerHTML = '<p class="p-sub">The preview could not be drawn.</p>'; });
+  }
+
+  /* ---------- Export ---------- */
+  function baseName() { return (state.file ? state.file.name : 'table').replace(/\.pdf$/i, '').replace(/[\\/:*?"<>|]+/g, '_') || 'table'; }
+
+  function parseNum(s) {
+    var t = String(s).replace(/\s+/g, '');
+    var m = t.match(/^(\()?([-+−])?[$€£¥₹]?([-+−])?(\d{1,3}(?:,\d{3})+|\d+)(\.\d+)?(%)?(\))?$/);
+    if (!m) return null;
+    if (!!m[1] !== !!m[7]) return null;
+    if (m[2] && m[3]) return null;
+    var intPart = m[4].replace(/,/g, '');
+    if (intPart.length > 1 && intPart.charAt(0) === '0') return null;
+    if (intPart.length + (m[5] ? m[5].length - 1 : 0) > 15) return null;
+    var v = parseFloat(intPart + (m[5] || ''));
+    if (m[1] || m[2] === '-' || m[2] === '−' || m[3] === '-' || m[3] === '−') v = -v;
+    if (m[6]) return { v: v / 100, z: m[5] ? '0.00%' : '0%' };
+    return { v: v, z: m[5] ? (m[4].indexOf(',') > -1 ? '#,##0.' + new Array(m[5].length).join('0') : '0.' + new Array(m[5].length).join('0')) : (m[4].indexOf(',') > -1 ? '#,##0' : undefined) };
+  }
+
+  function sheetFrom(rows, convert) {
+    var w = Math.max.apply(null, rows.map(function (r) { return r.length; }).concat([1]));
+    var aoa = rows.map(function (r) {
+      var out = [];
+      for (var c = 0; c < w; c++) {
+        var v = r[c] === undefined ? '' : String(r[c]);
+        var n = convert && v ? parseNum(v) : null;
+        if (n) { var cell = { t: 'n', v: n.v }; if (n.z) cell.z = n.z; out.push(cell); }
+        else out.push(v === '' ? null : v);
+      }
+      return out;
+    });
+    var ws = window.XLSX.utils.aoa_to_sheet(aoa);
+    var widths = [];
+    for (var c2 = 0; c2 < w; c2++) {
+      var mx = 6;
+      rows.forEach(function (r) { var l = r[c2] ? String(r[c2]).length : 0; if (l > mx) mx = l; });
+      widths.push({ wch: Math.min(60, mx + 2) });
+    }
+    ws['!cols'] = widths;
+    return ws;
+  }
+
+  function uniqueSheet(name, used) {
+    name = name.replace(/[\[\]:*?\/\\]/g, ' ').trim().slice(0, 31) || 'Sheet';
+    var base = name, i = 2;
+    while (used[name.toLowerCase()]) { var suf = ' ' + i++; name = base.slice(0, 31 - suf.length) + suf; }
+    used[name.toLowerCase()] = 1;
+    return name;
+  }
+
+  function stack(tables) {
+    var rows = [];
+    tables.forEach(function (t, i) { if (i) rows.push([]); t.rows.forEach(function (r) { rows.push(r); }); });
+    return rows;
+  }
+
+  function downloadBlob(blob, filename) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = filename; a.style.display = 'none';
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+  }
+
+  function exportXlsx() {
+    clearError();
+    if (!state.tables.length) return;
+    var btn = $('#p-xlsx'); btn.disabled = true;
+    loadLib('xlsx').then(function () {
+      var X = window.XLSX, wb = X.utils.book_new(), used = {}, conv = $('#p-num').checked, layout = $('#p-xlayout').value;
+      if (layout === 'one') X.utils.book_append_sheet(wb, sheetFrom(stack(state.tables), conv), 'Data');
+      else if (layout === 'page') {
+        var byPage = {}, order = [];
+        state.tables.forEach(function (t) { var p = t.pages[0]; if (!byPage[p]) { byPage[p] = []; order.push(p); } byPage[p].push(t); });
+        order.forEach(function (p) { X.utils.book_append_sheet(wb, sheetFrom(stack(byPage[p]), conv), uniqueSheet('Page ' + p, used)); });
+      } else {
+        state.tables.forEach(function (t) { X.utils.book_append_sheet(wb, sheetFrom(t.rows, conv), uniqueSheet(t.name, used)); });
+      }
+      var out = X.write(wb, { bookType: 'xlsx', type: 'array' });
+      downloadBlob(new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), baseName() + '.xlsx');
+    }).catch(function (e) { showError(e.message || 'The Excel file could not be created.'); }).then(function () { btn.disabled = false; });
+  }
+
+  function csvEscape(v) { v = v === undefined || v === null ? '' : String(v); return /[",\r\n]|^\s|\s$/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  function toCsv(rows) { return rows.map(function (r) { return r.map(csvEscape).join(','); }).join('\r\n'); }
+
+  function exportCsv() {
+    clearError();
+    if (!state.tables.length) return;
+    var all = $('#p-cscope').value === 'all';
+    var rows = all ? stack(state.tables) : state.tables[state.active].rows;
+    var name = baseName() + (all ? '' : '-' + state.tables[state.active].name.toLowerCase().replace(/\s+/g, '-'));
+    downloadBlob(new Blob(['﻿' + toCsv(rows)], { type: 'text/csv;charset=utf-8' }), name + '.csv');
+  }
+
+  function mdCell(v) { return String(v === undefined || v === null ? '' : v).replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/[\r\n]+/g, ' ').trim(); }
+  function tableToMd(tb) {
+    if (tb.type === 'text') return tb.rows.map(function (r) { return r.map(mdCell).join(' '); }).join('\n\n');
+    var w = Math.max.apply(null, tb.rows.map(function (r) { return r.length; }));
+    function line(r) { var o = []; for (var c = 0; c < w; c++) o.push(mdCell(r[c])); return '| ' + o.join(' | ') + ' |'; }
+    var sep = '|' + new Array(w + 1).join(' --- |');
+    return [line(tb.rows[0]), sep].concat(tb.rows.slice(1).map(line)).join('\n');
+  }
+  function exportMd() {
+    clearError();
+    if (!state.tables.length) return;
+    var all = $('#p-cscope').value === 'all';
+    var list = all ? state.tables : [state.tables[state.active]];
+    var md = list.map(function (t) { return (all ? '## ' + t.name + ' (page ' + t.pages[0] + (t.pages.length > 1 ? '\u2013' + t.pages[t.pages.length - 1] : '') + ')\n\n' : '') + tableToMd(t); }).join('\n\n') + '\n';
+    downloadBlob(new Blob([md], { type: 'text/markdown;charset=utf-8' }), baseName() + (all ? '' : '-' + list[0].name.toLowerCase().replace(/\s+/g, '-')) + '.md');
+  }
+
+  function copyTable() {
+    var tb = state.tables[state.active]; if (!tb) return;
+    var text = tb.rows.map(function (r) { return r.map(function (c) { return String(c === undefined ? '' : c).replace(/[\t\r\n]+/g, ' '); }).join('\t'); }).join('\n');
+    var done = function () { var b = $('#p-copy'), o = b.textContent; b.textContent = 'Copied ✓'; setTimeout(function () { b.textContent = o; }, 1800); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
+    function fallback() {
+      var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { showError('Copying is not available in this browser. Use the download buttons instead.'); }
+      ta.remove();
+    }
+  }
+
+  /* ---------- Events ---------- */
+  var drop = $('#p-drop');
+  $('#p-file').addEventListener('change', function (e) { acceptFile(e.target.files && e.target.files[0]); });
+  ['dragenter', 'dragover'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('is-over'); }); });
+  ['dragleave', 'drop'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('is-over'); }); });
+  drop.addEventListener('drop', function (e) { acceptFile(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]); });
+
+  $$('input[name=p-mode]').forEach(function (r) { r.addEventListener('change', updateModeUi); });
+  $('#p-change').addEventListener('click', resetAll);
+  $('#p-reset').addEventListener('click', resetAll);
+  $('#p-convert').addEventListener('click', runConversion);
+  $('#p-pw').addEventListener('keydown', function (e) { if (e.key === 'Enter') runConversion(); });
+  $('#p-pages').addEventListener('keydown', function (e) { if (e.key === 'Enter') runConversion(); });
+  $('#p-cancel').addEventListener('click', function () { state.cancel = true; $('#p-status').textContent = 'Cancelling…'; });
+
+  $('#p-sens').addEventListener('change', function () { analyzeAll(); deriveTables(); renderResults(); });
+  ['#p-join', '#p-text', '#p-trim'].forEach(function (id) { $(id).addEventListener('change', function () { deriveTables(); renderResults(); }); });
+
+  $('#p-tabs').addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('.p-tab') : null;
+    if (!b) return;
+    state.active = +b.getAttribute('data-i'); renderTable();
+  });
+  $('#p-del').addEventListener('click', function () {
+    state.tables.splice(state.active, 1);
+    state.active = Math.max(0, Math.min(state.active, state.tables.length - 1));
+    renderResults();
+  });
+  $('#p-scroll').addEventListener('input', function (e) {
+    var td = e.target;
+    if (!td || !td.getAttribute || td.getAttribute('data-r') === null) return;
+    var tb = state.tables[state.active], r = +td.getAttribute('data-r'), c = +td.getAttribute('data-c');
+    if (!tb.rows[r]) return;
+    while (tb.rows[r].length <= c) tb.rows[r].push('');
+    tb.rows[r][c] = td.textContent;
+  });
+  $('#p-scroll').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); var td = e.target, nxt = td.parentNode && td.parentNode.nextElementSibling; if (nxt) { var cell = nxt.querySelector('[data-c="' + td.getAttribute('data-c') + '"]'); if (cell) cell.focus(); } }
+  });
+  $('#p-scroll').addEventListener('paste', function (e) {
+    var t = (e.clipboardData || window.clipboardData); if (!t) return;
+    e.preventDefault();
+    var txt = t.getData('text/plain').replace(/[\r\n]+/g, ' ');
+    document.execCommand('insertText', false, txt);
+  });
+  $('#p-orig').addEventListener('toggle', function () { if ($('#p-orig').open) renderOriginal(); });
+
+  $('#p-xlsx').addEventListener('click', exportXlsx);
+  $('#p-csv').addEventListener('click', exportCsv);
+  $('#p-md').addEventListener('click', exportMd);
+  $('#p-copy').addEventListener('click', copyTable);
+
+  updateModeUi();
+  // Warm up the main libraries in the background so the first conversion starts faster.
+  setTimeout(function () { loadLib('pdf').catch(function () {}); loadLib('xlsx').catch(function () {}); }, 600);
+})();
+</script>
+</div>
