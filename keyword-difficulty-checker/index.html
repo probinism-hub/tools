@@ -1,0 +1,441 @@
+<!-- Keyword Difficulty Checker | paste this whole block into an Elementor "HTML" widget -->
+<div id="mckd-app">
+<style>
+#mckd-app{--bg:#f4f6fb;--card:#ffffff;--ink:#16192c;--muted:#5b6178;--line:#e2e6f0;--brand:#5b5bf0;--brand2:#8a5cf6;--brand-soft:#eceeff;--code:#f1f3f9;
+--c:#12a36b;--c-soft:#e3f6ee;--c-ink:#0b6e49;
+box-sizing:border-box;width:100%;max-width:1140px;margin:0 auto;padding:0;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;text-align:left}
+#mckd-app *,#mckd-app *::before,#mckd-app *::after{box-sizing:border-box}
+#mckd-app [hidden]{display:none!important}
+#mckd-app h1,#mckd-app h2,#mckd-app h3,#mckd-app p,#mckd-app ul,#mckd-app li,#mckd-app label,#mckd-app span,#mckd-app b,#mckd-app div,#mckd-app summary{font-family:inherit;letter-spacing:normal;text-transform:none;text-shadow:none}
+#mckd-app h1,#mckd-app h2,#mckd-app h3,#mckd-app p,#mckd-app ul{margin:0;padding:0;color:var(--ink)}
+#mckd-app ul{list-style:none}
+
+.mckd-wrap{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:0 10px 40px rgba(40,44,120,.08);overflow:hidden}
+.mckd-head{padding:clamp(22px,4vw,40px);background:linear-gradient(135deg,var(--brand) 0%,var(--brand2) 100%);color:#fff}
+#mckd-app .mckd-head h1{color:#fff;font-size:clamp(26px,4.2vw,38px);line-height:1.15;font-weight:800;margin:10px 0 8px}
+#mckd-app .mckd-head p{color:rgba(255,255,255,.92);font-size:17px;max-width:760px}
+#mckd-app .mckd-pill{display:inline-block;background:rgba(255,255,255,.2);color:#fff;border-radius:999px;padding:4px 14px;font-size:15px;font-weight:600}
+.mckd-body{padding:clamp(16px,3vw,32px);background:var(--bg)}
+
+/* tabs */
+.mckd-tabs{display:flex;gap:6px;background:#e7eaf5;border-radius:14px;padding:5px;margin-bottom:18px}
+#mckd-app button.mckd-tab{flex:1;appearance:none;-webkit-appearance:none;border:0;border-radius:10px;background:transparent;color:var(--muted);font-weight:600;font-size:16px;line-height:1.3;font-family:inherit;padding:12px 10px;cursor:pointer;box-shadow:none;text-transform:none;letter-spacing:normal;transition:background .15s,color .15s}
+#mckd-app button.mckd-tab:hover{background:rgba(255,255,255,.6);color:var(--ink)}
+#mckd-app button.mckd-tab[aria-selected="true"]{background:#fff;color:var(--brand);box-shadow:0 2px 8px rgba(40,44,120,.12)}
+#mckd-app button.mckd-tab:focus-visible,#mckd-app .mckd-btn:focus-visible,#mckd-app input:focus-visible,#mckd-app textarea:focus-visible,#mckd-app select:focus-visible,#mckd-app summary:focus-visible{outline:3px solid rgba(91,91,240,.45);outline-offset:2px}
+
+/* cards + form */
+.mckd-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(16px,2.6vw,26px)}
+.mckd-card+.mckd-card{margin-top:18px}
+#mckd-app .mckd-lbl{display:block;font-size:16px;font-weight:700;color:var(--ink);margin:0 0 6px}
+#mckd-app .mckd-hint{display:block;font-size:15px;color:var(--muted);font-weight:400;margin-top:2px}
+#mckd-app input[type=text],#mckd-app input[type=number],#mckd-app textarea,#mckd-app select{display:block;width:100%;margin:0;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font-weight:400;font-size:16px;line-height:1.4;font-family:inherit;padding:12px 14px;box-shadow:none;height:auto;min-height:48px;transition:border-color .15s,box-shadow .15s}
+#mckd-app textarea{resize:vertical;min-height:110px}
+#mckd-app input:focus,#mckd-app textarea:focus,#mckd-app select:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(91,91,240,.14);outline:none}
+#mckd-app ::placeholder{color:#8b91a8;opacity:1}
+.mckd-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:16px}
+.mckd-da-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,120px),1fr));gap:12px}
+.mckd-da-grid .mckd-lbl{font-size:15px;margin-bottom:4px}
+.mckd-sub{font-size:17px;font-weight:700;margin:22px 0 4px;color:var(--ink)}
+.mckd-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+#mckd-app .mckd-btn{appearance:none;-webkit-appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;font-weight:700;font-size:16px;line-height:1.2;font-family:inherit;padding:14px 24px;min-height:48px;cursor:pointer;text-decoration:none;text-transform:none;letter-spacing:normal;box-shadow:none;transition:transform .12s,box-shadow .15s,background .15s}
+#mckd-app .mckd-btn.pri{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;box-shadow:0 6px 18px rgba(91,91,240,.35)}
+#mckd-app .mckd-btn.pri:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(91,91,240,.45);color:#fff}
+#mckd-app .mckd-btn.sec{background:var(--brand-soft);color:var(--brand)}
+#mckd-app .mckd-btn.sec:hover{background:#dfe2ff;color:var(--brand)}
+#mckd-app .mckd-btn.pri:active,#mckd-app .mckd-btn.sec:active{transform:translateY(0)}
+.mckd-checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:16px;margin-top:6px}
+#mckd-app .mckd-tog{display:flex;align-items:center;gap:12px;font-size:16px;font-weight:600;color:var(--ink);padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;margin:0;min-height:48px}
+#mckd-app .mckd-tog input{font-size:16px;width:22px;height:22px;margin:0;flex:none;accent-color:var(--brand);cursor:pointer}
+#mckd-app .mckd-msg{margin-top:14px;padding:12px 16px;border-radius:12px;background:#fff1f1;color:#a31d1d;border:1px solid #f6cccc;font-size:16px;font-weight:600}
+
+/* result */
+.mckd-res{margin-top:22px}
+.mckd-res-grid{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:clamp(18px,3vw,34px);align-items:start}
+.mckd-kw{font-size:15px;color:var(--muted);font-weight:600;margin-bottom:2px}
+#mckd-app .mckd-kwname{font-size:21px;font-weight:800;word-break:break-word;margin-bottom:12px;color:var(--ink)}
+.mckd-gauge{position:relative;width:100%;max-width:320px;margin:0 auto}
+.mckd-gauge svg{display:block;width:100%;height:auto;overflow:visible}
+.mckd-gauge path{fill:none;stroke-width:16;stroke-linecap:round}
+.mckd-gauge .tr{stroke:#e8ebf5}
+.mckd-gauge .fl{stroke:var(--c);stroke-dasharray:282.74;stroke-dashoffset:282.74;transition:stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1)}
+.mckd-gnum{position:absolute;left:0;right:0;bottom:0;text-align:center;line-height:1}
+#mckd-app .mckd-gnum b{display:block;font-size:56px;font-weight:800;color:var(--c-ink)}
+#mckd-app .mckd-gnum span{font-size:15px;color:var(--muted);font-weight:600}
+.mckd-level{text-align:center;margin-top:14px}
+#mckd-app .mckd-badge{display:inline-block;background:var(--c-soft);color:var(--c-ink);border-radius:999px;padding:6px 18px;font-size:18px;font-weight:800}
+#mckd-app .mckd-adv{font-size:16px;color:var(--muted);margin-top:12px;text-align:center}
+.mckd-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+#mckd-app .mckd-chip{display:inline-block;background:var(--code);color:var(--ink);border-radius:999px;padding:5px 14px;font-size:15px;font-weight:600}
+#mckd-app h3.mckd-h3{font-size:19px;font-weight:800;margin:0 0 10px;color:var(--ink)}
+.mckd-fac{display:flex;flex-direction:column;gap:8px}
+.mckd-fac li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:start;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fbfcff}
+#mckd-app .mckd-d{min-width:58px;text-align:center;border-radius:8px;padding:2px 8px;font-size:15px;font-weight:800;background:var(--code);color:var(--ink)}
+#mckd-app .mckd-d.up{background:#fdeaea;color:#a31d1d}
+#mckd-app .mckd-d.dn{background:#e3f6ee;color:#0b6e49}
+#mckd-app .mckd-fac b{font-size:16px;font-weight:700;color:var(--ink)}
+#mckd-app .mckd-fac small{display:block;grid-column:2;font-size:15px;color:var(--muted);line-height:1.45}
+.mckd-sug{margin-top:22px;padding-top:20px;border-top:1px dashed var(--line)}
+#mckd-app .mckd-sug p{font-size:15px;color:var(--muted);margin-bottom:12px}
+.mckd-sugs{display:flex;flex-wrap:wrap;gap:10px}
+#mckd-app button.mckd-s{appearance:none;-webkit-appearance:none;display:inline-flex;align-items:center;gap:10px;border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;padding:9px 14px;font-weight:600;font-size:15px;line-height:1.3;font-family:inherit;cursor:pointer;text-align:left;box-shadow:none;text-transform:none;letter-spacing:normal;transition:border-color .15s,transform .12s}
+#mckd-app button.mckd-s:hover{border-color:var(--brand);transform:translateY(-1px);color:var(--ink);background:#fff}
+#mckd-app button.mckd-s span{background:var(--c-soft);color:var(--c-ink);border-radius:8px;padding:1px 8px;font-size:15px;font-weight:800}
+
+/* batch list */
+.mckd-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.mckd-bar select{width:auto!important;min-width:190px}
+.mckd-list{display:flex;flex-direction:column;gap:8px}
+#mckd-app button.mckd-item{appearance:none;-webkit-appearance:none;display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px 16px;align-items:center;width:100%;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:12px 14px;cursor:pointer;text-align:left;font-weight:400;font-size:16px;line-height:1.4;font-family:inherit;color:var(--ink);box-shadow:none;transition:border-color .15s}
+#mckd-app button.mckd-item:hover,#mckd-app button.mckd-item[aria-current="true"]{border-color:var(--brand);background:#fff;color:var(--ink)}
+#mckd-app .mckd-item .k{font-weight:700;word-break:break-word}
+#mckd-app .mckd-item .i{font-size:15px;color:var(--muted)}
+#mckd-app .mckd-item .sc{min-width:92px;text-align:center;border-radius:999px;padding:4px 12px;font-size:15px;font-weight:800;background:var(--c-soft);color:var(--c-ink)}
+
+/* scale legend + info */
+.mckd-scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));gap:10px;margin-top:6px}
+.mckd-scale div{border-radius:12px;padding:10px 12px;font-size:15px;color:var(--ink);background:var(--c-soft);border:1px solid rgba(0,0,0,.04)}
+#mckd-app .mckd-scale b{display:block;font-size:16px;color:var(--c-ink)}
+.mckd-info{margin-top:18px}
+#mckd-app details{border:1px solid var(--line);border-radius:14px;background:#fff;padding:0 18px;margin-top:10px}
+#mckd-app summary{cursor:pointer;font-size:17px;font-weight:700;padding:15px 0;color:var(--ink);list-style-position:inside}
+#mckd-app details p{font-size:16px;color:var(--muted);padding:0 0 16px}
+#mckd-app .mckd-note{font-size:15px;color:var(--muted);margin-top:16px;text-align:center}
+
+/* levels */
+[data-l="1"]{--c:#12a36b;--c-soft:#e3f6ee;--c-ink:#0b6e49}
+[data-l="2"]{--c:#5aa616;--c-soft:#edf7dc;--c-ink:#3d6f0c}
+[data-l="3"]{--c:#e0a100;--c-soft:#fdf3d4;--c-ink:#7a5800}
+[data-l="4"]{--c:#ee7a1c;--c-soft:#ffeadb;--c-ink:#9a4a07}
+[data-l="5"]{--c:#e5483c;--c-soft:#fde6e4;--c-ink:#a8261c}
+[data-l="6"]{--c:#a3202f;--c-soft:#f9dfe2;--c-ink:#7e1520}
+
+@media (max-width:860px){
+ .mckd-res-grid{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+ .mckd-tabs{flex-direction:column}
+ #mckd-app button.mckd-item{grid-template-columns:minmax(0,1fr) auto}
+ #mckd-app .mckd-item .i{grid-column:1;grid-row:2}
+ #mckd-app .mckd-item .sc{grid-column:2;grid-row:1 / span 2}
+ .mckd-row .mckd-btn{flex:1 1 100%}
+ .mckd-bar select{width:100%!important}
+}
+@media (prefers-reduced-motion:reduce){#mckd-app *{transition:none!important}}
+</style>
+
+<div class="mckd-wrap">
+ <div class="mckd-head">
+  <span class="mckd-pill">Free SEO Tool · ModernConvert</span>
+  <h1>Keyword Difficulty Checker</h1>
+  <p>Find out how hard it is to rank for a keyword. Get an instant estimate, or enter the top Google results for a sharper score.</p>
+ </div>
+
+ <div class="mckd-body">
+  <div class="mckd-tabs" role="tablist" aria-label="Choose a mode">
+   <button class="mckd-tab" type="button" role="tab" id="mckd-t1" aria-selected="true" aria-controls="mckd-p1">⚡ Quick Estimate</button>
+   <button class="mckd-tab" type="button" role="tab" id="mckd-t2" aria-selected="false" aria-controls="mckd-p2">🔍 SERP Analysis</button>
+  </div>
+
+  <!-- QUICK -->
+  <div class="mckd-card" id="mckd-p1" role="tabpanel" aria-labelledby="mckd-t1">
+   <label class="mckd-lbl" for="mckd-kws">Keywords <span class="mckd-hint">One per line, up to 30. Ctrl/⌘ + Enter to check.</span></label>
+   <textarea id="mckd-kws" rows="4" placeholder="e.g. how to start a blog&#10;best running shoes&#10;car insurance"></textarea>
+   <div class="mckd-row">
+    <button class="mckd-btn pri" type="button" id="mckd-go1">Check Difficulty</button>
+    <button class="mckd-btn sec" type="button" id="mckd-sample">Try examples</button>
+    <button class="mckd-btn sec" type="button" id="mckd-clear1">Clear</button>
+   </div>
+   <div class="mckd-msg" id="mckd-m1" role="alert" hidden></div>
+  </div>
+
+  <!-- SERP -->
+  <div class="mckd-card" id="mckd-p2" role="tabpanel" aria-labelledby="mckd-t2" hidden>
+   <div class="mckd-grid">
+    <div>
+     <label class="mckd-lbl" for="mckd-skw">Keyword</label>
+     <input type="text" id="mckd-skw" placeholder="e.g. best crm software" autocomplete="off">
+    </div>
+    <div>
+     <label class="mckd-lbl" for="mckd-mine">Your site authority <span class="mckd-hint">Optional, 0–100 (DA / DR)</span></label>
+     <input type="number" id="mckd-mine" min="0" max="100" inputmode="numeric" placeholder="e.g. 25">
+    </div>
+   </div>
+
+   <h2 class="mckd-sub">Authority of the top 10 Google results</h2>
+   <p class="mckd-hint" style="margin-bottom:12px">Search your keyword on Google, then enter the Domain Authority or Domain Rating (0–100) of each result from a free checker. Fill at least 3 (position 1 matters most).</p>
+   <div class="mckd-da-grid" id="mckd-das"></div>
+
+   <h2 class="mckd-sub">What does the results page look like?</h2>
+   <div class="mckd-checks">
+    <label class="mckd-tog"><input type="checkbox" id="mckd-snip"> Featured snippet shown</label>
+    <label class="mckd-tog"><input type="checkbox" id="mckd-ads"> Paid ads above results</label>
+   </div>
+   <div class="mckd-grid" style="margin-top:16px">
+    <div>
+     <label class="mckd-lbl" for="mckd-brands">Big brands in top 10 <span class="mckd-hint">Amazon, Wikipedia, YouTube, major publishers…</span></label>
+     <input type="number" id="mckd-brands" min="0" max="10" inputmode="numeric" value="0">
+    </div>
+    <div>
+     <label class="mckd-lbl" for="mckd-weak">Weak results in top 10 <span class="mckd-hint">Forums, Reddit/Quora, thin or outdated pages</span></label>
+     <input type="number" id="mckd-weak" min="0" max="10" inputmode="numeric" value="0">
+    </div>
+   </div>
+   <div class="mckd-row">
+    <button class="mckd-btn pri" type="button" id="mckd-go2">Calculate Difficulty</button>
+    <button class="mckd-btn sec" type="button" id="mckd-clear2">Clear</button>
+   </div>
+   <div class="mckd-msg" id="mckd-m2" role="alert" hidden></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="mckd-out" aria-live="polite"></div>
+
+  <div class="mckd-card mckd-info">
+   <h2 class="mckd-h3" style="font-size:19px;font-weight:800;margin-bottom:10px">Difficulty scale</h2>
+   <div class="mckd-scale">
+    <div data-l="1"><b>0–14 · Very Easy</b>Low competition</div>
+    <div data-l="2"><b>15–29 · Easy</b>Good starting point</div>
+    <div data-l="3"><b>30–49 · Moderate</b>Needs quality content</div>
+    <div data-l="4"><b>50–69 · Hard</b>Needs authority</div>
+    <div data-l="5"><b>70–84 · Very Hard</b>Strong sites dominate</div>
+    <div data-l="6"><b>85–100 · Extreme</b>Mostly out of reach</div>
+   </div>
+   <details>
+    <summary>How is the score calculated?</summary>
+    <p><b>Quick Estimate</b> reads the keyword itself: how many words it has, whether it contains commercial or informational wording, and whether it belongs to a highly competitive topic such as finance, insurance or hosting. It does not use live Google data, so treat it as a fast first filter.</p>
+    <p><b>SERP Analysis</b> uses the real results you enter. Higher positions count more, then the score is adjusted for snippets, ads, big brands and weak pages. It also compares the result with your own site's authority.</p>
+   </details>
+   <details>
+    <summary>Is this the same as Ahrefs or Semrush difficulty?</summary>
+    <p>No. Those tools use their own proprietary backlink databases. This tool gives a transparent, independent estimate you can use to compare keywords and prioritise your content. For high-stakes decisions, confirm with a paid tool.</p>
+   </details>
+   <details>
+    <summary>How do I find the authority of a website?</summary>
+    <p>Free Domain Authority and Domain Rating checkers are available from several SEO companies. Enter the domain of each Google result and copy the 0–100 number into the boxes above.</p>
+   </details>
+   <p class="mckd-note">Scores are estimates, not Google data. Nothing you type leaves your browser.</p>
+  </div>
+ </div>
+</div>
+
+<script>
+(function(){
+ var root=document.getElementById('mckd-app');
+ function $(s){return root.querySelector(s)}
+ function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+ function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
+
+ var LEVELS=[
+  {max:14,l:1,name:'Very Easy',adv:'Competition looks very light. A focused, helpful page could reach page one quickly, even on a new site.'},
+  {max:29,l:2,name:'Easy',adv:'A realistic target for newer sites. A well-written page that fully answers the search should have a good chance.'},
+  {max:49,l:3,name:'Moderate',adv:'Doable with strong content and some backlinks. Look for an angle that the current results miss.'},
+  {max:69,l:4,name:'Hard',adv:'Expect established, authoritative sites. You will likely need solid backlinks and topical depth to compete.'},
+  {max:84,l:5,name:'Very Hard',adv:'Dominated by strong sites. Consider longer, more specific variations of this keyword first.'},
+  {max:100,l:6,name:'Extreme',adv:'Very tough to win. Target related long-tail keywords and build authority before attempting this one.'}
+ ];
+ function level(s){for(var i=0;i<LEVELS.length;i++){if(s<=LEVELS[i].max)return LEVELS[i]}return LEVELS[5]}
+
+ /* ---------- Quick estimate engine ---------- */
+ var HEAD=['insurance','loan','loans','mortgage','credit card','credit score','casino','betting','crypto','bitcoin','forex','trading','lawyer','attorney','hosting','vpn','seo','hotel','hotels','flights','weight loss','payday','dentist','real estate','cbd','pharmacy','antivirus','investing','stocks','online degree','software','crm','accounting','tax','supplements'];
+ var COMM=['buy','price','prices','pricing','cheap','cheapest','discount','coupon','deal','deals','best','top','review','reviews','vs','versus','alternative','alternatives','order','sale','service','services','company','companies','near me','hire','quote'];
+ var INFO=['how to','what is','what are','why','guide','tutorial','tips','ideas','examples','example','definition','meaning','steps','ways to','checklist','template','explained','for beginners'];
+ var QUES=['who','when','where','which','can','does','do','is','are','should','will'];
+
+ function has(text,term){return new RegExp('(^|[^a-z0-9])'+term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'([^a-z0-9]|$)').test(text)}
+ function found(text,list){var o=[];for(var i=0;i<list.length;i++){if(has(text,list[i]))o.push(list[i])}return o}
+
+ function estimate(raw){
+  var kw=raw.trim().replace(/\s+/g,' '),t=kw.toLowerCase(),words=t?t.split(' ').length:0;
+  var f=[],sum=40;
+  function add(label,d,note){if(!d)return;sum+=d;f.push({label:label,d:d,note:note})}
+  var wd={1:28,2:12,3:0,4:-10,5:-16}[words];if(wd===undefined)wd=-22;
+  add(words+(words===1?' word':' words'),wd,words<=2?'Short, broad keywords attract the most competition.':words>=4?'Long-tail keywords are usually more specific and less contested.':'A mid-length keyword with average competition.');
+  var h=found(t,HEAD);if(h.length)add('Competitive topic',Math.min(20,h.length*12),'"'+h.slice(0,2).join('", "')+'" is a highly contested niche.');
+  var c=found(t,COMM);if(c.length)add('Commercial wording',Math.min(10,c.length*5),'Buyer-focused terms ("'+c.slice(0,2).join('", "')+'") draw advertisers and big sites.');
+  var inf=found(t,INFO),q=found(t,QUES);
+  if(inf.length)add('Informational wording',-Math.min(10,inf.length*6+2),'Learning-style searches ("'+inf[0]+'") tend to be easier to win.');
+  else if(q.length&&words>=3)add('Question format',-5,'Questions are usually less competitive than head terms.');
+  if(/\b20\d\d\b/.test(t))add('Includes a year',-6,'Year-specific searches have fewer lasting competitors.');
+  if(/\bfor [a-z]+/.test(t)&&words>=3&&inf.indexOf('for beginners')<0)add('Audience-specific',-8,'Targeting a specific audience narrows the competition.');
+  if(/\b(in|near) [a-z]+/.test(t)&&t.indexOf('near me')<0)add('Local modifier',-5,'Location-based searches are usually less competitive.');
+  if(t.indexOf('near me')>-1)add('"Near me" search',3,'Local pack results favour businesses with strong local signals.');
+  if(/\b(free|download)\b/.test(t))add('"Free" / "download"',4,'These searches are crowded with tool and software sites.');
+  if(kw.length>40)add('Very long phrase',-6,'Highly specific phrasing means few pages target it exactly.');
+  var score=clamp(Math.round(sum),1,100);
+  var intent=t.indexOf('near me')>-1?'Local':(/\b(buy|price|prices|pricing|cheap|cheapest|discount|coupon|deal|deals|order|sale|quote|hire)\b/.test(t)?'Transactional':(c.length?'Commercial':(inf.length||q.length?'Informational':'Mixed / Unclear')));
+  return{mode:'Quick Estimate',keyword:kw,score:score,words:words,intent:intent,factors:[{label:'Starting point',d:0,note:'Every keyword begins at 40 (average difficulty).',base:true}].concat(f)};
+ }
+
+ function ideas(kw){
+  var base=kw.toLowerCase(),yr=new Date().getFullYear();
+  var pre=['how to','best','what is','beginner guide to'],suf=['for beginners','for small business','tips','examples','checklist','template','near me',String(yr),'step by step','vs'];
+  var seen={},out=[];seen[base]=1;
+  function push(p){if(seen[p])return;seen[p]=1;var e=estimate(p);out.push({kw:p,score:e.score})}
+  if(base.split(' ').length>5)return[];
+  pre.forEach(function(p){if(base.indexOf(p)!==0)push(p+' '+base)});
+  suf.forEach(function(s){if(base.indexOf(s)<0)push(base+' '+s)});
+  return out;
+ }
+
+ /* ---------- SERP engine ---------- */
+ var W=[1.6,1.4,1.25,1.1,1,.9,.8,.7,.6,.5];
+ function serp(kw,das,mine,snip,ads,brands,weak){
+  var num=0,den=0,low=null,lowPos=0,n=0;
+  das.forEach(function(v,i){if(v===null)return;n++;num+=v*W[i];den+=W[i];if(low===null||v<low){low=v;lowPos=i+1}});
+  var avg=num/den,f=[],sum=avg;
+  f.push({label:'Weighted authority',d:0,note:'Top results average ~'+Math.round(avg)+' (higher positions count more, '+n+' results used).',base:true,val:Math.round(avg)});
+  function add(label,d,note){if(!d)return;sum+=d;f.push({label:label,d:d,note:note})}
+  if(snip)add('Featured snippet',3,'A snippet pushes organic results down the page.');
+  if(ads)add('Paid ads present',4,'Advertisers are bidding, so the topic is commercially valuable and competitive.');
+  if(brands)add('Big brands ranking',Math.min(10,brands*2),brands+' major brand'+(brands>1?'s':'')+' in the top 10 are hard to outrank.');
+  if(weak)add('Weak results',-Math.min(9,weak*3),weak+' forum, thin or outdated result'+(weak>1?'s':'')+' show room to outperform.');
+  var score=clamp(Math.round(sum),1,100),extra=[];
+  f.push({label:'Weakest result',d:0,note:'Lowest authority is '+low+' at position '+lowPos+'.',base:true,val:low});
+  var chance=null;
+  if(mine!==null){
+   var gap=mine-avg,txt,cls;
+   if(gap>=10){txt='High';cls='dn'}else if(gap>=-5){txt='Fair';cls='dn'}else if(gap>=-20){txt='Low';cls='up'}else{txt='Very low';cls='up'}
+   chance={txt:txt,cls:cls};
+   var tip=low<=mine+10?' Your authority is within reach of the weakest result (DA '+low+'), so a well-targeted page could break in.':' Even the weakest result is stronger than your site, so build authority first or aim for related long-tail keywords.';
+   f.push({label:'Your ranking chance: '+txt,d:0,note:'Your authority is '+mine+' vs a weighted top-10 average of '+Math.round(avg)+'.'+tip,base:true,chance:cls});
+  }
+  return{mode:'SERP Analysis',keyword:kw,score:score,words:kw.split(/\s+/).length,intent:null,factors:f};
+ }
+
+ /* ---------- Rendering ---------- */
+ var out=$('#mckd-out'),batch=[],sortMode='orig';
+
+ function gauge(score){
+  return '<div class="mckd-gauge"><svg viewBox="0 0 200 108" aria-hidden="true"><path class="tr" d="M10 100 A90 90 0 0 1 190 100"/><path class="fl" d="M10 100 A90 90 0 0 1 190 100" data-s="'+score+'"/></svg><div class="mckd-gnum"><b>'+score+'</b><span>out of 100</span></div></div>';
+ }
+
+ function detail(r){
+  var lv=level(r.score);
+  var chips='<span class="mckd-chip">'+esc(r.mode)+'</span><span class="mckd-chip">'+r.words+(r.words===1?' word':' words')+'</span>'+(r.intent?'<span class="mckd-chip">Intent: '+esc(r.intent)+'</span>':'');
+  var fac=r.factors.map(function(x){
+   var d=x.base?(x.val!==undefined?x.val:'40'):(x.d>0?'+'+x.d:String(x.d));
+   var cls=x.base?'':(x.d>0?'up':'dn');
+   if(x.chance)d='✓',cls=x.chance;
+   return '<li><span class="mckd-d '+cls+'">'+esc(d)+'</span><b>'+esc(x.label)+'</b><small>'+esc(x.note)+'</small></li>';
+  }).join('');
+  var sug='';
+  if(r.mode==='Quick Estimate'){
+   var all=ideas(r.keyword).filter(function(i){return i.score<r.score}).sort(function(a,b){return a.score-b.score}).slice(0,8);
+   if(all.length){
+    sug='<div class="mckd-sug"><h3 class="mckd-h3">Easier keyword ideas</h3><p>Longer or more specific versions that look easier to rank for. Tap one to check it.</p><div class="mckd-sugs">'+
+    all.map(function(i){return '<button type="button" class="mckd-s" data-kw="'+esc(i.kw)+'" data-l="'+level(i.score).l+'">'+esc(i.kw)+' <span>'+i.score+'</span></button>'}).join('')+'</div></div>';
+   }
+  }
+  return '<div class="mckd-card mckd-res" data-l="'+lv.l+'"><div class="mckd-res-grid"><div>'+
+   '<div class="mckd-kw">Keyword</div><div class="mckd-kwname">'+esc(r.keyword)+'</div>'+gauge(r.score)+
+   '<div class="mckd-level"><span class="mckd-badge">'+lv.name+'</span></div><p class="mckd-adv">'+lv.adv+'</p></div>'+
+   '<div><div class="mckd-chips">'+chips+'</div><h3 class="mckd-h3">Why this score?</h3><ul class="mckd-fac">'+fac+'</ul></div></div>'+sug+
+   '<div class="mckd-row"><button type="button" class="mckd-btn sec" data-act="copy">Copy result</button></div></div>';
+ }
+
+ function sorted(){
+  var a=batch.slice();
+  if(sortMode==='asc')a.sort(function(x,y){return x.score-y.score});
+  if(sortMode==='desc')a.sort(function(x,y){return y.score-x.score});
+  return a;
+ }
+
+ var current=null;
+ function render(){
+  var html='';
+  if(batch.length>1){
+   html+='<div class="mckd-card mckd-res"><div class="mckd-bar"><h3 class="mckd-h3" style="margin:0">Results ('+batch.length+' keywords)</h3><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><select id="mckd-sort" aria-label="Sort results"><option value="orig">Original order</option><option value="asc">Easiest first</option><option value="desc">Hardest first</option></select><button type="button" class="mckd-btn sec" data-act="csv">Download CSV</button></div></div><div class="mckd-list">'+
+   sorted().map(function(r){var lv=level(r.score);return '<button type="button" class="mckd-item" data-k="'+batch.indexOf(r)+'" data-l="'+lv.l+'" aria-current="'+(r===current)+'"><span><span class="k">'+esc(r.keyword)+'</span></span><span class="i">'+esc(r.intent||'')+'</span><span class="sc">'+r.score+' · '+lv.name+'</span></button>'}).join('')+'</div></div>';
+  }
+  html+=detail(current);
+  out.innerHTML=html;
+  var s=$('#mckd-sort');if(s){s.value=sortMode}
+  var fl=out.querySelector('.fl');
+  if(fl){var v=+fl.getAttribute('data-s');requestAnimationFrame(function(){requestAnimationFrame(function(){fl.style.strokeDashoffset=(282.74*(1-v/100)).toFixed(2)})})}
+ }
+
+ function show(list){
+  batch=list;current=list[0];sortMode=list.length>1?'orig':sortMode;render();
+  var el=out.firstElementChild;if(el&&el.scrollIntoView){try{el.scrollIntoView({behavior:'smooth',block:'start'})}catch(e){el.scrollIntoView()}}
+ }
+
+ function summary(r){var lv=level(r.score);return 'Keyword: '+r.keyword+'\nDifficulty: '+r.score+'/100 ('+lv.name+')\nMode: '+r.mode+'\nChecked with ModernConvert Keyword Difficulty Checker'}
+ function copy(text,btn){
+  function ok(){if(btn){var o=btn.textContent;btn.textContent='Copied ✓';setTimeout(function(){btn.textContent=o},1600)}}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(ok,fallback)}else fallback();
+  function fallback(){var a=document.createElement('textarea');a.value=text;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();try{document.execCommand('copy');ok()}catch(e){}document.body.removeChild(a)}
+ }
+ function csv(){
+  var rows=[['Keyword','Difficulty','Level','Words','Intent']].concat(sorted().map(function(r){return[r.keyword,r.score,level(r.score).name,r.words,r.intent||'']}));
+  var txt=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"'}).join(',')}).join('\r\n');
+  var b=new Blob(['﻿'+txt],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');
+  a.href=URL.createObjectURL(b);a.download='keyword-difficulty.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(a.href)},500);
+ }
+
+ /* ---------- Events ---------- */
+ var tabs=[$('#mckd-t1'),$('#mckd-t2')],panels=[$('#mckd-p1'),$('#mckd-p2')];
+ function setTab(i){tabs.forEach(function(t,k){t.setAttribute('aria-selected',k===i?'true':'false');t.tabIndex=k===i?0:-1;panels[k].hidden=k!==i});out.innerHTML=''}
+ tabs.forEach(function(t,i){
+  t.addEventListener('click',function(){setTab(i)});
+  t.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='ArrowLeft'){var n=(i+1)%2;setTab(n);tabs[n].focus()}});
+ });
+ tabs[1].tabIndex=-1;
+
+ var das=$('#mckd-das'),dh='';
+ for(var i=1;i<=10;i++)dh+='<div><label class="mckd-lbl" for="mckd-da'+i+'">Position #'+i+'</label><input type="number" id="mckd-da'+i+'" min="0" max="100" inputmode="numeric" placeholder="0–100"></div>';
+ das.innerHTML=dh;
+
+ function msg(id,t){var m=$(id);if(t){m.textContent=t;m.hidden=false}else m.hidden=true}
+
+ function runQuick(){
+  var lines=$('#mckd-kws').value.split(/\n/).map(function(s){return s.trim()}).filter(Boolean);
+  var seen={},list=[];lines.forEach(function(l){var k=l.toLowerCase();if(!seen[k]){seen[k]=1;list.push(l)}});
+  if(!list.length){msg('#mckd-m1','Please enter at least one keyword.');return}
+  if(list.length>30){msg('#mckd-m1','Please enter 30 keywords or fewer ('+list.length+' entered).');return}
+  msg('#mckd-m1','');
+  show(list.map(estimate));
+ }
+ function runSerp(){
+  var kw=$('#mckd-skw').value.trim().replace(/\s+/g,' ');
+  if(!kw){msg('#mckd-m2','Please enter the keyword you analysed.');return}
+  var arr=[],bad=false,n=0;
+  for(var i=1;i<=10;i++){
+   var raw=$('#mckd-da'+i).value.trim();
+   if(raw===''){arr.push(null);continue}
+   var v=Number(raw);if(isNaN(v)||v<0||v>100){bad=true;break}
+   arr.push(v);n++;
+  }
+  if(bad){msg('#mckd-m2','Authority values must be numbers between 0 and 100.');return}
+  if(n<3){msg('#mckd-m2','Please enter the authority of at least 3 results.');return}
+  var mineRaw=$('#mckd-mine').value.trim(),mine=null;
+  if(mineRaw!==''){mine=Number(mineRaw);if(isNaN(mine)||mine<0||mine>100){msg('#mckd-m2','Your site authority must be between 0 and 100.');return}}
+  var br=clamp(parseInt($('#mckd-brands').value,10)||0,0,10),wk=clamp(parseInt($('#mckd-weak').value,10)||0,0,10);
+  msg('#mckd-m2','');
+  show([serp(kw,arr,mine,$('#mckd-snip').checked,$('#mckd-ads').checked,br,wk)]);
+ }
+
+ $('#mckd-go1').addEventListener('click',runQuick);
+ $('#mckd-go2').addEventListener('click',runSerp);
+ $('#mckd-kws').addEventListener('keydown',function(e){if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();runQuick()}});
+ $('#mckd-skw').addEventListener('keydown',function(e){if(e.key==='Enter')runSerp()});
+ $('#mckd-sample').addEventListener('click',function(){$('#mckd-kws').value='how to start a blog\nbest running shoes\ncar insurance\nvegan meal prep ideas for beginners\nbuy bitcoin';runQuick()});
+ $('#mckd-clear1').addEventListener('click',function(){$('#mckd-kws').value='';msg('#mckd-m1','');out.innerHTML=''});
+ $('#mckd-clear2').addEventListener('click',function(){
+  root.querySelectorAll('#mckd-p2 input[type=text],#mckd-p2 input[type=number]').forEach(function(x){x.value=''});
+  $('#mckd-brands').value='0';$('#mckd-weak').value='0';$('#mckd-snip').checked=false;$('#mckd-ads').checked=false;msg('#mckd-m2','');out.innerHTML='';
+ });
+
+ out.addEventListener('click',function(e){
+  var t=e.target;if(!t.closest)return;
+  var sug=t.closest('.mckd-s');
+  if(sug){setTab(0);$('#mckd-kws').value=sug.getAttribute('data-kw');runQuick();return}
+  var item=t.closest('.mckd-item');
+  if(item){current=batch[+item.getAttribute('data-k')];render();var d=out.querySelectorAll('.mckd-card.mckd-res');if(d.length&&d[d.length-1].scrollIntoView){try{d[d.length-1].scrollIntoView({behavior:'smooth',block:'start'})}catch(x){}}return}
+  var act=t.closest('[data-act]');
+  if(act){var a=act.getAttribute('data-act');if(a==='copy')copy(batch.length>1?sorted().map(summary).join('\n\n'):summary(current),act);if(a==='csv')csv()}
+ });
+ out.addEventListener('change',function(e){if(e.target&&e.target.id==='mckd-sort'){sortMode=e.target.value;render()}});
+})();
+</script>
+</div>
