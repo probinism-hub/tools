@@ -1,0 +1,472 @@
+<!-- Link Shortener | paste this whole block into an Elementor "HTML" widget -->
+<div id="lsh-app">
+  <style>
+    #lsh-app{--lsh-indigo:#6366f1;--lsh-ink:#0f172a;--lsh-muted:#64748b;--lsh-border:#e5e9f2;--lsh-soft:#f7f8fc;width:100%;max-width:1140px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.6;color:var(--lsh-ink);text-align:left;-webkit-font-smoothing:antialiased}
+    #lsh-app *,#lsh-app *::before,#lsh-app *::after{box-sizing:border-box}
+    #lsh-app [hidden]{display:none !important}
+    #lsh-app h2,#lsh-app h3,#lsh-app p,#lsh-app form{margin:0;padding:0}
+    #lsh-app button,#lsh-app input{font-family:inherit;font-size:inherit;line-height:normal;margin:0}
+    #lsh-app a{text-decoration:none}
+    #lsh-app .lsh-card{position:relative;background:#fff;border:1px solid rgba(15,23,42,.07);border-radius:26px;padding:clamp(22px,4vw,46px);box-shadow:0 26px 60px -24px rgba(15,23,42,.22),0 6px 18px -10px rgba(15,23,42,.08);overflow:hidden}
+    #lsh-app .lsh-card::before{content:"";position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,#6366f1,#a855f7 55%,#ec4899)}
+    #lsh-app .lsh-head{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+    #lsh-app .lsh-logo{flex:0 0 auto;width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#6366f1,#a855f7);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 10px 22px -8px rgba(99,102,241,.75)}
+    #lsh-app .lsh-logo svg{width:26px;height:26px;display:block}
+    #lsh-app .lsh-title{font-size:clamp(22px,2.6vw,30px);font-weight:800;letter-spacing:-.02em;line-height:1.2;color:var(--lsh-ink)}
+    #lsh-app .lsh-sub{font-size:16px;color:var(--lsh-muted);max-width:640px;margin-top:2px}
+    #lsh-app .lsh-form{margin-top:26px}
+    #lsh-app .lsh-row{display:flex;gap:12px;align-items:stretch}
+    #lsh-app .lsh-input{flex:1 1 auto;min-width:0;height:60px;padding:0 18px;font-size:16px;color:var(--lsh-ink);background:var(--lsh-soft);border:1.5px solid var(--lsh-border);border-radius:15px;outline:none;transition:border-color .18s,box-shadow .18s,background .18s;-webkit-appearance:none;appearance:none}
+    #lsh-app .lsh-input::placeholder{color:#9aa6b8}
+    #lsh-app .lsh-input:focus{background:#fff;border-color:var(--lsh-indigo);box-shadow:0 0 0 4px rgba(99,102,241,.16)}
+    #lsh-app .lsh-btn{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;height:60px;padding:0 30px;font-size:16px;font-weight:700;color:#fff;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:15px;cursor:pointer;white-space:nowrap;box-shadow:0 12px 24px -12px rgba(99,102,241,.9);transition:transform .16s,box-shadow .16s,filter .16s;-webkit-appearance:none;appearance:none}
+    #lsh-app .lsh-btn:hover{transform:translateY(-2px)}
+    #lsh-app .lsh-btn:disabled{cursor:not-allowed;filter:grayscale(.25) brightness(.97);transform:none}
+    #lsh-app .lsh-btn.is-busy::after{content:"";width:17px;height:17px;margin-left:10px;border-radius:50%;border:2.5px solid rgba(255,255,255,.45);border-top-color:#fff;animation:lsh-spin .7s linear infinite}
+    @keyframes lsh-spin{to{transform:rotate(360deg)}}
+    #lsh-app .lsh-btn:focus-visible,#lsh-app .lsh-copy:focus-visible,#lsh-app .lsh-item-copy:focus-visible,#lsh-app .lsh-clear:focus-visible{outline:3px solid rgba(99,102,241,.45);outline-offset:2px}
+    #lsh-app .lsh-error{display:flex;align-items:flex-start;gap:8px;margin-top:12px;font-size:15px;font-weight:600;color:#dc2626}
+    #lsh-app .lsh-error svg{width:17px;height:17px;flex:0 0 auto;margin-top:3px}
+    #lsh-app .lsh-note{margin-top:14px;font-size:15px;color:#94a3b8}
+    #lsh-app .lsh-result{margin-top:22px;padding:18px 20px 20px;border:1px solid rgba(99,102,241,.28);border-radius:18px;background:linear-gradient(180deg,#f6f4ff,#fff 70%)}
+    #lsh-app .lsh-anim{animation:lsh-pop .38s cubic-bezier(.22,1,.36,1)}
+    @keyframes lsh-pop{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+    #lsh-app .lsh-badge{display:inline-flex;align-items:center;gap:6px;font-size:15px;font-weight:700;color:#4f46e5;background:rgba(99,102,241,.12);padding:5px 12px;border-radius:999px;margin-bottom:12px}
+    #lsh-app .lsh-badge svg{width:15px;height:15px}
+    #lsh-app .lsh-result-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    #lsh-app .lsh-short{flex:1 1 260px;min-width:0;font-size:17px;font-weight:800;color:#4f46e5;word-break:break-all}
+    #lsh-app .lsh-short:hover{color:#7c3aed;text-decoration:underline}
+    #lsh-app .lsh-copy{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:7px;height:46px;padding:0 20px;font-size:15px;font-weight:700;color:#fff;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:12px;cursor:pointer;transition:transform .16s,background .2s;-webkit-appearance:none;appearance:none}
+    #lsh-app .lsh-copy svg{width:16px;height:16px}
+    #lsh-app .lsh-copy:hover{transform:translateY(-2px)}
+    #lsh-app .lsh-copy.is-done{background:linear-gradient(135deg,#10b981,#059669)}
+    #lsh-app .lsh-orig{margin-top:12px;font-size:15px;color:var(--lsh-muted);word-break:break-all;line-height:1.5}
+    #lsh-app .lsh-orig b{color:#94a3b8;font-weight:700}
+    #lsh-app .lsh-history{margin-top:30px;padding-top:24px;border-top:1px dashed #e2e8f0}
+    #lsh-app .lsh-history-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px}
+    #lsh-app .lsh-history-head h3{font-size:17px;font-weight:800;color:var(--lsh-ink)}
+    #lsh-app .lsh-clear{background:none;border:none;padding:6px 2px;cursor:pointer;font-size:15px;font-weight:700;color:#94a3b8}
+    #lsh-app .lsh-clear:hover{color:#ef4444}
+    #lsh-app .lsh-history-list{display:flex;flex-direction:column;gap:10px}
+    #lsh-app .lsh-item{display:flex;align-items:center;gap:14px;padding:13px 16px;background:#fff;border:1px solid var(--lsh-border);border-radius:14px;transition:border-color .18s,box-shadow .18s}
+    #lsh-app .lsh-item:hover{border-color:#c7d2fe;box-shadow:0 12px 24px -18px rgba(79,70,229,.6)}
+    #lsh-app .lsh-item-main{flex:1 1 auto;min-width:0}
+    #lsh-app .lsh-item-short{display:block;font-size:16px;font-weight:700;color:#4f46e5;word-break:break-all;line-height:1.35}
+    #lsh-app .lsh-item-short:hover{text-decoration:underline}
+    #lsh-app .lsh-item-orig{font-size:15px;color:#a0aec0;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    #lsh-app .lsh-item-copy{flex:0 0 auto;height:40px;padding:0 16px;font-size:15px;font-weight:700;color:#4f46e5;background:rgba(99,102,241,.1);border:none;border-radius:10px;cursor:pointer;-webkit-appearance:none;appearance:none}
+    #lsh-app .lsh-item-copy:hover{background:rgba(99,102,241,.2)}
+    #lsh-app .lsh-item-copy.is-done{background:rgba(16,185,129,.15);color:#059669}
+    @media (max-width:760px){
+      #lsh-app .lsh-row{flex-direction:column;gap:10px}
+      #lsh-app .lsh-btn{width:100%;height:56px}
+      #lsh-app .lsh-input{height:56px}
+      #lsh-app .lsh-result-row{flex-direction:column;align-items:stretch}
+      #lsh-app .lsh-copy{width:100%}
+    }
+    @media (max-width:520px){
+      #lsh-app .lsh-card{border-radius:20px;padding:20px 16px 24px}
+      #lsh-app .lsh-item{flex-direction:column;align-items:stretch;gap:10px}
+      #lsh-app .lsh-item-copy{width:100%}
+      #lsh-app .lsh-item-orig{white-space:normal;word-break:break-all}
+      #lsh-app .lsh-history-head{flex-direction:column;align-items:flex-start;gap:2px}
+    }
+    @media (prefers-reduced-motion:reduce){#lsh-app *{animation:none !important;transition:none !important}}
+  </style>
+
+  <div class="lsh-card">
+    <div class="lsh-head">
+      <div class="lsh-logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      </div>
+      <div>
+        <h2 class="lsh-title">Link Shortener</h2>
+        <p class="lsh-sub">Paste a long URL and get a short, clean, shareable link in seconds.</p>
+      </div>
+    </div>
+
+    <form class="lsh-form" id="lsh-form" novalidate>
+      <div class="lsh-row">
+        <input id="lsh-input" class="lsh-input" type="text" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://example.com/my-very-long-link" aria-label="Long URL to shorten">
+        <button id="lsh-submit" class="lsh-btn" type="submit"><span class="lsh-btn-text">Shorten</span></button>
+      </div>
+      <div class="lsh-error" id="lsh-error" role="alert" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="lsh-error-text"></span>
+      </div>
+      <p class="lsh-note">Free to use &bull; No sign-up required &bull; Links are created instantly</p>
+    </form>
+
+    <div class="lsh-result" id="lsh-result" aria-live="polite" hidden>
+      <span class="lsh-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+        Short link ready
+      </span>
+      <div class="lsh-result-row">
+        <a id="lsh-short" class="lsh-short" href="#" target="_blank" rel="noopener noreferrer"></a>
+        <button id="lsh-copy" class="lsh-copy" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2.5"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span class="lsh-copy-text">Copy</span>
+        </button>
+      </div>
+      <div class="lsh-orig" id="lsh-orig"></div>
+    </div>
+
+    <section class="lsh-history" id="lsh-history" hidden>
+      <div class="lsh-history-head">
+        <h3>Recent links</h3>
+        <button type="button" class="lsh-clear" id="lsh-clear">Clear all</button>
+      </div>
+      <div class="lsh-history-list" id="lsh-history-list"></div>
+    </section>
+  </div>
+
+  <script>
+  (function () {
+    "use strict";
+
+    var app = document.getElementById('lsh-app');
+    if (!app || app.getAttribute('data-lsh-ready') === '1') return;
+    app.setAttribute('data-lsh-ready', '1');
+
+    /* ------------------------------------------------------------------
+       CONFIG
+       Browsers block calls to shortener APIs that don't send CORS headers,
+       which is the most likely reason a pure front-end shortener "does
+       nothing". The reliable fix is a tiny endpoint YOU control (e.g. a
+       Cloudflare Worker) that calls the shortener server-side. Put its URL
+       here; it must accept GET ?url=<encoded long url> and return JSON
+       {"short":"https://..."} (or plain text of the short URL), with
+       "Access-Control-Allow-Origin" set. Leave empty to use direct providers.
+       ------------------------------------------------------------------ */
+    var PROXY_ENDPOINT = '';
+    var TIMEOUT_MS = 8000;
+
+    var form       = app.querySelector('#lsh-form');
+    var input      = app.querySelector('#lsh-input');
+    var btn        = app.querySelector('#lsh-submit');
+    var btnText    = btn.querySelector('.lsh-btn-text');
+    var errorBox   = app.querySelector('#lsh-error');
+    var errorText  = app.querySelector('#lsh-error-text');
+    var resultEl   = app.querySelector('#lsh-result');
+    var shortLink  = app.querySelector('#lsh-short');
+    var origEl     = app.querySelector('#lsh-orig');
+    var copyBtn    = app.querySelector('#lsh-copy');
+    var copyTextEl = copyBtn.querySelector('.lsh-copy-text');
+    var histWrap   = app.querySelector('#lsh-history');
+    var histList   = app.querySelector('#lsh-history-list');
+    var clearBtn   = app.querySelector('#lsh-clear');
+
+    var STORAGE_KEY = 'lsh_history_v1';
+    var MAX_ITEMS   = 6;
+    var busy = false;
+
+    /* ---------------- Storage ---------------- */
+    function loadHistory() {
+      try {
+        var arr = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        if (!Array.isArray(arr)) return [];
+        return arr.filter(function (i) {
+          return i && typeof i.short === 'string' && typeof i.long === 'string';
+        }).slice(0, MAX_ITEMS);
+      } catch (e) { return []; }
+    }
+    function saveHistory() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch (e) {}
+    }
+    var items = loadHistory();
+
+    /* ---------------- Helpers ---------------- */
+    function pretty(url) { return String(url).replace(/^https?:\/\//i, ''); }
+
+    function normalizeUrl(value) {
+      var v = String(value || '').trim();
+      if (!v) return null;
+      if (!/^[a-zA-Z][a-zA-Z0-9+.\-]*:\/\//.test(v)) v = 'https://' + v;
+      var u;
+      try { u = new URL(v); } catch (e) { return null; }
+      if (u.protocol !== 'http:' && u.protocol !== 'https:') return null;
+      if (!u.hostname || u.hostname.indexOf('.') === -1) return null;
+      return u.href;
+    }
+
+    function isHttpUrl(s) { return /^https?:\/\/\S+$/i.test(s || ''); }
+
+    function showError(msg) { errorText.textContent = msg; errorBox.hidden = false; }
+    function hideError() { errorBox.hidden = true; errorText.textContent = ''; }
+
+    function setBusy(state) {
+      busy = state;
+      btn.disabled = state;
+      btn.classList.toggle('is-busy', state);
+      btnText.textContent = state ? 'Shortening' : 'Shorten';
+      input.disabled = state;
+    }
+
+    function copyToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text);
+      }
+      return new Promise(function (resolve, reject) {
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.cssText = 'position:fixed;top:-1000px;opacity:0';
+          document.body.appendChild(ta);
+          ta.select();
+          ta.setSelectionRange(0, ta.value.length);
+          var ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          ok ? resolve() : reject(new Error('copy failed'));
+        } catch (err) { reject(err); }
+      });
+    }
+
+    /* fetch with a timeout so one hung provider can't freeze the button */
+    function request(url, opts) {
+      var ctl = typeof AbortController === 'function' ? new AbortController() : null;
+      var timer = setTimeout(function () { if (ctl) ctl.abort(); }, TIMEOUT_MS);
+      opts = opts || {};
+      opts.mode = 'cors';
+      opts.credentials = 'omit';
+      opts.referrerPolicy = 'no-referrer';
+      if (ctl) opts.signal = ctl.signal;
+      return fetch(url, opts).then(function (r) {
+        clearTimeout(timer);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r;
+      }, function (e) { clearTimeout(timer); throw e; });
+    }
+
+    /* ---------------- Providers (tried in order) ---------------- */
+    var PROVIDERS = [];
+
+    if (PROXY_ENDPOINT) {
+      PROVIDERS.push({
+        name: 'Proxy',
+        run: function (url) {
+          return request(PROXY_ENDPOINT + (PROXY_ENDPOINT.indexOf('?') > -1 ? '&' : '?') + 'url=' + encodeURIComponent(url))
+            .then(function (r) { return r.text(); })
+            .then(function (t) {
+              t = (t || '').trim();
+              try { var j = JSON.parse(t); t = (j && (j.short || j.shorturl || j.result_url)) || ''; } catch (e) {}
+              return t;
+            });
+        }
+      });
+    }
+
+    PROVIDERS.push(
+      {
+        name: 'is.gd',
+        run: function (url) {
+          return request('https://is.gd/create.php?format=json&url=' + encodeURIComponent(url))
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+              if (d && d.errormessage) throw new Error(d.errormessage);
+              return d && d.shorturl;
+            });
+        }
+      },
+      {
+        name: 'CleanURI',
+        run: function (url) {
+          return request('https://cleanuri.com/api/v1/shorten', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'url=' + encodeURIComponent(url)
+          })
+            .then(function (r) { return r.json(); })
+            .then(function (d) { return d && d.result_url; });
+        }
+      },
+      {
+        name: 'TinyURL',
+        run: function (url) {
+          return request('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(url))
+            .then(function (r) { return r.text(); })
+            .then(function (t) { return (t || '').trim(); });
+        }
+      }
+    );
+
+    function shortenUrl(longUrl) {
+      var failures = [];
+      var i = 0;
+      function next() {
+        if (i >= PROVIDERS.length) {
+          var err = new Error('all providers failed');
+          err.failures = failures;
+          return Promise.reject(err);
+        }
+        var p = PROVIDERS[i++];
+        return p.run(longUrl).then(function (short) {
+          if (!isHttpUrl(short)) throw new Error('bad response');
+          return short;
+        }).catch(function (e) {
+          failures.push(p.name + ': ' + (e && e.message ? e.message : e));
+          return next();
+        });
+      }
+      return next();
+    }
+
+    /* ---------------- Result ---------------- */
+    function showResult(shortUrl, longUrl) {
+      shortLink.textContent = pretty(shortUrl);
+      shortLink.href = shortUrl;
+      origEl.innerHTML = '';
+      var label = document.createElement('b');
+      label.textContent = 'Original: ';
+      origEl.appendChild(label);
+      origEl.appendChild(document.createTextNode(longUrl));
+
+      copyBtn.setAttribute('data-url', shortUrl);
+      copyTextEl.textContent = 'Copy';
+      copyBtn.classList.remove('is-done');
+
+      resultEl.hidden = false;
+      resultEl.classList.remove('lsh-anim');
+      void resultEl.offsetWidth;
+      resultEl.classList.add('lsh-anim');
+    }
+
+    /* ---------------- History ---------------- */
+    function renderHistory() {
+      histList.innerHTML = '';
+      if (!items.length) { histWrap.hidden = true; return; }
+      histWrap.hidden = false;
+
+      items.forEach(function (item) {
+        var row = document.createElement('div');
+        row.className = 'lsh-item';
+
+        var main = document.createElement('div');
+        main.className = 'lsh-item-main';
+
+        var a = document.createElement('a');
+        a.className = 'lsh-item-short';
+        a.href = item.short;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = pretty(item.short);
+
+        var orig = document.createElement('div');
+        orig.className = 'lsh-item-orig';
+        orig.textContent = item.long;
+        orig.title = item.long;
+
+        main.appendChild(a);
+        main.appendChild(orig);
+
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'lsh-item-copy';
+        b.textContent = 'Copy';
+        b.setAttribute('data-url', item.short);
+
+        row.appendChild(main);
+        row.appendChild(b);
+        histList.appendChild(row);
+      });
+    }
+
+    function addHistory(shortUrl, longUrl) {
+      items = items.filter(function (i) { return i.short !== shortUrl; });
+      items.unshift({ short: shortUrl, long: longUrl });
+      items = items.slice(0, MAX_ITEMS);
+      saveHistory();
+      renderHistory();
+    }
+
+    /* ---------------- Events ---------------- */
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (busy) return;
+
+      hideError();
+      var raw = input.value.trim();
+
+      if (!raw) {
+        showError('Please paste a link first.');
+        input.focus();
+        return;
+      }
+
+      var longUrl = normalizeUrl(raw);
+      if (!longUrl) {
+        showError('That does not look like a valid link. Try something like https://example.com/page');
+        input.focus();
+        return;
+      }
+
+      setBusy(true);
+
+      shortenUrl(longUrl)
+        .then(function (shortUrl) {
+          showResult(shortUrl, longUrl);
+          addHistory(shortUrl, longUrl);
+          input.value = '';
+        })
+        .catch(function (err) {
+          if (window.console && console.warn) {
+            console.warn('[Link Shortener] all providers failed:', err && err.failures);
+          }
+          showError('Sorry, we could not shorten that link right now. Please try again in a moment.');
+        })
+        .then(function () {
+          setBusy(false);
+          input.focus();
+        });
+    });
+
+    input.addEventListener('input', function () { if (!errorBox.hidden) hideError(); });
+
+    function flash(el, okText, failText, ok, base) {
+      el.textContent = ok ? okText : failText;
+      el.classList.toggle('is-done', ok);
+      clearTimeout(el._timer);
+      el._timer = setTimeout(function () {
+        el.textContent = base;
+        el.classList.remove('is-done');
+      }, 1800);
+    }
+
+    copyBtn.addEventListener('click', function () {
+      var url = copyBtn.getAttribute('data-url');
+      if (!url) return;
+      copyToClipboard(url).then(
+        function () { flash(copyTextEl, 'Copied!', '', true, 'Copy'); copyBtn.classList.add('is-done'); },
+        function () { flash(copyTextEl, '', 'Copy failed', false, 'Copy'); }
+      );
+      clearTimeout(copyBtn._timer);
+      copyBtn._timer = setTimeout(function () { copyBtn.classList.remove('is-done'); }, 1800);
+    });
+
+    histList.addEventListener('click', function (e) {
+      var target = e.target;
+      while (target && target !== histList && !target.classList.contains('lsh-item-copy')) {
+        target = target.parentNode;
+      }
+      if (!target || target === histList) return;
+      var url = target.getAttribute('data-url');
+      if (!url) return;
+      copyToClipboard(url).then(
+        function () { flash(target, 'Copied!', '', true, 'Copy'); },
+        function () { flash(target, '', 'Failed', false, 'Copy'); }
+      );
+    });
+
+    clearBtn.addEventListener('click', function () {
+      items = [];
+      saveHistory();
+      renderHistory();
+      resultEl.hidden = true;
+      hideError();
+    });
+
+    renderHistory();
+  })();
+  </script>
+</div>
