@@ -1,0 +1,817 @@
+<!-- ============================================================
+  Keyword Generator for modernconvert.com
+  Paste this ENTIRE file into an Elementor "HTML" widget.
+  Single file: HTML + CSS + JavaScript. No external libraries.
+  Data source: live search-engine autocomplete suggestions
+  (Google, YouTube, Bing, Amazon), fetched in the visitor's browser.
+============================================================ -->
+<style>
+.mc-kg, .mc-kg * { box-sizing: border-box; }
+.mc-kg {
+  --kg-primary: #5b4bff;
+  --kg-primary-dark: #4435d6;
+  --kg-primary-soft: #eeecff;
+  --kg-ink: #14142b;
+  --kg-text: #3b3b58;
+  --kg-muted: #666684;
+  --kg-line: #e3e3f0;
+  --kg-bg: #f6f6fc;
+  --kg-card: #ffffff;
+  --kg-green: #12a36b;
+  --kg-orange: #ee7a1c;
+  --kg-red: #e5484d;
+  --kg-radius: 16px;
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--kg-text);
+  -webkit-text-size-adjust: 100%;
+}
+.mc-kg h1, .mc-kg h2, .mc-kg h3, .mc-kg p, .mc-kg ul, .mc-kg ol, .mc-kg li { margin: 0; padding: 0; }
+.mc-kg ul, .mc-kg ol { list-style: none; }
+.mc-kg button, .mc-kg input, .mc-kg select { font-family: inherit; }
+.mc-kg [hidden] { display: none !important; }
+
+/* ---------- Hero ---------- */
+.mc-kg .kg-hero {
+  background: linear-gradient(135deg, #5b4bff 0%, #8a4dff 55%, #c04dff 100%);
+  border-radius: 22px; padding: 40px 36px 64px; color: #fff; position: relative; overflow: hidden;
+}
+.mc-kg .kg-hero::after { content: ""; position: absolute; right: -80px; top: -80px; width: 280px; height: 280px; background: rgba(255,255,255,.12); border-radius: 50%; }
+.mc-kg .kg-hero::before { content: ""; position: absolute; left: -60px; bottom: -110px; width: 240px; height: 240px; background: rgba(255,255,255,.08); border-radius: 50%; }
+.mc-kg .kg-hero > * { position: relative; z-index: 1; }
+.mc-kg .kg-badge { display: inline-block; background: rgba(255,255,255,.2); color: #fff; font-weight: 600; font-size: 15px; padding: 5px 14px; border-radius: 999px; margin-bottom: 14px; }
+.mc-kg .kg-hero h1 { color: #fff; font-size: 38px; line-height: 1.15; font-weight: 800; letter-spacing: -.5px; margin-bottom: 10px; }
+.mc-kg .kg-hero p { color: rgba(255,255,255,.92); font-size: 17px; max-width: 680px; }
+
+/* ---------- Search card ---------- */
+.mc-kg .kg-search {
+  background: var(--kg-card); border: 1px solid var(--kg-line); border-radius: 18px; padding: 22px;
+  margin: -40px 24px 22px; position: relative; z-index: 2; box-shadow: 0 14px 38px rgba(40,30,120,.14);
+}
+.mc-kg .kg-row { display: flex; gap: 12px; align-items: stretch; }
+.mc-kg .kg-input-wrap { position: relative; flex: 1 1 auto; min-width: 0; }
+.mc-kg .kg-input-wrap svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; color: var(--kg-muted); pointer-events: none; }
+.mc-kg .kg-input {
+  width: 100%; height: 56px; padding: 0 16px 0 48px; font-size: 17px; color: var(--kg-ink);
+  background: var(--kg-bg); border: 2px solid var(--kg-line); border-radius: 12px; outline: none; transition: border-color .15s, box-shadow .15s, background .15s;
+}
+.mc-kg .kg-input::placeholder { color: #8a8aa6; opacity: 1; }
+.mc-kg .kg-input:focus { border-color: var(--kg-primary); background: #fff; box-shadow: 0 0 0 4px rgba(91,75,255,.15); }
+.mc-kg .kg-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px;
+  font-size: 16px; font-weight: 700; border-radius: 12px; border: 2px solid transparent; cursor: pointer; transition: all .18s; white-space: nowrap; line-height: 1.2;
+}
+.mc-kg .kg-btn svg { width: 19px; height: 19px; flex: 0 0 auto; }
+.mc-kg .kg-btn-primary { background: var(--kg-primary); color: #fff; box-shadow: 0 8px 20px rgba(91,75,255,.32); min-height: 56px; padding: 0 30px; font-size: 17px; }
+.mc-kg .kg-btn-primary:hover { background: var(--kg-primary-dark); transform: translateY(-1px); }
+.mc-kg .kg-btn-ghost { background: #fff; color: var(--kg-primary); border-color: var(--kg-line); }
+.mc-kg .kg-btn-ghost:hover { border-color: var(--kg-primary); background: var(--kg-primary-soft); }
+.mc-kg .kg-btn-danger { background: #fff; color: var(--kg-red); border-color: #f5c9cb; min-height: 44px; }
+.mc-kg .kg-btn-danger:hover { background: #fff1f1; }
+.mc-kg .kg-btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+.mc-kg .kg-btn:focus-visible, .mc-kg .kg-pill:focus-visible, .mc-kg .kg-chip:focus-visible, .mc-kg .kg-tab:focus-visible,
+.mc-kg .kg-icon-btn:focus-visible, .mc-kg .kg-select:focus-visible, .mc-kg .kg-field input:focus-visible { outline: 3px solid #b9b2ff; outline-offset: 2px; }
+
+.mc-kg .kg-options { display: flex; flex-wrap: wrap; gap: 16px 22px; align-items: flex-end; margin-top: 18px; }
+.mc-kg .kg-label { display: block; font-size: 15px; font-weight: 700; color: var(--kg-ink); margin-bottom: 7px; }
+.mc-kg .kg-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.mc-kg .kg-pill {
+  min-height: 44px; padding: 0 16px; border: 2px solid var(--kg-line); background: #fff; color: var(--kg-text);
+  font-size: 16px; font-weight: 600; border-radius: 999px; cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 7px;
+}
+.mc-kg .kg-pill:hover { border-color: var(--kg-primary); color: var(--kg-primary); }
+.mc-kg .kg-pill.is-active { background: var(--kg-primary); border-color: var(--kg-primary); color: #fff; box-shadow: 0 6px 14px rgba(91,75,255,.28); }
+.mc-kg .kg-select {
+  height: 46px; min-width: 190px; padding: 0 38px 0 14px; font-size: 16px; color: var(--kg-ink); border: 2px solid var(--kg-line); border-radius: 12px; background: #fff;
+  -webkit-appearance: none; appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23666684' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+}
+.mc-kg .kg-select:hover { border-color: #c9c6ee; }
+.mc-kg .kg-try { margin-top: 16px; font-size: 15px; color: var(--kg-muted); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.mc-kg .kg-chip { border: 1px dashed #c9c6ee; background: var(--kg-primary-soft); color: var(--kg-primary-dark); font-size: 15px; font-weight: 600; padding: 5px 13px; border-radius: 999px; cursor: pointer; min-height: 36px; }
+.mc-kg .kg-chip:hover { background: #e2deff; }
+
+/* ---------- Status ---------- */
+.mc-kg .kg-status { background: var(--kg-card); border: 1px solid var(--kg-line); border-radius: var(--kg-radius); padding: 20px 24px; margin-bottom: 22px; }
+.mc-kg .kg-status-top { display: flex; gap: 14px; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+.mc-kg .kg-status-text { font-size: 16px; font-weight: 600; color: var(--kg-ink); }
+.mc-kg .kg-bar { height: 10px; background: var(--kg-bg); border-radius: 99px; overflow: hidden; }
+.mc-kg .kg-bar > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #5b4bff, #c04dff); border-radius: 99px; transition: width .25s; }
+.mc-kg .kg-alert { margin-bottom: 22px; padding: 16px 20px; border-radius: 14px; font-size: 16px; background: #fff1f1; border: 1px solid #f5c9cb; color: #8f1d22; }
+.mc-kg .kg-alert strong { color: #7a1318; }
+
+/* ---------- Results ---------- */
+.mc-kg .kg-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+.mc-kg .kg-stat { background: var(--kg-card); border: 1px solid var(--kg-line); border-radius: 14px; padding: 18px 20px; box-shadow: 0 4px 18px rgba(40,30,120,.05); }
+.mc-kg .kg-stat b { display: block; font-size: 30px; line-height: 1.1; color: var(--kg-primary); font-weight: 800; letter-spacing: -.5px; }
+.mc-kg .kg-stat span { font-size: 15px; color: var(--kg-muted); font-weight: 600; }
+
+.mc-kg .kg-card { background: var(--kg-card); border: 1px solid var(--kg-line); border-radius: var(--kg-radius); box-shadow: 0 4px 18px rgba(40,30,120,.05); margin-bottom: 22px; overflow: hidden; }
+.mc-kg .kg-tabs { display: flex; gap: 6px; padding: 12px; border-bottom: 1px solid var(--kg-line); background: #fbfbff; overflow-x: auto; }
+.mc-kg .kg-tab { flex: 0 0 auto; border: 0; background: transparent; color: var(--kg-muted); font-size: 16px; font-weight: 700; padding: 0 18px; min-height: 46px; border-radius: 10px; cursor: pointer; transition: all .15s; white-space: nowrap; }
+.mc-kg .kg-tab small { font-size: 15px; font-weight: 700; margin-left: 6px; padding: 1px 9px; border-radius: 99px; background: var(--kg-line); color: var(--kg-text); }
+.mc-kg .kg-tab:hover { color: var(--kg-primary); background: var(--kg-primary-soft); }
+.mc-kg .kg-tab.is-active { background: var(--kg-primary); color: #fff; box-shadow: 0 6px 16px rgba(91,75,255,.32); }
+.mc-kg .kg-tab.is-active small { background: rgba(255,255,255,.25); color: #fff; }
+
+.mc-kg .kg-filters { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 14px; padding: 18px 20px; border-bottom: 1px solid var(--kg-line); }
+.mc-kg .kg-field label { display: block; font-size: 15px; font-weight: 700; color: var(--kg-ink); margin-bottom: 6px; }
+.mc-kg .kg-field input[type="text"], .mc-kg .kg-field input[type="number"], .mc-kg .kg-field .kg-select {
+  width: 100%; min-width: 0; height: 46px; padding: 0 14px; font-size: 16px; color: var(--kg-ink); border: 2px solid var(--kg-line); border-radius: 12px; background: #fff; outline: none;
+}
+.mc-kg .kg-field .kg-select { padding-right: 38px; }
+.mc-kg .kg-field input:focus { border-color: var(--kg-primary); box-shadow: 0 0 0 3px rgba(91,75,255,.14); }
+.mc-kg .kg-field input::placeholder { color: #8a8aa6; opacity: 1; }
+.mc-kg .kg-minmax { display: flex; gap: 8px; }
+
+.mc-kg .kg-toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--kg-line); }
+.mc-kg .kg-count { font-size: 16px; font-weight: 600; color: var(--kg-ink); }
+.mc-kg .kg-count span { color: var(--kg-muted); font-weight: 500; }
+.mc-kg .kg-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.mc-kg .kg-actions .kg-btn { min-height: 44px; padding: 0 16px; }
+
+.mc-kg .kg-head, .mc-kg .kg-item { display: grid; grid-template-columns: 52px minmax(0, 1fr) 78px 118px 150px 92px; align-items: center; gap: 10px; padding: 0 20px; }
+.mc-kg .kg-head { min-height: 48px; background: var(--kg-bg); font-size: 15px; font-weight: 700; color: var(--kg-muted); border-bottom: 1px solid var(--kg-line); }
+.mc-kg .kg-item { min-height: 60px; border-bottom: 1px solid var(--kg-line); transition: background .12s; }
+.mc-kg .kg-item:last-child { border-bottom: 0; }
+.mc-kg .kg-item:hover { background: #faf9ff; }
+.mc-kg .kg-item.is-sel { background: var(--kg-primary-soft); }
+.mc-kg .kg-chk { width: 22px; height: 22px; accent-color: var(--kg-primary); cursor: pointer; margin: 0; }
+.mc-kg .kg-kw { font-size: 17px; color: var(--kg-muted); word-break: break-word; padding: 10px 0; line-height: 1.35; }
+.mc-kg .kg-kw b { color: var(--kg-ink); font-weight: 700; }
+.mc-kg .kg-num { font-size: 16px; color: var(--kg-text); }
+.mc-kg .kg-type { display: inline-block; font-size: 15px; font-weight: 700; padding: 3px 11px; border-radius: 99px; background: var(--kg-bg); color: var(--kg-text); width: fit-content; }
+.mc-kg .kg-type.q { background: #e6f8f0; color: #0b7a50; }
+.mc-kg .kg-type.l { background: #fff1e3; color: #b05404; }
+.mc-kg .kg-rel { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; color: var(--kg-ink); }
+.mc-kg .kg-rel i { display: block; flex: 1 1 auto; height: 8px; background: var(--kg-line); border-radius: 99px; overflow: hidden; }
+.mc-kg .kg-rel i em { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #5b4bff, #c04dff); }
+.mc-kg .kg-rel span { min-width: 28px; text-align: right; }
+.mc-kg .kg-links { display: flex; gap: 6px; justify-content: flex-end; }
+.mc-kg .kg-icon-btn { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--kg-line); background: #fff; color: var(--kg-muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; transition: all .15s; padding: 0; }
+.mc-kg .kg-icon-btn svg { width: 19px; height: 19px; }
+.mc-kg .kg-icon-btn:hover { color: var(--kg-primary); border-color: var(--kg-primary); background: var(--kg-primary-soft); }
+.mc-kg .kg-icon-btn.ok { color: var(--kg-green); border-color: var(--kg-green); }
+.mc-kg .kg-empty { padding: 40px 20px; text-align: center; color: var(--kg-muted); font-size: 16px; }
+.mc-kg .kg-more { padding: 18px; text-align: center; border-top: 1px solid var(--kg-line); background: #fbfbff; }
+.mc-kg .kg-note { font-size: 15px; color: var(--kg-muted); padding: 14px 20px; border-top: 1px solid var(--kg-line); background: #fbfbff; }
+
+/* ---------- Info sections ---------- */
+.mc-kg .kg-info { background: var(--kg-card); border: 1px solid var(--kg-line); border-radius: var(--kg-radius); padding: 28px; box-shadow: 0 4px 18px rgba(40,30,120,.05); }
+.mc-kg .kg-info h2 { color: var(--kg-ink); font-size: 24px; font-weight: 800; letter-spacing: -.3px; margin-bottom: 18px; }
+.mc-kg .kg-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 26px; }
+.mc-kg .kg-step { background: var(--kg-bg); border-radius: 14px; padding: 18px; }
+.mc-kg .kg-step b { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: var(--kg-primary); color: #fff; font-size: 16px; margin-bottom: 10px; }
+.mc-kg .kg-step h3 { color: var(--kg-ink); font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+.mc-kg .kg-step p { font-size: 15.5px; color: var(--kg-text); }
+.mc-kg .kg-faq details { border: 1px solid var(--kg-line); border-radius: 12px; margin-bottom: 10px; background: #fff; }
+.mc-kg .kg-faq summary { cursor: pointer; padding: 15px 18px; font-size: 16.5px; font-weight: 700; color: var(--kg-ink); list-style: none; display: flex; justify-content: space-between; gap: 12px; align-items: center; min-height: 52px; }
+.mc-kg .kg-faq summary::-webkit-details-marker { display: none; }
+.mc-kg .kg-faq summary::after { content: "+"; font-size: 24px; color: var(--kg-primary); line-height: 1; flex: 0 0 auto; }
+.mc-kg .kg-faq details[open] summary::after { content: "\2212"; }
+.mc-kg .kg-faq details p { padding: 0 18px 16px; font-size: 16px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 960px) {
+  .mc-kg .kg-filters { grid-template-columns: 1fr 1fr; }
+  .mc-kg .kg-stats { grid-template-columns: repeat(2, 1fr); }
+  .mc-kg .kg-head, .mc-kg .kg-item { grid-template-columns: 44px minmax(0, 1fr) 70px 108px 120px 90px; gap: 8px; padding: 0 14px; }
+}
+@media (max-width: 760px) {
+  .mc-kg .kg-hero { padding: 30px 22px 58px; border-radius: 18px; }
+  .mc-kg .kg-hero h1 { font-size: 30px; }
+  .mc-kg .kg-hero p { font-size: 16px; }
+  .mc-kg .kg-search { margin: -36px 12px 20px; padding: 18px; }
+  .mc-kg .kg-row { flex-direction: column; }
+  .mc-kg .kg-btn-primary { width: 100%; }
+  .mc-kg .kg-select { width: 100%; }
+  .mc-kg .kg-options > div { width: 100%; }
+  .mc-kg .kg-steps { grid-template-columns: 1fr; }
+  .mc-kg .kg-head { display: none; }
+  .mc-kg .kg-item { grid-template-columns: 34px minmax(0, 1fr) auto; grid-template-areas: "c k l" ". m m"; row-gap: 4px; padding: 10px 14px 12px; min-height: 0; align-items: start; }
+  .mc-kg .kg-item .kg-chk { grid-area: c; margin-top: 8px; }
+  .mc-kg .kg-item .kg-kw { grid-area: k; padding: 6px 0 2px; }
+  .mc-kg .kg-item .kg-links { grid-area: l; }
+  .mc-kg .kg-item .kg-meta { grid-area: m; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+  .mc-kg .kg-item .kg-rel { width: 170px; }
+  .mc-kg .kg-meta-d { display: contents; }
+}
+@media (min-width: 761px) {
+  .mc-kg .kg-item .kg-meta { display: contents; }
+  .mc-kg .kg-meta-w { grid-column: 3; }
+  .mc-kg .kg-w { display: none; }
+}
+@media (max-width: 560px) {
+  .mc-kg .kg-filters { grid-template-columns: 1fr; padding: 16px; }
+  .mc-kg .kg-stat b { font-size: 26px; }
+  .mc-kg .kg-stat { padding: 14px 16px; }
+  .mc-kg .kg-info { padding: 20px 16px; }
+  .mc-kg .kg-toolbar { padding: 14px; }
+  .mc-kg .kg-actions { width: 100%; }
+  .mc-kg .kg-actions .kg-btn { flex: 1 1 calc(50% - 10px); padding: 0 10px; }
+  .mc-kg .kg-pill { flex: 1 1 calc(50% - 8px); justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) { .mc-kg * { transition: none !important; } }
+</style>
+
+<div class="mc-kg" id="mcKg">
+
+  <!-- Hero -->
+  <div class="kg-hero">
+    <span class="kg-badge">Free SEO Tool</span>
+    <h1>Keyword Generator</h1>
+    <p>Find thousands of relevant keyword ideas in seconds.</p>
+  </div>
+
+  <!-- Search -->
+  <form class="kg-search" id="kgForm" autocomplete="off" novalidate>
+    <div class="kg-row">
+      <div class="kg-input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input class="kg-input" id="kgSeed" type="text" maxlength="100" placeholder="Enter a word or phrase, e.g. coffee machine" aria-label="Seed keyword">
+      </div>
+      <button class="kg-btn kg-btn-primary" id="kgGo" type="submit">Find keywords</button>
+    </div>
+
+    <div class="kg-options">
+      <div>
+        <span class="kg-label" id="kgEngLbl">Search engine</span>
+        <div class="kg-pills" id="kgEngines" role="group" aria-labelledby="kgEngLbl">
+          <button type="button" class="kg-pill is-active" data-engine="google" aria-pressed="true">Google</button>
+          <button type="button" class="kg-pill" data-engine="youtube" aria-pressed="false">YouTube</button>
+          <button type="button" class="kg-pill" data-engine="amazon" aria-pressed="false">Amazon</button>
+          <button type="button" class="kg-pill" data-engine="bing" aria-pressed="false">Bing</button>
+        </div>
+      </div>
+      <div>
+        <label class="kg-label" for="kgCountry">Country</label>
+        <select class="kg-select" id="kgCountry"></select>
+      </div>
+      <div>
+        <label class="kg-label" for="kgDepth">Search depth</label>
+        <select class="kg-select" id="kgDepth">
+          <option value="quick">Quick (about 30 lookups)</option>
+          <option value="standard" selected>Standard (about 100 lookups)</option>
+          <option value="deep">Deep (about 300 lookups, most ideas)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="kg-try" id="kgTry">
+      <span>Try:</span>
+      <button type="button" class="kg-chip">coffee machine</button>
+      <button type="button" class="kg-chip">running shoes</button>
+      <button type="button" class="kg-chip">email marketing</button>
+      <button type="button" class="kg-chip">yoga</button>
+    </div>
+  </form>
+
+  <!-- Progress -->
+  <div class="kg-status" id="kgStatus" hidden role="status" aria-live="polite">
+    <div class="kg-status-top">
+      <div class="kg-status-text" id="kgStatusText">Searching…</div>
+      <button type="button" class="kg-btn kg-btn-danger" id="kgStop">Stop</button>
+    </div>
+    <div class="kg-bar"><i id="kgBar"></i></div>
+  </div>
+
+  <div class="kg-alert" id="kgAlert" hidden role="alert"></div>
+
+  <!-- Results -->
+  <div id="kgResults" hidden>
+    <div class="kg-stats">
+      <div class="kg-stat"><b id="kgStTotal">0</b><span>Keyword ideas</span></div>
+      <div class="kg-stat"><b id="kgStQ">0</b><span>Questions</span></div>
+      <div class="kg-stat"><b id="kgStLong">0</b><span>Long-tail (4+ words)</span></div>
+      <div class="kg-stat"><b id="kgStAvg">0</b><span>Avg. words per idea</span></div>
+    </div>
+
+    <div class="kg-card">
+      <div class="kg-tabs" role="tablist" aria-label="Keyword groups">
+        <button type="button" class="kg-tab is-active" role="tab" aria-selected="true" data-tab="all">All ideas <small id="kgTabAll">0</small></button>
+        <button type="button" class="kg-tab" role="tab" aria-selected="false" data-tab="questions">Questions <small id="kgTabQ">0</small></button>
+        <button type="button" class="kg-tab" role="tab" aria-selected="false" data-tab="long">Long-tail <small id="kgTabL">0</small></button>
+      </div>
+
+      <div class="kg-filters">
+        <div class="kg-field">
+          <label for="kgInc">Include words</label>
+          <input type="text" id="kgInc" placeholder="e.g. best, cheap">
+        </div>
+        <div class="kg-field">
+          <label for="kgExc">Exclude words</label>
+          <input type="text" id="kgExc" placeholder="e.g. free, review">
+        </div>
+        <div class="kg-field">
+          <label for="kgMatch">Seed match</label>
+          <select class="kg-select" id="kgMatch">
+            <option value="all">Has all seed words</option>
+            <option value="phrase">Has the exact phrase</option>
+            <option value="any">Any suggestion</option>
+          </select>
+        </div>
+        <div class="kg-field">
+          <label for="kgSort">Sort by</label>
+          <select class="kg-select" id="kgSort">
+            <option value="rel">Relevance</option>
+            <option value="az">A to Z</option>
+            <option value="wasc">Fewest words</option>
+            <option value="wdesc">Most words</option>
+          </select>
+        </div>
+        <div class="kg-field">
+          <label>Word count</label>
+          <div class="kg-minmax">
+            <input type="number" id="kgMin" min="1" max="20" placeholder="Min" aria-label="Minimum words">
+            <input type="number" id="kgMax" min="1" max="20" placeholder="Max" aria-label="Maximum words">
+          </div>
+        </div>
+      </div>
+
+      <div class="kg-toolbar">
+        <div class="kg-count" id="kgCount"></div>
+        <div class="kg-actions">
+          <button type="button" class="kg-btn kg-btn-ghost" id="kgCopy">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            <span id="kgCopyLbl">Copy</span>
+          </button>
+          <button type="button" class="kg-btn kg-btn-primary" id="kgCsv" style="min-height:44px;font-size:16px;padding:0 18px;box-shadow:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 19h16"/></svg>
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="kg-head" aria-hidden="true">
+        <span><input type="checkbox" class="kg-chk" id="kgAll" aria-label="Select all shown keywords"></span>
+        <span>Keyword</span><span>Words</span><span>Type</span><span>Relevance</span><span></span>
+      </div>
+      <div id="kgList"></div>
+      <div class="kg-more" id="kgMore" hidden><button type="button" class="kg-btn kg-btn-ghost" id="kgMoreBtn">Show more</button></div>
+      <div class="kg-note">Ideas come from live search-engine autocomplete. Relevance (1 to 100) shows how prominently a phrase appeared across all lookups. It is not monthly search volume.</div>
+    </div>
+  </div>
+
+  <!-- Info -->
+  <div class="kg-info">
+    <h2>How it works</h2>
+    <div class="kg-steps">
+      <div class="kg-step"><b>1</b><h3>Enter a seed keyword</h3><p>Type a topic, product or phrase you want to rank for.</p></div>
+      <div class="kg-step"><b>2</b><h3>Pick engine and country</h3><p>Get suggestions people actually type into Google, YouTube, Amazon or Bing.</p></div>
+      <div class="kg-step"><b>3</b><h3>Filter and export</h3><p>Narrow by questions, long-tail, words, then copy or download a CSV.</p></div>
+    </div>
+    <h2>Frequently asked questions</h2>
+    <div class="kg-faq">
+      <details><summary>Where do the keyword ideas come from?</summary><p>The tool asks the selected search engine for its autocomplete suggestions many times, using your seed keyword with letters, numbers, question words and common modifiers added. All the results are merged, de-duplicated and ranked.</p></details>
+      <details><summary>Does it show search volume or keyword difficulty?</summary><p>No. Those numbers come from paid keyword databases, and autocomplete does not provide them. This tool shows a relevance score instead. Use the Trends button on any row, or your preferred SEO tool, to check demand for the keywords you shortlist.</p></details>
+      <details><summary>Why do I get fewer results than expected?</summary><p>Very niche seed keywords have fewer suggestions. Try a broader term, switch to Deep search depth, or set Seed match to Any suggestion. If nothing loads at all, an ad blocker or network filter may be blocking the suggestion service.</p></details>
+      <details><summary>Is my data stored anywhere?</summary><p>No. Lookups run directly from your browser to the search engine. Nothing is sent to or saved on this website.</p></details>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var root = document.getElementById('mcKg');
+  if (!root) { return; }
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- Countries: code, name, language, Bing market, Amazon marketplace id ---------- */
+  var COUNTRIES = [
+    ['US', 'United States', 'en', 'en-US', 'ATVPDKIKX0DER'],
+    ['GB', 'United Kingdom', 'en', 'en-GB', 'A1F83G8C2ARO7P'],
+    ['CA', 'Canada', 'en', 'en-CA', 'A2EUQ1WTGCTBG2'],
+    ['AU', 'Australia', 'en', 'en-AU', 'A39IBJ37TRP1C6'],
+    ['IN', 'India', 'en', 'en-IN', 'A21TJRUUN4KGV'],
+    ['IE', 'Ireland', 'en', 'en-IE', ''],
+    ['NZ', 'New Zealand', 'en', 'en-NZ', ''],
+    ['ZA', 'South Africa', 'en', 'en-ZA', ''],
+    ['SG', 'Singapore', 'en', 'en-SG', ''],
+    ['PH', 'Philippines', 'en', 'en-PH', ''],
+    ['NG', 'Nigeria', 'en', 'en-NG', ''],
+    ['PK', 'Pakistan', 'en', 'en-PK', ''],
+    ['AE', 'United Arab Emirates', 'en', 'en-AE', ''],
+    ['DE', 'Germany', 'de', 'de-DE', 'A1PA6795UKMFR9'],
+    ['FR', 'France', 'fr', 'fr-FR', 'A13V1IB3VIYZZH'],
+    ['ES', 'Spain', 'es', 'es-ES', 'A1RKKUPIHCS9HS'],
+    ['IT', 'Italy', 'it', 'it-IT', 'APJ6JRA9NG5V4'],
+    ['NL', 'Netherlands', 'nl', 'nl-NL', ''],
+    ['PT', 'Portugal', 'pt', 'pt-PT', ''],
+    ['BR', 'Brazil', 'pt', 'pt-BR', 'A2Q3Y263D00KWC'],
+    ['MX', 'Mexico', 'es', 'es-MX', 'A1AM78C64UM0Y8'],
+    ['AR', 'Argentina', 'es', 'es-AR', ''],
+    ['SE', 'Sweden', 'sv', 'sv-SE', ''],
+    ['PL', 'Poland', 'pl', 'pl-PL', ''],
+    ['TR', 'Turkey', 'tr', 'tr-TR', ''],
+    ['RU', 'Russia', 'ru', 'ru-RU', ''],
+    ['ID', 'Indonesia', 'id', 'id-ID', ''],
+    ['JP', 'Japan', 'ja', 'ja-JP', 'A1VC38T7YXB528'],
+    ['KR', 'South Korea', 'ko', 'ko-KR', '']
+  ];
+  var CMAP = {};
+  var sel = $('kgCountry');
+  COUNTRIES.forEach(function (c) {
+    CMAP[c[0]] = c;
+    var o = document.createElement('option');
+    o.value = c[0]; o.textContent = c[1];
+    sel.appendChild(o);
+  });
+
+  /* ---------- State ---------- */
+  var S = {
+    engine: 'google', seed: '', seedWords: [], items: {}, running: false, stop: false,
+    ok: 0, fail: 0, tab: 'all', shown: 100, selected: {}, filtered: [], uid: 0, runId: 0
+  };
+  var PAGE = 100, CONC = 5, TIMEOUT = 9000;
+
+  /* ---------- Helpers ---------- */
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function norm(s) { return String(s).toLowerCase().replace(/\s+/g, ' ').trim(); }
+  function fmt(n) { return Number(n).toLocaleString('en-US'); }
+  function wc(s) { return s.split(' ').length; }
+  var QRE = /^(how|what|why|when|where|who|whom|whose|which|can|could|is|are|was|were|do|does|did|should|will|would|has|have|am|wie|was|warum|wann|wo|comment|pourquoi|quand|où|como|cómo|por qué|cuando|dónde|come|perché|quando|dove)\b/;
+  function isQuestion(k) { return QRE.test(k) || /\?$/.test(k); }
+
+  /* ---------- Fetching suggestions ---------- */
+  function jsonp(makeUrl) {
+    return new Promise(function (resolve, reject) {
+      var name = 'mcKgCb' + (++S.uid) + '_' + Math.random().toString(36).slice(2, 7);
+      var s = document.createElement('script'), done = false, t;
+      function cleanup() {
+        done = true; clearTimeout(t);
+        try { delete window[name]; } catch (e) { window[name] = undefined; }
+        if (s.parentNode) { s.parentNode.removeChild(s); }
+      }
+      window[name] = function (d) { if (!done) { cleanup(); resolve(d); } };
+      s.onerror = function () { if (!done) { cleanup(); reject(new Error('network')); } };
+      t = setTimeout(function () { if (!done) { cleanup(); reject(new Error('timeout')); } }, TIMEOUT);
+      s.async = true;
+      s.src = makeUrl(name);
+      document.head.appendChild(s);
+    });
+  }
+
+  function parseList(d) {
+    var list = [];
+    if (d && !Array.isArray(d) && d.suggestions) {
+      d.suggestions.forEach(function (x) { if (x && x.value) { list.push(x.value); } });
+      return list;
+    }
+    if (Array.isArray(d) && Array.isArray(d[1])) {
+      d[1].forEach(function (x) {
+        if (typeof x === 'string') { list.push(x); }
+        else if (Array.isArray(x) && typeof x[0] === 'string') { list.push(x[0]); }
+      });
+    }
+    return list;
+  }
+
+  function lookup(q) {
+    var c = CMAP[sel.value] || CMAP.US, enc = encodeURIComponent(q), cc = c[0].toLowerCase(), e = S.engine;
+    var p;
+    if (e === 'amazon') {
+      var mid = c[4] || CMAP.US[4];
+      p = fetch('https://completion.amazon.com/api/2017/suggestions?limit=11&alias=aps&plain-mid=1&mid=' + mid + '&lop=' + c[3].replace('-', '_') + '&prefix=' + enc)
+        .then(function (r) { if (!r.ok) { throw new Error('http'); } return r.json(); });
+    } else if (e === 'bing') {
+      p = jsonp(function (cb) { return 'https://api.bing.com/osjson.aspx?query=' + enc + '&language=' + c[2] + '&mkt=' + c[3] + '&JsonType=callback&JsonCallback=' + cb; });
+    } else if (e === 'youtube') {
+      p = jsonp(function (cb) { return 'https://suggestqueries.google.com/complete/search?client=youtube&ds=yt&hl=' + c[2] + '&gl=' + cc + '&q=' + enc + '&callback=' + cb; });
+    } else {
+      p = jsonp(function (cb) { return 'https://suggestqueries.google.com/complete/search?client=chrome&hl=' + c[2] + '&gl=' + cc + '&q=' + enc + '&callback=' + cb; });
+    }
+    return p.then(function (d) { S.ok++; return parseList(d); }, function () { S.fail++; return []; });
+  }
+
+  /* ---------- Query plan ---------- */
+  var AZ = 'abcdefghijklmnopqrstuvwxyz'.split('');
+  var DIG = '0123456789'.split('');
+  var QW = ['how', 'what', 'why', 'when', 'where', 'who', 'which', 'can', 'is', 'are', 'does', 'do', 'should', 'will'];
+  var PREP = ['for', 'with', 'without', 'near me', 'vs', 'versus', 'to', 'and', 'or', 'like', 'in', 'on', 'from', 'by', 'under', 'after', 'during', 'than'];
+  var MOD = ['best', 'top', 'cheap', 'free', 'online', 'easy', 'new', 'used', 'diy', 'review', 'price', 'cost', 'near me', 'tips', 'ideas', 'guide', 'tutorial', 'examples', 'benefits', 'alternatives', String(new Date().getFullYear())];
+
+  function plan(seed, depth) {
+    var q = [{ q: seed, w: 1 }];
+    AZ.forEach(function (l) { q.push({ q: seed + ' ' + l, w: 0.7 }); });
+    if (depth === 'quick') { return q; }
+    DIG.forEach(function (d) { q.push({ q: seed + ' ' + d, w: 0.5 }); });
+    AZ.forEach(function (l) { q.push({ q: l + ' ' + seed, w: 0.6 }); });
+    QW.forEach(function (w) { q.push({ q: w + ' ' + seed, w: 0.8 }); });
+    PREP.forEach(function (w) { q.push({ q: seed + ' ' + w, w: 0.7 }); });
+    MOD.forEach(function (w) { q.push({ q: w + ' ' + seed, w: 0.6 }); q.push({ q: seed + ' ' + w, w: 0.6 }); });
+    return q;
+  }
+
+  function addAll(list, w, seed) {
+    for (var i = 0; i < list.length; i++) {
+      var k = norm(list[i]);
+      if (!k || k.length > 120) { continue; }
+      var pts = (12 - Math.min(i, 11)) * w;
+      var it = S.items[k];
+      if (it) { it.score += pts; it.hits++; }
+      else { S.items[k] = { k: k, score: pts, hits: 1 }; }
+    }
+  }
+
+  function runQueue(list, runId, onTick) {
+    return new Promise(function (resolve) {
+      var i = 0, active = 0, done = 0, total = list.length;
+      function next() {
+        if (S.stop || runId !== S.runId) { if (!active) { resolve(); } return; }
+        while (active < CONC && i < list.length) {
+          (function (item) {
+            active++;
+            lookup(item.q).then(function (arr) {
+              if (runId === S.runId) { addAll(arr, item.w); }
+            }).then(function () {
+              active--; done++; onTick(done, total); next();
+            });
+          })(list[i++]);
+        }
+        if (!active && i >= list.length) { resolve(); }
+      }
+      next();
+    });
+  }
+
+  /* ---------- Run ---------- */
+  function setBusy(b) {
+    S.running = b;
+    $('kgGo').disabled = b;
+    $('kgGo').textContent = b ? 'Searching…' : 'Find keywords';
+  }
+
+  function showAlert(html) { var a = $('kgAlert'); if (html) { a.innerHTML = html; a.hidden = false; } else { a.hidden = true; } }
+
+  function topPhrases(n) {
+    var seed = S.seed;
+    return Object.keys(S.items).map(function (k) { return S.items[k]; })
+      .filter(function (it) { return it.k !== seed && wc(it.k) <= 5; })
+      .sort(function (a, b) { return b.score - a.score; }).slice(0, n);
+  }
+
+  function start() {
+    if (S.running) { return; }
+    var seed = norm($('kgSeed').value).replace(/[<>]/g, '');
+    if (!seed) { $('kgSeed').focus(); showAlert('<strong>Please enter a keyword</strong> to get started.'); return; }
+    showAlert('');
+    S.runId++;
+    var rid = S.runId;
+    S.seed = seed; S.seedWords = seed.split(' '); S.items = {}; S.ok = 0; S.fail = 0; S.stop = false;
+    S.selected = {}; S.shown = PAGE; S.tab = 'all';
+    setTab('all', true);
+    var depth = $('kgDepth').value;
+    var first = plan(seed, depth);
+    setBusy(true);
+    $('kgStatus').hidden = false;
+    $('kgResults').hidden = true;
+    var lastDraw = 0;
+
+    function progress(base, total) {
+      return function (done, tot) {
+        var pct = Math.round(((base + done) / total) * 100);
+        $('kgBar').style.width = Math.min(pct, 100) + '%';
+        $('kgStatusText').textContent = 'Searching… ' + Math.min(base + done, total) + ' of ' + total + ' lookups · ' + fmt(Object.keys(S.items).length) + ' ideas found';
+        var now = Date.now();
+        if (now - lastDraw > 400 && Object.keys(S.items).length) { lastDraw = now; $('kgResults').hidden = false; render(); }
+      };
+    }
+
+    var total1 = first.length, total = total1;
+    if (depth === 'deep') { total = total1 + 40 + 8 * 26; }
+    runQueue(first, rid, progress(0, total)).then(function () {
+      if (depth !== 'deep' || S.stop || rid !== S.runId) { return; }
+      var tops = topPhrases(40);
+      var second = tops.map(function (t) { return { q: t.k, w: 0.4 }; });
+      tops.slice(0, 8).forEach(function (t) { AZ.forEach(function (l) { second.push({ q: t.k + ' ' + l, w: 0.3 }); }); });
+      total = total1 + second.length;
+      return runQueue(second, rid, progress(total1, total));
+    }).then(function () {
+      if (rid !== S.runId) { return; }
+      setBusy(false);
+      $('kgStatus').hidden = true;
+      var n = Object.keys(S.items).length;
+      if (!n) {
+        $('kgResults').hidden = true;
+        showAlert('<strong>No suggestions could be loaded.</strong> ' + (S.ok === 0
+          ? 'The ' + S.engine + ' suggestion service could not be reached. Please check your connection, disable any ad blocker or privacy extension for this page, or try another search engine.'
+          : 'Try a broader keyword.'));
+        return;
+      }
+      if (S.fail > 0 && S.ok > 0 && S.fail > S.ok) {
+        showAlert('Some lookups failed, so the list may be incomplete. Run the search again for more ideas.');
+      }
+      $('kgResults').hidden = false;
+      render();
+      if (window.innerWidth < 900) { $('kgResults').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+  }
+
+  /* ---------- Filtering & rendering ---------- */
+  function words(v) { return norm(v).split(/[,\s]+/).filter(Boolean); }
+
+  function compute() {
+    var arr = Object.keys(S.items).map(function (k) { return S.items[k]; });
+    var max = 1;
+    arr.forEach(function (it) { if (it.score > max) { max = it.score; } });
+    arr.forEach(function (it) {
+      it.rel = Math.max(1, Math.round(100 * Math.sqrt(it.score / max)));
+      it.n = wc(it.k);
+      it.q = isQuestion(it.k);
+    });
+    return arr;
+  }
+
+  function matchesSeed(k, mode) {
+    if (mode === 'any') { return true; }
+    if (mode === 'phrase') { return k.indexOf(S.seed) !== -1; }
+    var toks = k.split(' ');
+    return S.seedWords.every(function (w) { return toks.some(function (t) { return t.indexOf(w) === 0 || t === w; }) || k.indexOf(w) !== -1; });
+  }
+
+  function render() {
+    var all = compute(), mode = $('kgMatch').value;
+    var inc = words($('kgInc').value), exc = words($('kgExc').value);
+    var mn = parseInt($('kgMin').value, 10), mx = parseInt($('kgMax').value, 10);
+    var base = all.filter(function (it) {
+      if (!matchesSeed(it.k, mode)) { return false; }
+      if (inc.length && !inc.some(function (w) { return it.k.indexOf(w) !== -1; })) { return false; }
+      if (exc.length && exc.some(function (w) { return it.k.indexOf(w) !== -1; })) { return false; }
+      if (mn && it.n < mn) { return false; }
+      if (mx && it.n > mx) { return false; }
+      return true;
+    });
+    var qs = base.filter(function (i) { return i.q; }), ls = base.filter(function (i) { return i.n >= 4; });
+    var sum = 0; base.forEach(function (i) { sum += i.n; });
+    $('kgStTotal').textContent = fmt(base.length);
+    $('kgStQ').textContent = fmt(qs.length);
+    $('kgStLong').textContent = fmt(ls.length);
+    $('kgStAvg').textContent = base.length ? (sum / base.length).toFixed(1) : '0';
+    $('kgTabAll').textContent = fmt(base.length);
+    $('kgTabQ').textContent = fmt(qs.length);
+    $('kgTabL').textContent = fmt(ls.length);
+
+    var list = S.tab === 'questions' ? qs : S.tab === 'long' ? ls : base;
+    var sort = $('kgSort').value;
+    list = list.slice().sort(function (a, b) {
+      if (sort === 'az') { return a.k < b.k ? -1 : a.k > b.k ? 1 : 0; }
+      if (sort === 'wasc') { return a.n - b.n || b.rel - a.rel; }
+      if (sort === 'wdesc') { return b.n - a.n || b.rel - a.rel; }
+      return b.rel - a.rel || (a.k < b.k ? -1 : 1);
+    });
+    S.filtered = list;
+
+    var shown = list.slice(0, S.shown), h = '';
+    var c = CMAP[sel.value] || CMAP.US;
+    shown.forEach(function (it) {
+      var toks = it.k.split(' '), kw = toks.map(function (t) {
+        return S.seedWords.indexOf(t) !== -1 ? esc(t) : '<b>' + esc(t) + '</b>';
+      }).join(' ');
+      var type = it.q ? '<span class="kg-type q">Question</span>' : it.n >= 4 ? '<span class="kg-type l">Long-tail</span>' : '<span class="kg-type">Keyword</span>';
+      var on = S.selected[it.k];
+      h += '<div class="kg-item' + (on ? ' is-sel' : '') + '">' +
+        '<input type="checkbox" class="kg-chk" data-k="' + esc(it.k) + '" aria-label="Select ' + esc(it.k) + '"' + (on ? ' checked' : '') + '>' +
+        '<div class="kg-kw">' + kw + '</div>' +
+        '<div class="kg-meta"><span class="kg-num kg-meta-w">' + it.n + '<span class="kg-w"> words</span></span>' + type +
+        '<div class="kg-rel" title="Relevance score"><i><em style="width:' + it.rel + '%"></em></i><span>' + it.rel + '</span></div></div>' +
+        '<div class="kg-links">' +
+        '<button type="button" class="kg-icon-btn" data-copy="' + esc(it.k) + '" aria-label="Copy ' + esc(it.k) + '" title="Copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>' +
+        '<a class="kg-icon-btn" target="_blank" rel="noopener noreferrer" href="https://trends.google.com/trends/explore?q=' + encodeURIComponent(it.k) + '&geo=' + c[0] + '" aria-label="Google Trends for ' + esc(it.k) + '" title="Google Trends"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></a>' +
+        '</div></div>';
+    });
+    $('kgList').innerHTML = h || '<div class="kg-empty">No keywords match your filters. Try loosening them.</div>';
+    $('kgMore').hidden = list.length <= S.shown;
+    $('kgMoreBtn').textContent = 'Show ' + Math.min(PAGE, list.length - S.shown) + ' more (' + fmt(list.length - S.shown) + ' remaining)';
+
+    var nSel = Object.keys(S.selected).length;
+    $('kgCount').innerHTML = 'Showing ' + fmt(Math.min(S.shown, list.length)) + ' of ' + fmt(list.length) + (nSel ? ' <span>· ' + fmt(nSel) + ' selected</span>' : '');
+    $('kgCopyLbl').textContent = nSel ? 'Copy selected' : 'Copy all';
+    $('kgAll').checked = shown.length > 0 && shown.every(function (it) { return S.selected[it.k]; });
+  }
+
+  function setTab(t, silent) {
+    S.tab = t; S.shown = PAGE;
+    var tabs = root.querySelectorAll('.kg-tab');
+    for (var i = 0; i < tabs.length; i++) {
+      var on = tabs[i].getAttribute('data-tab') === t;
+      tabs[i].classList.toggle('is-active', on);
+      tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
+    }
+    if (!silent) { render(); }
+  }
+
+  /* ---------- Copy / export ---------- */
+  function outputRows() {
+    var keys = Object.keys(S.selected);
+    if (keys.length) {
+      var set = {}; keys.forEach(function (k) { set[k] = 1; });
+      return S.filtered.filter(function (it) { return set[it.k]; });
+    }
+    return S.filtered;
+  }
+
+  function copyText(text, done) {
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+      document.body.appendChild(ta); ta.select();
+      var ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta); done(ok);
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+    } else { fallback(); }
+  }
+
+  function csvCell(v) {
+    v = String(v);
+    if (/^[=+\-@\t\r]/.test(v)) { v = "'" + v; }
+    return '"' + v.replace(/"/g, '""') + '"';
+  }
+
+  function download() {
+    var rows = outputRows();
+    if (!rows.length) { return; }
+    var lines = ['Keyword,Words,Type,Relevance'];
+    rows.forEach(function (it) {
+      lines.push([csvCell(it.k), it.n, it.q ? 'Question' : it.n >= 4 ? 'Long-tail' : 'Keyword', it.rel].join(','));
+    });
+    var blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'keywords-' + S.seed.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '') + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500);
+  }
+
+  /* ---------- Events ---------- */
+  $('kgForm').addEventListener('submit', function (e) { e.preventDefault(); start(); });
+  $('kgStop').addEventListener('click', function () { S.stop = true; $('kgStatusText').textContent = 'Stopping…'; });
+
+  $('kgEngines').addEventListener('click', function (e) {
+    var b = e.target.closest('.kg-pill'); if (!b) { return; }
+    S.engine = b.getAttribute('data-engine');
+    var all = $('kgEngines').querySelectorAll('.kg-pill');
+    for (var i = 0; i < all.length; i++) {
+      var on = all[i] === b;
+      all[i].classList.toggle('is-active', on);
+      all[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+  });
+
+  $('kgTry').addEventListener('click', function (e) {
+    var b = e.target.closest('.kg-chip'); if (!b) { return; }
+    $('kgSeed').value = b.textContent; start();
+  });
+
+  root.querySelector('.kg-tabs').addEventListener('click', function (e) {
+    var b = e.target.closest('.kg-tab'); if (b) { setTab(b.getAttribute('data-tab')); }
+  });
+
+  ['kgInc', 'kgExc', 'kgMin', 'kgMax'].forEach(function (id) {
+    var t;
+    $(id).addEventListener('input', function () { clearTimeout(t); t = setTimeout(function () { S.shown = PAGE; render(); }, 180); });
+  });
+  ['kgMatch', 'kgSort'].forEach(function (id) { $(id).addEventListener('change', function () { S.shown = PAGE; render(); }); });
+
+  $('kgMoreBtn').addEventListener('click', function () { S.shown += PAGE; render(); });
+
+  $('kgList').addEventListener('change', function (e) {
+    var c = e.target; if (!c.classList || !c.classList.contains('kg-chk')) { return; }
+    var k = c.getAttribute('data-k');
+    if (c.checked) { S.selected[k] = 1; } else { delete S.selected[k]; }
+    render();
+  });
+
+  $('kgList').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-copy]'); if (!b) { return; }
+    copyText(b.getAttribute('data-copy'), function (ok) {
+      if (!ok) { return; }
+      b.classList.add('ok'); setTimeout(function () { b.classList.remove('ok'); }, 1200);
+    });
+  });
+
+  $('kgAll').addEventListener('change', function () {
+    var on = this.checked;
+    S.filtered.slice(0, S.shown).forEach(function (it) { if (on) { S.selected[it.k] = 1; } else { delete S.selected[it.k]; } });
+    render();
+  });
+
+  $('kgCopy').addEventListener('click', function () {
+    var rows = outputRows(); if (!rows.length) { return; }
+    var lbl = $('kgCopyLbl');
+    copyText(rows.map(function (r) { return r.k; }).join('\n'), function (ok) {
+      lbl.textContent = ok ? 'Copied ' + fmt(rows.length) + '!' : 'Copy failed';
+      setTimeout(render, 1500);
+    });
+  });
+  $('kgCsv').addEventListener('click', download);
+})();
+</script>
