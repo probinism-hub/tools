@@ -1,0 +1,849 @@
+<!-- ============================================================
+  Keyword Difficulty Checker for modernconvert.com
+  Paste this ENTIRE file into an Elementor "HTML" widget.
+  Single file: HTML + CSS + JavaScript. No external libraries.
+============================================================ -->
+<style>
+.mc-kd, .mc-kd * { box-sizing: border-box; }
+.mc-kd {
+  --kd-primary: #5b4bff;
+  --kd-primary-dark: #4435d6;
+  --kd-primary-soft: #eeecff;
+  --kd-ink: #14142b;
+  --kd-text: #3b3b58;
+  --kd-muted: #666684;
+  --kd-line: #e3e3f0;
+  --kd-bg: #f6f6fc;
+  --kd-card: #ffffff;
+  --kd-green: #12a36b;
+  --kd-lime: #6fb52c;
+  --kd-yellow: #e5a50a;
+  --kd-orange: #ee7a1c;
+  --kd-red: #e5484d;
+  --kd-dark: #a3153f;
+  --kd-radius: 16px;
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--kd-text);
+  -webkit-text-size-adjust: 100%;
+}
+.mc-kd h1, .mc-kd h2, .mc-kd h3, .mc-kd p, .mc-kd ul, .mc-kd li { margin: 0; padding: 0; }
+.mc-kd ul { list-style: none; }
+.mc-kd button, .mc-kd input, .mc-kd select, .mc-kd textarea { font-family: inherit; }
+.mc-kd [hidden] { display: none !important; }
+
+/* ---------- Header ---------- */
+.mc-kd .kd-hero {
+  background: linear-gradient(135deg, #5b4bff 0%, #8a4dff 55%, #c04dff 100%);
+  border-radius: 22px;
+  padding: 40px 36px 36px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.mc-kd .kd-hero::after {
+  content: ""; position: absolute; right: -80px; top: -80px; width: 280px; height: 280px;
+  background: rgba(255,255,255,.12); border-radius: 50%;
+}
+.mc-kd .kd-hero::before {
+  content: ""; position: absolute; left: -60px; bottom: -110px; width: 240px; height: 240px;
+  background: rgba(255,255,255,.08); border-radius: 50%;
+}
+.mc-kd .kd-hero > * { position: relative; z-index: 1; }
+.mc-kd .kd-badge {
+  display: inline-block; background: rgba(255,255,255,.2); color: #fff; font-weight: 600;
+  font-size: 15px; padding: 5px 14px; border-radius: 999px; margin-bottom: 14px;
+}
+.mc-kd .kd-hero h1 { color: #fff; font-size: 38px; line-height: 1.15; font-weight: 800; letter-spacing: -.5px; margin-bottom: 10px; }
+.mc-kd .kd-hero p { color: rgba(255,255,255,.92); font-size: 17px; max-width: 680px; }
+
+/* ---------- Tabs ---------- */
+.mc-kd .kd-tabs {
+  display: flex; gap: 6px; background: var(--kd-card); border: 1px solid var(--kd-line);
+  border-radius: 14px; padding: 6px; margin: -24px 24px 22px; position: relative; z-index: 2;
+  box-shadow: 0 10px 30px rgba(40,30,120,.10);
+}
+.mc-kd .kd-tab {
+  flex: 1 1 0; min-width: 0; border: 0; background: transparent; color: var(--kd-muted); font-size: 16px; font-weight: 700;
+  padding: 13px 12px; border-radius: 10px; cursor: pointer; transition: all .2s; min-height: 48px;
+}
+.mc-kd .kd-tab:hover { color: var(--kd-primary); background: var(--kd-primary-soft); }
+.mc-kd .kd-tab.is-active { background: var(--kd-primary); color: #fff; box-shadow: 0 6px 16px rgba(91,75,255,.35); }
+.mc-kd .kd-tab:focus-visible, .mc-kd .kd-btn:focus-visible, .mc-kd .kd-chip:focus-visible { outline: 3px solid #b9b2ff; outline-offset: 2px; }
+
+/* ---------- Cards ---------- */
+.mc-kd .kd-card {
+  background: var(--kd-card); border: 1px solid var(--kd-line); border-radius: var(--kd-radius);
+  padding: 26px; box-shadow: 0 4px 18px rgba(40,30,120,.05); margin-bottom: 22px;
+}
+.mc-kd .kd-card h2 { color: var(--kd-ink); font-size: 22px; font-weight: 800; margin-bottom: 4px; line-height: 1.3; }
+.mc-kd .kd-card h3 { color: var(--kd-ink); font-size: 18px; font-weight: 700; margin-bottom: 10px; line-height: 1.3; }
+.mc-kd .kd-sub { color: var(--kd-muted); font-size: 15px; margin-bottom: 18px; }
+.mc-kd label.kd-label { display: block; font-size: 15px; font-weight: 700; color: var(--kd-ink); margin-bottom: 6px; }
+
+.mc-kd .kd-input, .mc-kd .kd-select, .mc-kd .kd-textarea {
+  width: 100%; font-size: 16px; color: var(--kd-ink); background: #fff;
+  border: 2px solid var(--kd-line); border-radius: 12px; padding: 12px 14px; min-height: 50px;
+  transition: border-color .2s, box-shadow .2s; margin: 0; box-shadow: none;
+}
+.mc-kd .kd-textarea { min-height: 170px; resize: vertical; line-height: 1.5; }
+.mc-kd .kd-input:focus, .mc-kd .kd-select:focus, .mc-kd .kd-textarea:focus {
+  outline: none; border-color: var(--kd-primary); box-shadow: 0 0 0 4px rgba(91,75,255,.15);
+}
+.mc-kd .kd-input::placeholder, .mc-kd .kd-textarea::placeholder { color: #9a9ab5; opacity: 1; }
+
+.mc-kd .kd-searchrow { display: flex; gap: 12px; }
+.mc-kd .kd-searchrow .kd-input { flex: 1; font-size: 18px; }
+
+/* ---------- Buttons ---------- */
+.mc-kd .kd-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+  border: 2px solid transparent; border-radius: 12px; font-size: 16px; font-weight: 700; padding: 12px 22px;
+  min-height: 50px; line-height: 1.2; transition: all .2s; text-decoration: none; margin: 0;
+}
+.mc-kd .kd-btn-primary { background: var(--kd-primary); color: #fff; box-shadow: 0 6px 16px rgba(91,75,255,.32); }
+.mc-kd .kd-btn-primary:hover { background: var(--kd-primary-dark); transform: translateY(-1px); color: #fff; }
+.mc-kd .kd-btn-ghost { background: #fff; color: var(--kd-primary); border-color: var(--kd-line); }
+.mc-kd .kd-btn-ghost:hover { border-color: var(--kd-primary); background: var(--kd-primary-soft); color: var(--kd-primary); }
+.mc-kd .kd-btn-sm { min-height: 44px; padding: 8px 16px; }
+.mc-kd .kd-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+
+/* ---------- Advanced panel ---------- */
+.mc-kd .kd-toggle {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;
+  background: var(--kd-bg); border: 2px dashed #cfcdf2; border-radius: 12px; padding: 14px 16px;
+  margin-top: 16px; cursor: pointer; color: var(--kd-ink); font-size: 16px; font-weight: 700; text-align: left;
+}
+.mc-kd .kd-toggle:hover { border-color: var(--kd-primary); }
+.mc-kd .kd-toggle small { display: block; font-size: 15px; font-weight: 500; color: var(--kd-muted); margin-top: 2px; }
+.mc-kd .kd-toggle .kd-arrow { transition: transform .25s; font-size: 20px; color: var(--kd-primary); flex: none; }
+.mc-kd .kd-toggle[aria-expanded="true"] .kd-arrow { transform: rotate(180deg); }
+.mc-kd .kd-adv { padding-top: 18px; }
+.mc-kd .kd-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.mc-kd .kd-note {
+  background: #fff8e6; border: 1px solid #f3dfa3; color: #6b5200; border-radius: 12px;
+  padding: 12px 14px; font-size: 15px; margin-bottom: 16px;
+}
+.mc-kd .kd-note-blue { background: var(--kd-primary-soft); border-color: #d6d2ff; color: #2e2699; }
+
+.mc-kd .kd-serp-head, .mc-kd .kd-serp-row {
+  display: grid; grid-template-columns: 44px 1fr 1fr 1.3fr; gap: 10px; align-items: center;
+}
+.mc-kd .kd-serp-head { font-size: 15px; font-weight: 700; color: var(--kd-muted); padding: 0 0 6px; }
+.mc-kd .kd-serp-row { margin-bottom: 10px; }
+.mc-kd .kd-pos {
+  width: 38px; height: 38px; border-radius: 10px; background: var(--kd-primary-soft); color: var(--kd-primary);
+  font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 16px;
+}
+.mc-kd .kd-mlabel { display: none; font-size: 15px; font-weight: 700; color: var(--kd-muted); margin-bottom: 4px; }
+
+.mc-kd .kd-feats { display: flex; flex-wrap: wrap; gap: 10px; }
+.mc-kd .kd-check {
+  display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 2px solid var(--kd-line);
+  border-radius: 10px; padding: 9px 14px; font-size: 15px; font-weight: 600; cursor: pointer; color: var(--kd-text);
+  min-height: 44px; user-select: none;
+}
+.mc-kd .kd-check input { width: 18px; height: 18px; accent-color: var(--kd-primary); margin: 0; }
+.mc-kd .kd-check:has(input:checked) { border-color: var(--kd-primary); background: var(--kd-primary-soft); color: var(--kd-primary-dark); }
+
+/* ---------- Results ---------- */
+.mc-kd .kd-result-top { display: grid; grid-template-columns: 340px 1fr; gap: 28px; align-items: center; }
+.mc-kd .kd-gauge-wrap { text-align: center; }
+.mc-kd .kd-gauge { width: 100%; max-width: 320px; height: auto; display: block; margin: 0 auto; }
+.mc-kd .kd-gauge-track { fill: none; stroke: #ececf6; stroke-width: 18; stroke-linecap: round; }
+.mc-kd .kd-gauge-bar { fill: none; stroke-width: 18; stroke-linecap: round; transition: stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1), stroke .4s; }
+.mc-kd .kd-gauge-num { font-size: 52px; font-weight: 800; fill: var(--kd-ink); text-anchor: middle; }
+.mc-kd .kd-gauge-max { font-size: 16px; font-weight: 600; fill: var(--kd-muted); text-anchor: middle; }
+.mc-kd .kd-level { display: inline-block; font-weight: 800; font-size: 18px; padding: 6px 18px; border-radius: 999px; color: #fff; margin-top: 4px; }
+.mc-kd .kd-kwtitle { font-size: 15px; font-weight: 700; color: var(--kd-muted); text-transform: uppercase; letter-spacing: .6px; }
+.mc-kd .kd-kwname { font-size: 28px; font-weight: 800; color: var(--kd-ink); word-break: break-word; line-height: 1.25; margin: 2px 0 10px; }
+.mc-kd .kd-verdict { font-size: 17px; margin-bottom: 14px; }
+.mc-kd .kd-meta { display: flex; flex-wrap: wrap; gap: 10px; }
+.mc-kd .kd-pill { background: var(--kd-bg); border: 1px solid var(--kd-line); border-radius: 999px; padding: 6px 14px; font-size: 15px; font-weight: 600; color: var(--kd-text); }
+.mc-kd .kd-pill b { color: var(--kd-ink); }
+
+.mc-kd .kd-scale { display: flex; height: 12px; border-radius: 999px; overflow: hidden; margin-top: 22px; }
+.mc-kd .kd-scale span { flex: 1; }
+.mc-kd .kd-scale-labels { display: flex; justify-content: space-between; font-size: 15px; color: var(--kd-muted); margin-top: 6px; }
+
+.mc-kd .kd-two { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.mc-kd .kd-factor { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--kd-line); font-size: 16px; }
+.mc-kd .kd-factor:last-child { border-bottom: 0; }
+.mc-kd .kd-delta { flex: none; min-width: 58px; text-align: center; font-weight: 800; border-radius: 8px; padding: 2px 8px; font-size: 15px; }
+.mc-kd .kd-delta.up { background: #fde8e9; color: #b3262b; }
+.mc-kd .kd-delta.down { background: #def5ea; color: #0c7a50; }
+.mc-kd .kd-delta.neutral { background: #ececf6; color: var(--kd-muted); }
+.mc-kd .kd-tips li { position: relative; padding: 9px 0 9px 30px; font-size: 16px; }
+.mc-kd .kd-tips li::before { content: "✓"; position: absolute; left: 0; top: 9px; width: 22px; height: 22px; border-radius: 50%; background: var(--kd-primary-soft); color: var(--kd-primary); font-weight: 800; font-size: 15px; text-align: center; line-height: 22px; }
+
+/* ---------- Tables ---------- */
+.mc-kd .kd-tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--kd-line); border-radius: 12px; }
+.mc-kd table.kd-table { width: 100%; border-collapse: collapse; min-width: 520px; margin: 0; border: 0; }
+.mc-kd .kd-table th, .mc-kd .kd-table td { text-align: left; padding: 12px 14px; font-size: 15px; border: 0; border-bottom: 1px solid var(--kd-line); background: transparent; vertical-align: middle; }
+.mc-kd .kd-table thead th { background: var(--kd-bg); color: var(--kd-ink); font-weight: 700; white-space: nowrap; }
+.mc-kd .kd-table tbody tr:last-child td { border-bottom: 0; }
+.mc-kd .kd-table tbody tr:hover td { background: #fafaff; }
+.mc-kd .kd-sortable { cursor: pointer; user-select: none; }
+.mc-kd .kd-sortable:hover { color: var(--kd-primary); }
+.mc-kd .kd-score-pill { display: inline-block; min-width: 46px; text-align: center; color: #fff; font-weight: 800; border-radius: 8px; padding: 2px 10px; font-size: 15px; }
+.mc-kd .kd-link { background: none; border: 0; color: var(--kd-primary); font-weight: 700; cursor: pointer; padding: 6px 0; font-size: 15px; text-align: left; min-height: 36px; }
+.mc-kd .kd-link:hover { text-decoration: underline; }
+
+/* ---------- Chips / history ---------- */
+.mc-kd .kd-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.mc-kd .kd-chip { border: 2px solid var(--kd-line); background: #fff; color: var(--kd-text); font-size: 15px; font-weight: 600; padding: 8px 16px; border-radius: 999px; cursor: pointer; transition: all .2s; min-height: 44px; }
+.mc-kd .kd-chip:hover { border-color: var(--kd-primary); color: var(--kd-primary); background: var(--kd-primary-soft); }
+
+.mc-kd .kd-empty { text-align: center; padding: 30px 10px; color: var(--kd-muted); font-size: 16px; }
+.mc-kd .kd-empty .kd-ico { font-size: 42px; display: block; margin-bottom: 8px; }
+.mc-kd .kd-foot { font-size: 15px; color: var(--kd-muted); text-align: center; padding: 6px 10px 0; }
+.mc-kd .kd-toast {
+  position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(30px); background: var(--kd-ink); color: #fff;
+  padding: 12px 22px; border-radius: 12px; font-size: 16px; font-weight: 600; opacity: 0; pointer-events: none;
+  transition: all .3s; z-index: 99999; max-width: 90vw; text-align: center;
+}
+.mc-kd .kd-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .mc-kd .kd-result-top { grid-template-columns: 1fr; gap: 14px; text-align: center; }
+  .mc-kd .kd-meta { justify-content: center; }
+  .mc-kd .kd-two { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .mc-kd .kd-hero { padding: 30px 20px 40px; border-radius: 18px; }
+  .mc-kd .kd-hero h1 { font-size: 29px; }
+  .mc-kd .kd-hero p { font-size: 16px; }
+  .mc-kd .kd-tabs { margin: -22px 10px 18px; }
+  .mc-kd .kd-card { padding: 18px 16px; }
+  .mc-kd .kd-searchrow { flex-direction: column; }
+  .mc-kd .kd-searchrow .kd-btn { width: 100%; }
+  .mc-kd .kd-grid2 { grid-template-columns: 1fr; }
+  .mc-kd .kd-serp-head { display: none; }
+  .mc-kd .kd-serp-row { grid-template-columns: 38px 1fr 1fr; background: var(--kd-bg); border-radius: 12px; padding: 12px; gap: 10px; }
+  .mc-kd .kd-serp-row .kd-type { grid-column: 2 / 4; }
+  .mc-kd .kd-pos { grid-row: 1 / span 2; align-self: start; }
+  .mc-kd .kd-mlabel { display: block; }
+  .mc-kd .kd-kwname { font-size: 24px; }
+  .mc-kd .kd-actions .kd-btn { flex: 1 1 100%; }
+}
+@media (max-width: 420px) {
+  .mc-kd .kd-tab { font-size: 15px; padding: 12px 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mc-kd * { transition: none !important; }
+}
+</style>
+
+<div class="mc-kd" id="mcKd">
+
+  <!-- HERO -->
+  <div class="kd-hero">
+    <span class="kd-badge">Free SEO Tool</span>
+    <h1>Keyword Difficulty Checker</h1>
+    <p>Find out how hard it is to rank for any keyword. Get an instant estimate, or add the top-10 Google results for a much more accurate score.</p>
+  </div>
+
+  <!-- TABS -->
+  <div class="kd-tabs" role="tablist">
+    <button class="kd-tab is-active" role="tab" aria-selected="true" data-tab="single" type="button">🔍 Single Keyword</button>
+    <button class="kd-tab" role="tab" aria-selected="false" data-tab="bulk" type="button">📋 Bulk Check</button>
+  </div>
+
+  <!-- ================= SINGLE ================= -->
+  <section data-panel="single">
+    <div class="kd-card">
+      <h2>Check a keyword</h2>
+      <p class="kd-sub">Type a keyword and press Check. For a more reliable result, open the accuracy panel below and add what you see in Google.</p>
+
+      <label class="kd-label" for="kdKeyword">Keyword</label>
+      <div class="kd-searchrow">
+        <input class="kd-input" id="kdKeyword" type="text" placeholder="e.g. best pdf converter" autocomplete="off" maxlength="120">
+        <button class="kd-btn kd-btn-primary" id="kdCheck" type="button">Check Difficulty</button>
+      </div>
+
+      <button class="kd-toggle" id="kdAdvToggle" type="button" aria-expanded="false" aria-controls="kdAdv">
+        <span>🎯 Improve accuracy with Google results (optional)
+          <small>Add the domain authority of the top-ranking pages</small></span>
+        <span class="kd-arrow">▾</span>
+      </button>
+
+      <div class="kd-adv" id="kdAdv" hidden>
+        <div class="kd-note kd-note-blue">
+          <b>How to use:</b> Search your keyword on Google. For each of the top 10 results, enter its Domain Authority (DA) or Domain Rating (DR) from any free checker such as Moz, Ahrefs or Ubersuggest. Referring domains is optional but makes the score more accurate. Fill at least 3 rows.
+        </div>
+
+        <div class="kd-grid2" style="margin-bottom:18px;">
+          <div>
+            <label class="kd-label" for="kdMyDa">Your website's DA / DR (optional)</label>
+            <input class="kd-input" id="kdMyDa" type="number" min="0" max="100" inputmode="numeric" placeholder="e.g. 25">
+          </div>
+          <div>
+            <label class="kd-label" for="kdVolume">Monthly search volume (optional)</label>
+            <input class="kd-input" id="kdVolume" type="number" min="0" inputmode="numeric" placeholder="e.g. 2400">
+          </div>
+        </div>
+
+        <h3>Top 10 Google results</h3>
+        <div class="kd-serp-head"><span>#</span><span>DA / DR (0-100)</span><span>Referring domains</span><span>Page type</span></div>
+        <div id="kdRows"></div>
+
+        <h3 style="margin-top:18px;">SERP features you see on the results page</h3>
+        <div class="kd-feats" id="kdFeats"></div>
+
+        <div class="kd-actions">
+          <button class="kd-btn kd-btn-ghost kd-btn-sm" id="kdExample" type="button">Fill example data</button>
+          <button class="kd-btn kd-btn-ghost kd-btn-sm" id="kdClearSerp" type="button">Clear results</button>
+        </div>
+      </div>
+
+      <div class="kd-actions">
+        <button class="kd-btn kd-btn-primary" id="kdCheck2" type="button">Check Difficulty</button>
+        <button class="kd-btn kd-btn-ghost" id="kdReset" type="button">Reset</button>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div id="kdResult" hidden>
+      <div class="kd-card">
+        <div class="kd-result-top">
+          <div class="kd-gauge-wrap">
+            <svg class="kd-gauge" viewBox="0 0 220 135" role="img" aria-label="Keyword difficulty gauge" id="kdGaugeSvg">
+              <path class="kd-gauge-track" d="M20 115 A90 90 0 0 1 200 115" pathLength="100"/>
+              <path class="kd-gauge-bar" id="kdGaugeBar" d="M20 115 A90 90 0 0 1 200 115" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/>
+              <text class="kd-gauge-num" id="kdGaugeNum" x="110" y="102">0</text>
+              <text class="kd-gauge-max" x="110" y="128">out of 100</text>
+            </svg>
+            <span class="kd-level" id="kdLevel">Easy</span>
+          </div>
+          <div>
+            <div class="kd-kwtitle">Keyword</div>
+            <div class="kd-kwname" id="kdKwName"></div>
+            <p class="kd-verdict" id="kdVerdict"></p>
+            <div class="kd-meta" id="kdMeta"></div>
+          </div>
+        </div>
+        <div class="kd-scale" aria-hidden="true">
+          <span style="background:#12a36b"></span><span style="background:#6fb52c"></span><span style="background:#e5a50a"></span><span style="background:#ee7a1c"></span><span style="background:#e5484d"></span><span style="background:#a3153f"></span>
+        </div>
+        <div class="kd-scale-labels"><span>0 · Very easy</span><span>100 · Extreme</span></div>
+      </div>
+
+      <div class="kd-two">
+        <div class="kd-card">
+          <h3>What's driving this score</h3>
+          <div id="kdFactors"></div>
+        </div>
+        <div class="kd-card">
+          <h3>Suggested next steps</h3>
+          <ul class="kd-tips" id="kdTips"></ul>
+        </div>
+      </div>
+
+      <div class="kd-card">
+        <h2>Related keyword ideas</h2>
+        <p class="kd-sub">Variations of your keyword with a quick difficulty estimate. Longer, more specific phrases are usually easier to rank for.</p>
+        <div class="kd-tablewrap">
+          <table class="kd-table">
+            <thead><tr><th>Keyword idea</th><th>Est. difficulty</th><th>Level</th><th></th></tr></thead>
+            <tbody id="kdIdeas"></tbody>
+          </table>
+        </div>
+        <div class="kd-actions">
+          <button class="kd-btn kd-btn-ghost kd-btn-sm" id="kdCopy" type="button">Copy results</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="kd-card" id="kdEmpty">
+      <div class="kd-empty"><span class="kd-ico">📈</span>Enter a keyword above to see its difficulty score.</div>
+      <div style="text-align:center;margin-top:6px;">
+        <p class="kd-sub" style="margin-bottom:10px;">Or try an example:</p>
+        <div class="kd-chips" style="justify-content:center;" id="kdExamples"></div>
+      </div>
+    </div>
+
+    <div class="kd-card" id="kdHistoryCard" hidden>
+      <h2>Recent checks</h2>
+      <p class="kd-sub">Saved only in your browser on this device.</p>
+      <div class="kd-chips" id="kdHistory"></div>
+      <div class="kd-actions"><button class="kd-btn kd-btn-ghost kd-btn-sm" id="kdClearHistory" type="button">Clear history</button></div>
+    </div>
+  </section>
+
+  <!-- ================= BULK ================= -->
+  <section data-panel="bulk" hidden>
+    <div class="kd-card">
+      <h2>Bulk keyword check</h2>
+      <p class="kd-sub">Paste one keyword per line (up to 200). You'll get a quick estimate for each, which you can sort and export.</p>
+      <label class="kd-label" for="kdBulkInput">Keywords</label>
+      <textarea class="kd-textarea" id="kdBulkInput" placeholder="best pdf converter&#10;how to convert jpg to png&#10;image compressor online&#10;video converter"></textarea>
+      <div class="kd-actions">
+        <button class="kd-btn kd-btn-primary" id="kdBulkRun" type="button">Check All</button>
+        <button class="kd-btn kd-btn-ghost" id="kdBulkClear" type="button">Clear</button>
+      </div>
+    </div>
+
+    <div class="kd-card" id="kdBulkResult" hidden>
+      <h2>Results</h2>
+      <p class="kd-sub" id="kdBulkSummary"></p>
+      <div class="kd-tablewrap">
+        <table class="kd-table">
+          <thead><tr>
+            <th class="kd-sortable" data-sort="kw">Keyword ⇅</th>
+            <th class="kd-sortable" data-sort="score">Difficulty ⇅</th>
+            <th class="kd-sortable" data-sort="score">Level</th>
+            <th class="kd-sortable" data-sort="words">Words ⇅</th>
+          </tr></thead>
+          <tbody id="kdBulkBody"></tbody>
+        </table>
+      </div>
+      <div class="kd-actions">
+        <button class="kd-btn kd-btn-primary kd-btn-sm" id="kdCsv" type="button">Download CSV</button>
+        <button class="kd-btn kd-btn-ghost kd-btn-sm" id="kdBulkCopy" type="button">Copy as text</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Honest disclaimer -->
+  <div class="kd-card">
+    <h3>How is the score calculated?</h3>
+    <p class="kd-sub" style="margin-bottom:10px;"><b>Quick estimate:</b> based on the keyword itself (length, commercial intent words, question words). This runs entirely in your browser, so it is a rough guide only and does not use live Google data.</p>
+    <p class="kd-sub" style="margin-bottom:0;"><b>Accurate mode:</b> uses the authority and backlinks of the pages you enter from Google's top 10, plus weak spots (forums, small sites) and SERP features. Scores are estimates and will differ from paid tools like Ahrefs, Semrush or Moz.</p>
+  </div>
+  <p class="kd-foot">Keyword Difficulty Checker by modernconvert.com</p>
+
+  <div class="kd-toast" id="kdToast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var root = document.getElementById("mcKd");
+  if (!root) return;
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- Config ---------- */
+  var LEVELS = [
+    { max: 14, name: "Very Easy", color: "#12a36b" },
+    { max: 29, name: "Easy", color: "#6fb52c" },
+    { max: 49, name: "Medium", color: "#e5a50a" },
+    { max: 69, name: "Hard", color: "#ee7a1c" },
+    { max: 84, name: "Very Hard", color: "#e5484d" },
+    { max: 100, name: "Extreme", color: "#a3153f" }
+  ];
+  var TYPES = [
+    { v: "normal", t: "Regular website / blog" },
+    { v: "brand", t: "Big brand / Wikipedia / Amazon" },
+    { v: "ugc", t: "Forum / Reddit / Quora" },
+    { v: "thin", t: "Small / new / thin site" }
+  ];
+  var FEATURES = [
+    { id: "snippet", t: "Featured snippet" },
+    { id: "paa", t: "People Also Ask" },
+    { id: "ads", t: "Many ads" },
+    { id: "video", t: "Video results" },
+    { id: "shopping", t: "Shopping results" },
+    { id: "local", t: "Local pack" }
+  ];
+  var COMMERCIAL = ["buy", "best", "price", "pricing", "cheap", "review", "reviews", "vs", "software", "service", "services", "tool", "tools", "coupon", "discount", "deal", "deals", "hire", "agency", "course", "top", "compare", "alternative", "alternatives", "free"];
+  var INFO = ["how", "what", "why", "when", "can", "does", "is", "ideas", "examples", "tutorial", "guide", "beginners", "steps", "tips", "meaning", "definition"];
+  var EXAMPLES = ["best pdf converter", "how to convert jpg to png", "image compressor online", "video converter"];
+  var HISTORY_KEY = "mcKdHistory";
+
+  /* ---------- Helpers ---------- */
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
+  function level(score) { for (var i = 0; i < LEVELS.length; i++) if (score <= LEVELS[i].max) return LEVELS[i]; return LEVELS[LEVELS.length - 1]; }
+  function toast(msg) {
+    var t = $("kdToast"); t.textContent = msg; t.classList.add("show");
+    clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove("show"); }, 2200);
+  }
+  function words(k) { return k.toLowerCase().replace(/[^\p{L}\p{N}\s'-]/gu, " ").split(/\s+/).filter(Boolean); }
+  function num(v) { if (v === "" || v === null || v === undefined) return null; var n = parseFloat(v); return isFinite(n) ? n : null; }
+  function fmt(n) { return Number(n).toLocaleString("en-US"); }
+  function copyText(text, okMsg) {
+    function fallback() {
+      var ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); toast(okMsg); } catch (e) { toast("Copy failed. Please copy manually."); }
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function () { toast(okMsg); }, fallback);
+    } else fallback();
+  }
+
+  /* ---------- Quick estimate (keyword only) ---------- */
+  function quickEstimate(keyword) {
+    var w = words(keyword), n = w.length, factors = [];
+    var base = n === 1 ? 58 : n === 2 ? 46 : n === 3 ? 34 : n === 4 ? 25 : 18;
+    var score = base;
+    factors.push({ d: base, text: n + (n === 1 ? " word" : " words") + (n <= 2 ? ": short, broad keywords are usually very competitive" : n === 3 ? ": medium-length keyword" : ": long-tail keyword, usually less competitive"), kind: "base" });
+
+    var com = w.filter(function (x) { return COMMERCIAL.indexOf(x) > -1; });
+    com = com.filter(function (x, i) { return com.indexOf(x) === i; });
+    if (com.length) {
+      var add = Math.min(18, com.length * 6);
+      score += add;
+      factors.push({ d: add, text: "Commercial intent words (" + com.join(", ") + "): more businesses compete for these" });
+    }
+    var inf = w.filter(function (x) { return INFO.indexOf(x) > -1; });
+    inf = inf.filter(function (x, i) { return inf.indexOf(x) === i; });
+    if (inf.length && !(com.length && inf.length === 1 && inf[0] === "is")) {
+      var sub = Math.min(10, inf.length * 5);
+      score -= sub;
+      factors.push({ d: -sub, text: "Question / informational words (" + inf.join(", ") + "): usually easier to rank for" });
+    }
+    if (/\b(19|20)\d{2}\b/.test(keyword)) {
+      score -= 4; factors.push({ d: -4, text: "Includes a year, which narrows the competition" });
+    }
+    if (/\bnear me\b|\bin [a-z]{3,}\b/i.test(keyword) && n >= 2) {
+      score -= 4; factors.push({ d: -4, text: "Looks location-based, which narrows the competition" });
+    }
+    if (/[0-9]/.test(keyword) && !/\b(19|20)\d{2}\b/.test(keyword)) {
+      score -= 3; factors.push({ d: -3, text: "Contains a number or model name, which makes it more specific" });
+    }
+    score = Math.round(clamp(score, 3, 90));
+    return { score: score, factors: factors, words: n };
+  }
+
+  /* ---------- Accurate estimate (with SERP data) ---------- */
+  var WEIGHTS = [1, .95, .9, .85, .8, .7, .65, .6, .55, .5];
+  function accurateEstimate(keyword, rows, feats, myDa) {
+    var valid = [];
+    rows.forEach(function (r, i) { if (r.da !== null) valid.push({ i: i, da: clamp(r.da, 0, 100), rd: r.rd, type: r.type }); });
+    var sw = 0, sd = 0;
+    valid.forEach(function (r) { sd += r.da * WEIGHTS[r.i]; sw += WEIGHTS[r.i]; });
+    var authority = sd / sw;
+    var factors = [];
+    factors.push({ d: Math.round(authority), text: "Weighted average authority of the top results (" + Math.round(authority) + "). Higher-ranking pages count more", kind: "base" });
+
+    var rdRows = valid.filter(function (r) { return r.rd !== null; }).slice(0, 5);
+    var base, confidence = "Medium", backlink = null;
+    if (rdRows.length >= 3) {
+      var avg = rdRows.reduce(function (a, r) { return a + r.rd; }, 0) / rdRows.length;
+      backlink = clamp(Math.log10(avg + 1) / Math.log10(1500) * 100, 0, 100);
+      base = authority * 0.6 + backlink * 0.4;
+      confidence = "High";
+      factors.push({ d: Math.round(backlink), text: "Backlink pressure: top results average " + fmt(Math.round(avg)) + " referring domains", kind: "base" });
+    } else {
+      base = authority;
+      factors.push({ d: 0, text: "No referring-domain data entered. Add it for a more accurate score", kind: "neutral" });
+    }
+
+    var strong = valid.filter(function (r) { return r.type === "brand"; }).length;
+    if (strong) {
+      var sAdd = Math.min(10, strong * 3);
+      base += sAdd;
+      factors.push({ d: sAdd, text: strong + " big-brand result" + (strong > 1 ? "s" : "") + " in the top 10 are hard to outrank" });
+    }
+    var weak = valid.filter(function (r) { return r.type === "ugc" || r.type === "thin" || r.da <= 25; });
+    if (weak.length) {
+      var wSub = Math.min(16, weak.length * 4);
+      base -= wSub;
+      factors.push({ d: -wSub, text: weak.length + " weak result" + (weak.length > 1 ? "s" : "") + " (forums, small sites or DA 25 or lower): an opening for you" });
+    }
+    var fAdd = Math.min(12, feats.length * 3);
+    if (feats.length) {
+      base += fAdd;
+      factors.push({ d: fAdd, text: "SERP features take up space (" + feats.join(", ") + "), pushing organic results down" });
+    }
+    var score = Math.round(clamp(base, 1, 100));
+
+    var minDa = Math.min.apply(null, valid.map(function (r) { return r.da; }));
+    var extra = { authority: Math.round(authority), minDa: Math.round(minDa), rows: valid.length };
+    if (myDa !== null) {
+      var me = clamp(myDa, 0, 100), v;
+      if (me >= authority - 10) v = "Your site's authority (" + me + ") is competitive with the current top results.";
+      else if (me >= minDa) v = "Your site's authority (" + me + ") is below the average (" + Math.round(authority) + ") but above the weakest result (" + Math.round(minDa) + "). Ranking is possible with a strong, focused page.";
+      else v = "Your site's authority (" + me + ") is below every result on page one. Target easier long-tail keywords first.";
+      extra.myDaVerdict = v;
+    }
+    return { score: score, factors: factors, confidence: confidence, extra: extra };
+  }
+
+  /* ---------- Tips ---------- */
+  function tipsFor(score, mode, extra) {
+    var t = [];
+    if (score <= 29) {
+      t.push("A great target. Publish a focused, helpful page and optimise the title, headings and internal links.");
+      t.push("Cover the topic fully and answer the likely follow-up questions on the same page.");
+    } else if (score <= 49) {
+      t.push("Achievable with quality content and a few relevant backlinks. Aim to be clearly more useful than the current top results.");
+      t.push("Build supporting articles on related topics and link them to your main page.");
+    } else if (score <= 69) {
+      t.push("Competitive. You'll need strong content, internal linking and real backlinks. Expect it to take months.");
+      t.push("Consider targeting a longer, more specific version of this keyword first, then work up.");
+    } else {
+      t.push("Very competitive. Dominated by high-authority sites, so it's rarely a good first target for a newer site.");
+      t.push("Use the related ideas below to find specific long-tail versions with a much better chance.");
+    }
+    if (mode === "quick") t.push("Open the accuracy panel and add the top-10 Google results for a more reliable score.");
+    if (extra && extra.myDaVerdict) t.push(extra.myDaVerdict);
+    t.push("Check the search intent: look at what type of pages Google shows and match that format.");
+    return t;
+  }
+
+  /* ---------- Build SERP form ---------- */
+  function buildForm() {
+    var h = "";
+    for (var i = 0; i < 10; i++) {
+      h += '<div class="kd-serp-row" data-i="' + i + '">' +
+        '<span class="kd-pos">' + (i + 1) + '</span>' +
+        '<div><span class="kd-mlabel">DA / DR</span><input class="kd-input kd-da" type="number" min="0" max="100" inputmode="numeric" placeholder="e.g. 62" aria-label="Domain authority of result ' + (i + 1) + '"></div>' +
+        '<div><span class="kd-mlabel">Referring domains</span><input class="kd-input kd-rd" type="number" min="0" inputmode="numeric" placeholder="optional" aria-label="Referring domains of result ' + (i + 1) + '"></div>' +
+        '<div class="kd-type"><span class="kd-mlabel">Page type</span><select class="kd-select kd-ty" aria-label="Page type of result ' + (i + 1) + '">' +
+        TYPES.map(function (t) { return '<option value="' + t.v + '">' + t.t + '</option>'; }).join("") + '</select></div></div>';
+    }
+    $("kdRows").innerHTML = h;
+    $("kdFeats").innerHTML = FEATURES.map(function (f) {
+      return '<label class="kd-check"><input type="checkbox" value="' + f.t + '" data-f="' + f.id + '"> ' + f.t + '</label>';
+    }).join("");
+    $("kdExamples").innerHTML = EXAMPLES.map(function (e) { return '<button type="button" class="kd-chip" data-kw="' + esc(e) + '">' + esc(e) + '</button>'; }).join("");
+  }
+
+  function readSerp() {
+    var rows = [];
+    root.querySelectorAll(".kd-serp-row").forEach(function (r) {
+      rows.push({ da: num(r.querySelector(".kd-da").value), rd: num(r.querySelector(".kd-rd").value), type: r.querySelector(".kd-ty").value });
+    });
+    var feats = [];
+    root.querySelectorAll("#kdFeats input:checked").forEach(function (c) { feats.push(c.value); });
+    return { rows: rows, feats: feats };
+  }
+
+  /* ---------- Render result ---------- */
+  var lastText = "";
+  function render(keyword, res, mode, extra, volume) {
+    var lv = level(res.score);
+    $("kdKwName").textContent = keyword;
+    $("kdLevel").textContent = lv.name;
+    $("kdLevel").style.background = lv.color;
+    var bar = $("kdGaugeBar");
+    bar.style.stroke = lv.color;
+    bar.style.strokeDashoffset = 100;
+    void bar.getBoundingClientRect();
+    bar.style.strokeDashoffset = 100 - res.score;
+    animateNumber($("kdGaugeNum"), res.score);
+
+    var verdicts = {
+      "Very Easy": "Very low competition. A new page can realistically reach the top results.",
+      "Easy": "Low competition. A well-optimised, helpful page has a good chance.",
+      "Medium": "Moderate competition. You'll need quality content and some backlinks.",
+      "Hard": "High competition. Expect to need strong authority and links.",
+      "Very Hard": "Very high competition from established sites.",
+      "Extreme": "Extreme competition. Dominated by major authority sites."
+    };
+    $("kdVerdict").textContent = verdicts[lv.name];
+
+    var conf = mode === "quick" ? "Low" : res.confidence;
+    var meta = '<span class="kd-pill">Mode: <b>' + (mode === "quick" ? "Quick estimate" : "With Google data") + '</b></span>' +
+      '<span class="kd-pill">Confidence: <b>' + conf + '</b></span>';
+    if (volume !== null) meta += '<span class="kd-pill">Volume: <b>' + fmt(volume) + '/mo</b></span>';
+    $("kdMeta").innerHTML = meta;
+
+    $("kdFactors").innerHTML = res.factors.map(function (f) {
+      var cls = f.kind === "base" ? "neutral" : f.kind === "neutral" ? "neutral" : f.d > 0 ? "up" : "down";
+      var label = f.kind === "base" ? String(f.d) : f.kind === "neutral" ? "–" : (f.d > 0 ? "+" : "") + f.d;
+      return '<div class="kd-factor"><span class="kd-delta ' + cls + '">' + label + '</span><span>' + esc(f.text) + '</span></div>';
+    }).join("");
+    $("kdTips").innerHTML = tipsFor(res.score, mode, extra).map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("");
+
+    var ideas = relatedIdeas(keyword);
+    $("kdIdeas").innerHTML = ideas.map(function (i) {
+      var l = level(i.score);
+      return '<tr><td>' + esc(i.kw) + '</td><td><span class="kd-score-pill" style="background:' + l.color + '">' + i.score + '</span></td><td>' + l.name + '</td>' +
+        '<td><button type="button" class="kd-link" data-kw="' + esc(i.kw) + '">Check →</button></td></tr>';
+    }).join("");
+
+    lastText = "Keyword: " + keyword + "\nDifficulty: " + res.score + "/100 (" + lv.name + ")\nConfidence: " + conf +
+      "\n\nRelated ideas:\n" + ideas.map(function (i) { return "- " + i.kw + ": " + i.score; }).join("\n") +
+      "\n\nEstimated with the Keyword Difficulty Checker, modernconvert.com";
+
+    $("kdEmpty").hidden = true;
+    $("kdResult").hidden = false;
+  }
+
+  function animateNumber(el, to) {
+    var start = null, dur = 800;
+    function step(ts) {
+      if (start === null) start = ts;
+      var p = Math.min(1, (ts - start) / dur);
+      el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    }
+    if (window.requestAnimationFrame) requestAnimationFrame(step); else el.textContent = to;
+  }
+
+  function relatedIdeas(kw) {
+    var base = kw.trim().toLowerCase(), set = {}, out = [];
+    var hasBest = /^(best|top|cheap)\b/.test(base), hasHow = /^(how|what|why)\b/.test(base);
+    var list = [base + " for beginners", base + " free online", base + " step by step", base + " examples", base + " tips", base + " 2026", base + " vs alternatives"];
+    if (!hasHow && !hasBest) list.unshift("how to use " + base);
+    if (!hasBest) list.unshift("best " + base, "cheap " + base);
+    list.forEach(function (k) {
+      if (set[k] || k === base) return; set[k] = 1;
+      out.push({ kw: k, score: quickEstimate(k).score });
+    });
+    out.sort(function (a, b) { return a.score - b.score; });
+    return out.slice(0, 8);
+  }
+
+  /* ---------- Check action ---------- */
+  function runCheck(keyword) {
+    keyword = (keyword || "").trim().replace(/\s+/g, " ");
+    if (!keyword) { toast("Please enter a keyword first."); $("kdKeyword").focus(); return; }
+    $("kdKeyword").value = keyword;
+    var serp = readSerp();
+    var filled = serp.rows.filter(function (r) { return r.da !== null; }).length;
+    var myDa = num($("kdMyDa").value), vol = num($("kdVolume").value);
+    var res, mode, extra = null;
+    if (filled >= 3) {
+      var r = accurateEstimate(keyword, serp.rows, serp.feats, myDa);
+      res = r; extra = r.extra; mode = "accurate";
+    } else {
+      if (filled > 0) toast("Add at least 3 results to use accurate mode. Showing quick estimate.");
+      res = quickEstimate(keyword); mode = "quick";
+      if (myDa !== null) extra = { myDaVerdict: null };
+    }
+    render(keyword, res, mode, extra, vol);
+    saveHistory(keyword, res.score);
+    var top = $("kdResult").getBoundingClientRect().top + (window.pageYOffset || 0) - 20;
+    try { window.scrollTo({ top: top, behavior: "smooth" }); } catch (e) { window.scrollTo(0, top); }
+  }
+
+  /* ---------- History ---------- */
+  function loadHistory() { try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch (e) { return []; } }
+  function saveHistory(kw, score) {
+    var h = loadHistory().filter(function (x) { return x.kw.toLowerCase() !== kw.toLowerCase(); });
+    h.unshift({ kw: kw, score: score });
+    h = h.slice(0, 10);
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); } catch (e) {}
+    renderHistory(h);
+  }
+  function renderHistory(h) {
+    h = h || loadHistory();
+    $("kdHistoryCard").hidden = !h.length;
+    $("kdHistory").innerHTML = h.map(function (x) {
+      return '<button type="button" class="kd-chip" data-kw="' + esc(x.kw) + '">' + esc(x.kw) + ' · ' + x.score + '</button>';
+    }).join("");
+  }
+
+  /* ---------- Bulk ---------- */
+  var bulkData = [], sortKey = "score", sortDir = 1;
+  function runBulk() {
+    var lines = $("kdBulkInput").value.split(/\r?\n/).map(function (s) { return s.trim().replace(/\s+/g, " "); }).filter(Boolean);
+    var seen = {}, list = [];
+    lines.forEach(function (k) { var l = k.toLowerCase(); if (!seen[l]) { seen[l] = 1; list.push(k); } });
+    if (!list.length) { toast("Please paste at least one keyword."); return; }
+    if (list.length > 200) { list = list.slice(0, 200); toast("Only the first 200 keywords were checked."); }
+    bulkData = list.map(function (k) { var q = quickEstimate(k); return { kw: k, score: q.score, words: q.words }; });
+    sortKey = "score"; sortDir = 1;
+    renderBulk();
+    $("kdBulkResult").hidden = false;
+    var top = $("kdBulkResult").getBoundingClientRect().top + (window.pageYOffset || 0) - 20;
+    try { window.scrollTo({ top: top, behavior: "smooth" }); } catch (e) {}
+  }
+  function renderBulk() {
+    var d = bulkData.slice().sort(function (a, b) {
+      var x = a[sortKey], y = b[sortKey];
+      if (typeof x === "string") return x.localeCompare(y) * sortDir;
+      return (x - y) * sortDir;
+    });
+    var avg = Math.round(bulkData.reduce(function (a, r) { return a + r.score; }, 0) / bulkData.length);
+    var easy = bulkData.filter(function (r) { return r.score <= 29; }).length;
+    $("kdBulkSummary").textContent = bulkData.length + " keywords checked · average difficulty " + avg + " · " + easy + " easy opportunit" + (easy === 1 ? "y" : "ies") + ". Click a column heading to sort. Quick estimates only.";
+    $("kdBulkBody").innerHTML = d.map(function (r) {
+      var l = level(r.score);
+      return '<tr><td>' + esc(r.kw) + '</td><td><span class="kd-score-pill" style="background:' + l.color + '">' + r.score + '</span></td><td>' + l.name + '</td><td>' + r.words + '</td></tr>';
+    }).join("");
+  }
+  function csvCell(s) { s = String(s); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; }
+  function downloadCsv() {
+    if (!bulkData.length) return;
+    var rows = ["Keyword,Difficulty,Level,Words"].concat(bulkData.map(function (r) { return [csvCell(r.kw), r.score, level(r.score).name, r.words].join(","); }));
+    var blob = new Blob(["﻿" + rows.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = "keyword-difficulty.csv";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    toast("CSV downloaded");
+  }
+
+  /* ---------- Events ---------- */
+  buildForm();
+  renderHistory();
+
+  root.querySelectorAll(".kd-tab").forEach(function (b) {
+    b.addEventListener("click", function () {
+      root.querySelectorAll(".kd-tab").forEach(function (x) { x.classList.remove("is-active"); x.setAttribute("aria-selected", "false"); });
+      b.classList.add("is-active"); b.setAttribute("aria-selected", "true");
+      root.querySelectorAll("[data-panel]").forEach(function (p) { p.hidden = p.getAttribute("data-panel") !== b.getAttribute("data-tab"); });
+    });
+  });
+
+  $("kdCheck").addEventListener("click", function () { runCheck($("kdKeyword").value); });
+  $("kdCheck2").addEventListener("click", function () { runCheck($("kdKeyword").value); });
+  $("kdKeyword").addEventListener("keydown", function (e) { if (e.key === "Enter") runCheck(this.value); });
+
+  $("kdAdvToggle").addEventListener("click", function () {
+    var open = this.getAttribute("aria-expanded") === "true";
+    this.setAttribute("aria-expanded", String(!open));
+    $("kdAdv").hidden = open;
+  });
+
+  $("kdExample").addEventListener("click", function () {
+    var da = [91, 84, 72, 68, 55, 47, 41, 33, 28, 19], rd = [4200, 2100, 980, 760, 310, 150, 90, 45, 20, 8];
+    var ty = ["brand", "normal", "normal", "normal", "normal", "normal", "thin", "normal", "ugc", "thin"];
+    root.querySelectorAll(".kd-serp-row").forEach(function (r, i) {
+      r.querySelector(".kd-da").value = da[i]; r.querySelector(".kd-rd").value = rd[i]; r.querySelector(".kd-ty").value = ty[i];
+    });
+    root.querySelectorAll("#kdFeats input").forEach(function (c) { c.checked = c.getAttribute("data-f") === "paa" || c.getAttribute("data-f") === "snippet"; });
+    toast("Example data filled in");
+  });
+  function clearSerp() {
+    root.querySelectorAll(".kd-serp-row").forEach(function (r) { r.querySelector(".kd-da").value = ""; r.querySelector(".kd-rd").value = ""; r.querySelector(".kd-ty").value = "normal"; });
+    root.querySelectorAll("#kdFeats input").forEach(function (c) { c.checked = false; });
+    $("kdMyDa").value = ""; $("kdVolume").value = "";
+  }
+  $("kdClearSerp").addEventListener("click", clearSerp);
+  $("kdReset").addEventListener("click", function () {
+    $("kdKeyword").value = ""; clearSerp();
+    $("kdResult").hidden = true; $("kdEmpty").hidden = false; $("kdKeyword").focus();
+  });
+
+  $("kdCopy").addEventListener("click", function () { copyText(lastText, "Results copied"); });
+  $("kdClearHistory").addEventListener("click", function () { try { localStorage.removeItem(HISTORY_KEY); } catch (e) {} renderHistory([]); });
+
+  // Delegated: example chips, history chips, related-idea buttons
+  root.addEventListener("click", function (e) {
+    var el = e.target.closest ? e.target.closest("[data-kw]") : null;
+    if (el) {
+      // Re-checking a different keyword clears stale SERP data (it belonged to the previous keyword)
+      if (el.classList.contains("kd-link") || el.classList.contains("kd-chip")) {
+        if (el.getAttribute("data-kw").toLowerCase() !== $("kdKeyword").value.trim().toLowerCase()) clearSerp();
+      }
+      runCheck(el.getAttribute("data-kw"));
+    }
+    var th = e.target.closest ? e.target.closest(".kd-sortable") : null;
+    if (th && bulkData.length) {
+      var k = th.getAttribute("data-sort");
+      if (sortKey === k) sortDir = -sortDir; else { sortKey = k; sortDir = 1; }
+      renderBulk();
+    }
+  });
+
+  $("kdBulkRun").addEventListener("click", runBulk);
+  $("kdBulkClear").addEventListener("click", function () { $("kdBulkInput").value = ""; $("kdBulkResult").hidden = true; bulkData = []; });
+  $("kdCsv").addEventListener("click", downloadCsv);
+  $("kdBulkCopy").addEventListener("click", function () {
+    copyText(bulkData.map(function (r) { return r.kw + "\t" + r.score + "\t" + level(r.score).name; }).join("\n"), "Copied to clipboard");
+  });
+})();
+</script>
