@@ -1,0 +1,1571 @@
+<!-- ============================================================
+  Email / Contact / Calendar Converter for modernconvert.com
+  Paste this ENTIRE file into an Elementor "HTML" widget.
+  Single file: HTML + CSS + JavaScript. No external libraries.
+  Converters: EML to PDF, MSG to PDF, VCF to CSV, CSV to VCF,
+              ICS to CSV, CSV to ICS.
+  Everything runs inside the visitor's browser - no uploads.
+============================================================ -->
+<style>
+.mc-ecc, .mc-ecc *, .mc-ecc *::before, .mc-ecc *::after { box-sizing: border-box; }
+.mc-ecc {
+  --ink: #0f172a; --text: #334155; --muted: #475569; --line: #e2e8f0; --soft: #f1f5f9; --card: #ffffff;
+  --acc: #4338ca; --acc-soft: #eef2ff; --acc-line: #c7d2fe;
+  --ok: #047857; --ok-soft: #ecfdf5; --warn: #92400e; --warn-soft: #fffbeb; --err: #b91c1c; --err-soft: #fef2f2; --info-soft: #eff6ff; --info: #1d4ed8;
+  width: 100%; max-width: 1140px; margin: 0 auto; padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px; line-height: 1.55; color: var(--text); text-align: left; -webkit-text-size-adjust: 100%;
+}
+.mc-ecc h1, .mc-ecc h2, .mc-ecc h3, .mc-ecc h4, .mc-ecc p, .mc-ecc ul, .mc-ecc li { margin: 0; padding: 0; }
+.mc-ecc ul { list-style: none; }
+.mc-ecc [hidden] { display: none !important; }
+.mc-ecc .ecc-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); border: 0; white-space: nowrap; }
+.mc-ecc .ecc-svg { width: 1.3em; height: 1.3em; flex: 0 0 auto; display: inline-block; vertical-align: middle; }
+.mc-ecc .ecc-g-email { --acc: #1d4ed8; --acc-soft: #eff6ff; --acc-line: #bfdbfe; }
+.mc-ecc .ecc-g-contacts { --acc: #047857; --acc-soft: #ecfdf5; --acc-line: #a7f3d0; }
+.mc-ecc .ecc-g-calendar { --acc: #b45309; --acc-soft: #fffbeb; --acc-line: #fde68a; }
+
+/* ---------- Hero ---------- */
+.mc-ecc .ecc-hero { position: relative; overflow: hidden; border-radius: 24px; padding: 40px 36px 36px; color: #fff; background: linear-gradient(135deg, #312e81 0%, #4338ca 48%, #0ea5e9 100%); }
+.mc-ecc .ecc-hero::after { content: ""; position: absolute; right: -90px; top: -90px; width: 300px; height: 300px; border-radius: 50%; background: rgba(255,255,255,.12); }
+.mc-ecc .ecc-hero::before { content: ""; position: absolute; left: -70px; bottom: -120px; width: 260px; height: 260px; border-radius: 50%; background: rgba(255,255,255,.08); }
+.mc-ecc .ecc-hero > * { position: relative; z-index: 1; }
+.mc-ecc .ecc-pill { display: inline-block; margin-bottom: 14px; padding: 5px 14px; border-radius: 999px; background: rgba(255,255,255,.2); font-size: 15px; font-weight: 600; }
+.mc-ecc .ecc-h1 { margin-bottom: 10px; color: #fff; font-size: 38px; line-height: 1.15; font-weight: 800; letter-spacing: -.5px; }
+.mc-ecc .ecc-lead { max-width: 720px; color: rgba(255,255,255,.94); font-size: 18px; }
+.mc-ecc .ecc-badges { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 22px; }
+.mc-ecc .ecc-badges li { display: inline-flex; align-items: center; gap: 8px; color: #fff; font-size: 15px; font-weight: 600; }
+.mc-ecc .ecc-badges .ecc-svg { width: 20px; height: 20px; }
+
+/* ---------- Converter chooser ---------- */
+.mc-ecc .ecc-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 16px; margin: 22px 0; }
+.mc-ecc .ecc-group { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 16px; box-shadow: 0 6px 20px rgba(15,23,42,.05); }
+.mc-ecc .ecc-group-h { display: flex; align-items: center; gap: 10px; margin: 2px 4px 12px; color: var(--ink); font-size: 18px; font-weight: 800; }
+.mc-ecc .ecc-group-h .ecc-gi { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 10px; background: var(--acc); color: #fff; }
+.mc-ecc .ecc-group-h .ecc-gi .ecc-svg { width: 20px; height: 20px; }
+.mc-ecc .ecc-tile {
+  display: flex; align-items: center; gap: 12px; width: 100%; margin: 0 0 10px; padding: 12px 14px; cursor: pointer; text-align: left;
+  font: inherit; color: var(--ink); background: #fff; border: 2px solid var(--line); border-radius: 14px; box-shadow: none; text-transform: none; letter-spacing: normal;
+  transition: border-color .15s, background .15s, transform .15s;
+}
+.mc-ecc .ecc-tile:last-child { margin-bottom: 0; }
+.mc-ecc .ecc-tile:hover { background: var(--acc-soft); border-color: var(--acc-line); color: var(--ink); transform: translateY(-1px); }
+.mc-ecc .ecc-tile:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.mc-ecc .ecc-tile[aria-pressed="true"] { background: var(--acc-soft); border-color: var(--acc); color: var(--ink); }
+.mc-ecc .ecc-tile-t { display: block; font-size: 18px; font-weight: 800; line-height: 1.2; }
+.mc-ecc .ecc-tile-s { display: block; margin-top: 2px; color: var(--muted); font-size: 15px; line-height: 1.3; }
+.mc-ecc .ecc-tile-main { flex: 1 1 auto; min-width: 0; }
+.mc-ecc .ecc-tile-ic { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; width: 42px; height: 42px; border-radius: 12px; background: var(--acc-soft); color: var(--acc); }
+.mc-ecc .ecc-tile[aria-pressed="true"] .ecc-tile-ic { background: var(--acc); color: #fff; }
+.mc-ecc .ecc-tile-ck { display: none; color: var(--acc); }
+.mc-ecc .ecc-tile[aria-pressed="true"] .ecc-tile-ck { display: inline-flex; }
+
+/* ---------- Work panel ---------- */
+.mc-ecc .ecc-panel { position: relative; overflow: hidden; background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 30px 28px 28px; box-shadow: 0 14px 38px rgba(15,23,42,.08); scroll-margin-top: 20px; }
+.mc-ecc .ecc-panel::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: var(--acc); }
+.mc-ecc .ecc-phead { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 18px; margin-bottom: 22px; }
+.mc-ecc .ecc-phead-ic { display: inline-flex; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 16px; background: var(--acc-soft); color: var(--acc); }
+.mc-ecc .ecc-phead-ic .ecc-svg { width: 28px; height: 28px; }
+.mc-ecc .ecc-phead-t { flex: 1 1 300px; min-width: 0; }
+.mc-ecc .ecc-h2 { color: var(--ink); font-size: 26px; line-height: 1.2; font-weight: 800; letter-spacing: -.2px; }
+.mc-ecc .ecc-phead-t p { margin-top: 4px; color: var(--muted); font-size: 16px; }
+.mc-ecc .ecc-pgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 22px; align-items: start; }
+.mc-ecc .ecc-col { min-width: 0; }
+.mc-ecc .ecc-h4 { margin-bottom: 12px; color: var(--ink); font-size: 18px; font-weight: 800; }
+.mc-ecc .ecc-step { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin-right: 8px; border-radius: 50%; background: var(--acc); color: #fff; font-size: 15px; font-weight: 800; vertical-align: 1px; }
+
+.mc-ecc .ecc-drop { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 190px; padding: 26px 20px; text-align: center; cursor: pointer; background: var(--acc-soft); border: 2px dashed var(--acc); border-radius: 20px; transition: background .15s, transform .15s, box-shadow .15s; }
+.mc-ecc .ecc-drop:hover, .mc-ecc .ecc-drop.is-over { background: #fff; box-shadow: 0 0 0 5px var(--acc-line); }
+.mc-ecc .ecc-drop.is-over { transform: scale(1.01); }
+.mc-ecc .ecc-drop:focus-within { box-shadow: 0 0 0 4px var(--acc-line); outline: 3px solid var(--acc); outline-offset: 2px; }
+.mc-ecc .ecc-drop-ic { display: inline-flex; align-items: center; justify-content: center; width: 58px; height: 58px; border-radius: 50%; background: var(--acc); color: #fff; }
+.mc-ecc .ecc-drop-ic .ecc-svg { width: 28px; height: 28px; }
+.mc-ecc .ecc-drop-t { color: var(--ink); font-size: 19px; font-weight: 800; }
+.mc-ecc .ecc-drop-s { color: var(--muted); font-size: 16px; }
+.mc-ecc .ecc-drop-s u { color: var(--acc); font-weight: 700; }
+
+.mc-ecc .ecc-files { margin-top: 14px; display: grid; gap: 8px; }
+.mc-ecc .ecc-file { display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 14px; background: var(--soft); border: 1px solid var(--line); border-radius: 14px; }
+.mc-ecc .ecc-file > .ecc-svg { color: var(--acc); width: 24px; height: 24px; }
+.mc-ecc .ecc-file-n { flex: 1 1 auto; min-width: 0; }
+.mc-ecc .ecc-file-n b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); font-size: 16px; font-weight: 700; }
+.mc-ecc .ecc-file-n span { color: var(--muted); font-size: 15px; }
+.mc-ecc .ecc-x { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; width: 42px; height: 42px; padding: 0; cursor: pointer; color: var(--muted); background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: none; }
+.mc-ecc .ecc-x:hover { color: var(--err); background: var(--err-soft); border-color: #fecaca; }
+.mc-ecc .ecc-x:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.mc-ecc .ecc-x .ecc-svg { width: 20px; height: 20px; }
+
+.mc-ecc .ecc-opts { padding: 18px; background: var(--soft); border: 1px solid var(--line); border-radius: 20px; }
+.mc-ecc .ecc-optgrid { display: grid; gap: 14px; }
+.mc-ecc .ecc-field { display: block; margin: 0; }
+.mc-ecc .ecc-lab { display: block; margin-bottom: 6px; color: var(--ink); font-size: 15px; font-weight: 700; }
+.mc-ecc .ecc-sel {
+  display: block; width: 100%; height: 48px; margin: 0; padding: 0 42px 0 14px; color: var(--ink); font: inherit; font-size: 16px; line-height: 1.2; cursor: pointer;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;
+  border: 2px solid #cbd5e1; border-radius: 12px; -webkit-appearance: none; appearance: none; box-shadow: none; text-transform: none;
+}
+.mc-ecc .ecc-sel:hover { border-color: #94a3b8; }
+.mc-ecc .ecc-sel:focus { outline: none; border-color: var(--acc); box-shadow: 0 0 0 4px var(--acc-line); }
+.mc-ecc .ecc-sel.is-set { border-color: #6ee7b7; background-color: #f0fdf9; }
+.mc-ecc .ecc-check { display: flex; align-items: flex-start; gap: 12px; margin: 0; padding: 0; cursor: pointer; color: var(--ink); font-size: 16px; font-weight: 600; line-height: 1.35; }
+.mc-ecc .ecc-check input { flex: 0 0 auto; width: 24px; height: 24px; margin: 0; cursor: pointer; accent-color: var(--acc); }
+.mc-ecc .ecc-check input:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.mc-ecc .ecc-hint { margin-top: 4px; color: var(--muted); font-size: 15px; font-weight: 400; }
+
+.mc-ecc .ecc-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+.mc-ecc .ecc-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px; margin: 0; padding: 14px 26px; min-height: 52px; cursor: pointer; text-align: center;
+  font: inherit; font-size: 17px; font-weight: 800; line-height: 1.2; text-decoration: none; text-transform: none; letter-spacing: normal;
+  border: 2px solid transparent; border-radius: 14px; box-shadow: none; transition: background .15s, transform .15s, box-shadow .15s, border-color .15s;
+}
+.mc-ecc .ecc-btn-primary { flex: 1 1 200px; color: #fff; background: var(--acc); box-shadow: 0 8px 20px rgba(15,23,42,.18); }
+.mc-ecc .ecc-btn-primary:hover { color: #fff; background: var(--acc); filter: brightness(1.12); transform: translateY(-1px); }
+.mc-ecc .ecc-btn-primary:disabled { cursor: not-allowed; opacity: .5; transform: none; filter: none; box-shadow: none; }
+.mc-ecc .ecc-btn-ghost { color: var(--acc); background: #fff; border-color: var(--acc-line); }
+.mc-ecc .ecc-btn-ghost:hover { color: var(--acc); background: var(--acc-soft); border-color: var(--acc); }
+.mc-ecc .ecc-btn-sm { min-height: 44px; padding: 9px 18px; font-size: 16px; border-radius: 12px; }
+.mc-ecc .ecc-btn:focus-visible { outline: 3px solid var(--acc); outline-offset: 3px; }
+.mc-ecc .ecc-btn .ecc-svg { width: 22px; height: 22px; }
+.mc-ecc .ecc-ex { margin-left: auto; }
+
+/* ---------- Mapping ---------- */
+.mc-ecc .ecc-map { margin-top: 24px; padding: 20px; background: #fff; border: 2px solid var(--acc-line); border-radius: 20px; }
+.mc-ecc .ecc-map p { color: var(--muted); font-size: 16px; margin-bottom: 14px; }
+.mc-ecc .ecc-mapgroup { margin-top: 18px; }
+.mc-ecc .ecc-mapgroup > h5 { margin: 0 0 10px; padding: 0; color: var(--acc); font-size: 15px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.mc-ecc .ecc-mapgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 12px 16px; }
+
+/* ---------- Messages and results ---------- */
+.mc-ecc .ecc-alert { display: flex; gap: 12px; align-items: flex-start; margin-top: 22px; padding: 14px 18px; border-radius: 14px; font-size: 16px; line-height: 1.5; border: 1px solid; }
+.mc-ecc .ecc-alert .ecc-svg { margin-top: 2px; }
+.mc-ecc .ecc-alert div { min-width: 0; }
+.mc-ecc .ecc-alert-info { color: #1e3a8a; background: var(--info-soft); border-color: #bfdbfe; }
+.mc-ecc .ecc-alert-ok { color: #064e3b; background: var(--ok-soft); border-color: #a7f3d0; }
+.mc-ecc .ecc-alert-warn { color: var(--warn); background: var(--warn-soft); border-color: #fde68a; }
+.mc-ecc .ecc-alert-err { color: #7f1d1d; background: var(--err-soft); border-color: #fecaca; }
+.mc-ecc .ecc-res-wrap { margin-top: 22px; }
+.mc-ecc .ecc-res-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.mc-ecc .ecc-res-head .ecc-h4 { margin: 0; }
+.mc-ecc .ecc-res-list { display: grid; gap: 10px; }
+.mc-ecc .ecc-res { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; padding: 14px 16px; background: var(--ok-soft); border: 1px solid #a7f3d0; border-radius: 16px; }
+.mc-ecc .ecc-res.is-err { background: var(--err-soft); border-color: #fecaca; }
+.mc-ecc .ecc-res-ic { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; color: #fff; background: var(--ok); }
+.mc-ecc .ecc-res.is-err .ecc-res-ic { background: var(--err); }
+.mc-ecc .ecc-res-main { flex: 1 1 220px; min-width: 0; }
+.mc-ecc .ecc-res-main b { display: block; overflow-wrap: anywhere; color: var(--ink); font-size: 17px; font-weight: 800; }
+.mc-ecc .ecc-res-main span { color: var(--muted); font-size: 15px; overflow-wrap: anywhere; }
+.mc-ecc .ecc-res.is-err .ecc-res-main span { color: #7f1d1d; }
+.mc-ecc .ecc-res-act { display: flex; flex-wrap: wrap; gap: 10px; }
+.mc-ecc .ecc-res .ecc-btn-primary { flex: 0 0 auto; background: var(--ok); }
+.mc-ecc .ecc-res .ecc-btn-ghost { color: var(--ok); border-color: #6ee7b7; }
+.mc-ecc .ecc-res .ecc-btn-ghost:hover { color: var(--ok); background: #d1fae5; border-color: var(--ok); }
+.mc-ecc .ecc-prev { margin-top: 22px; }
+.mc-ecc .ecc-tablewrap { overflow: auto; max-height: 360px; background: #fff; border: 1px solid var(--line); border-radius: 14px; -webkit-overflow-scrolling: touch; }
+.mc-ecc .ecc-table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.4; }
+.mc-ecc .ecc-table th, .mc-ecc .ecc-table td { max-width: 260px; padding: 10px 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; border-bottom: 1px solid var(--line); font-size: 15px; }
+.mc-ecc .ecc-table th { position: sticky; top: 0; z-index: 1; color: var(--ink); background: var(--soft); font-weight: 800; }
+.mc-ecc .ecc-table td { color: var(--text); background: #fff; }
+.mc-ecc .ecc-table tr:last-child td { border-bottom: 0; }
+.mc-ecc .ecc-pre { margin: 0; padding: 16px; max-height: 340px; overflow: auto; color: #e2e8f0; background: #0f172a; border-radius: 14px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 15px; line-height: 1.5; white-space: pre; tab-size: 4; }
+.mc-ecc .ecc-cap { margin-top: 8px; color: var(--muted); font-size: 15px; }
+
+/* ---------- Notes ---------- */
+.mc-ecc .ecc-notes { margin-top: 22px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr)); gap: 14px; }
+.mc-ecc .ecc-note { padding: 18px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; }
+.mc-ecc .ecc-note h3 { margin-bottom: 6px; color: var(--ink); font-size: 17px; font-weight: 800; }
+.mc-ecc .ecc-note p { color: var(--muted); font-size: 15px; }
+
+@media (max-width: 760px) {
+  .mc-ecc .ecc-hero { padding: 28px 20px 26px; border-radius: 20px; }
+  .mc-ecc .ecc-h1 { font-size: 29px; }
+  .mc-ecc .ecc-lead { font-size: 16px; }
+  .mc-ecc .ecc-panel { padding: 24px 16px 20px; border-radius: 20px; }
+  .mc-ecc .ecc-h2 { font-size: 23px; }
+  .mc-ecc .ecc-ex { margin-left: 0; width: 100%; }
+  .mc-ecc .ecc-map { padding: 16px 14px; }
+  .mc-ecc .ecc-res-act { width: 100%; }
+  .mc-ecc .ecc-res-act .ecc-btn { flex: 1 1 140px; }
+  .mc-ecc .ecc-btn-primary { flex-basis: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mc-ecc *, .mc-ecc *::before, .mc-ecc *::after { transition: none !important; }
+}
+</style>
+
+<div class="mc-ecc" id="mc-ecc">
+  <header class="ecc-hero">
+    <span class="ecc-pill">Free online converter</span>
+    <h2 class="ecc-h1">Email, Contact &amp; Calendar Converter</h2>
+    <p class="ecc-lead">Turn EML and MSG emails into PDF, and move contacts and calendars between VCF, ICS and CSV. Pick a converter, add your files and download the result.</p>
+    <ul class="ecc-badges">
+      <li><span data-icon="lock"></span>Private: files never leave your device</li>
+      <li><span data-icon="bolt"></span>Instant results, no sign-up</li>
+      <li><span data-icon="device"></span>Works on phone, tablet and desktop</li>
+    </ul>
+  </header>
+
+  <nav class="ecc-groups" id="ecc-groups" aria-label="Choose a converter"></nav>
+
+  <section class="ecc-panel" id="ecc-panel" aria-label="Converter workspace">
+    <div class="ecc-phead" id="ecc-phead"></div>
+    <div class="ecc-pgrid">
+      <div class="ecc-col">
+        <h4 class="ecc-h4"><span class="ecc-step">1</span>Add your file</h4>
+        <label class="ecc-drop" id="ecc-drop">
+          <input type="file" class="ecc-sr" id="ecc-file">
+          <span class="ecc-drop-ic" data-icon="upload"></span>
+          <span class="ecc-drop-t">Drag &amp; drop your file here</span>
+          <span class="ecc-drop-s" id="ecc-drop-s">or <u>tap / click to browse</u></span>
+        </label>
+        <ul class="ecc-files" id="ecc-files"></ul>
+      </div>
+      <div class="ecc-col">
+        <h4 class="ecc-h4"><span class="ecc-step">2</span>Choose options &amp; convert</h4>
+        <div class="ecc-opts"><div class="ecc-optgrid" id="ecc-opts"></div></div>
+        <div class="ecc-actions">
+          <button type="button" class="ecc-btn ecc-btn-primary" id="ecc-go" disabled>Convert</button>
+          <button type="button" class="ecc-btn ecc-btn-ghost" id="ecc-clear">Clear all</button>
+        </div>
+      </div>
+    </div>
+    <div id="ecc-map"></div>
+    <div id="ecc-msg" role="status" aria-live="polite"></div>
+    <div id="ecc-res"></div>
+    <div id="ecc-prev"></div>
+  </section>
+
+  <section class="ecc-notes" aria-label="Good to know">
+    <div class="ecc-note"><h3>Your files stay private</h3><p>Conversion happens inside your web browser. Nothing is uploaded to any server.</p></div>
+    <div class="ecc-note"><h3>About the PDF layout</h3><p>Emails become clean, readable PDFs with headers, body text and an attachment list. Images and fancy HTML styling are not reproduced.</p></div>
+    <div class="ecc-note"><h3>Opening CSV in Excel</h3><p>Keep &ldquo;Excel-friendly&rdquo; ticked so accents and non-English names display correctly.</p></div>
+    <div class="ecc-note"><h3>Dates in spreadsheets</h3><p>For CSV to ICS, check that the date column matches the date order you choose (for example 03/04/2025 can mean March 4 or April 3).</p></div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var root = document.getElementById("mc-ecc");
+  if (!root) return;
+
+  /* ============================================================
+     Small helpers
+  ============================================================ */
+  function $(s, c) { return (c || root).querySelector(s); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function pad(n, l) { n = String(n); while (n.length < (l || 2)) n = "0" + n; return n; }
+  function fmtSize(n) { if (n < 1024) return n + " B"; if (n < 1048576) return (n / 1024).toFixed(1) + " KB"; return (n / 1048576).toFixed(1) + " MB"; }
+  function plural(n, a, b) { return n + " " + (n === 1 ? a : b); }
+  function tick() { return new Promise(function (r) { setTimeout(r, 0); }); }
+  function baseName(n) { return String(n).replace(/\.[^.]*$/, ""); }
+  function extOf(n) { var m = /\.([^.\\/]+)$/.exec(n); return m ? m[1].toLowerCase() : ""; }
+  function safeName(n, fb) { n = String(n || "").replace(/[\\/:*?"<>|\u0000-\u001f]+/g, "").replace(/\s+/g, " ").trim(); return (n || fb || "file").slice(0, 80); }
+  var LOCALTZ = ""; try { LOCALTZ = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch (e) { }
+
+  var ICONS = {
+    lock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+    bolt: '<path d="M13 3 5 14h6l-1 7 8-11h-6z"/>',
+    device: '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+    mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
+    calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+    upload: '<path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
+    file: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>',
+    x: '<path d="M6 6l12 12M18 6 6 18"/>',
+    download: '<path d="M12 4v12m0 0 5-5m-5 5-5-5"/><path d="M4 18v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1"/>',
+    check: '<path d="m5 12 5 5 9-10"/>',
+    alert: '<path d="M12 3 2 20h20z"/><path d="M12 10v5M12 18h.01"/>',
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+    ext: '<path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+    spark: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/>'
+  };
+  function svg(n) { return '<svg class="ecc-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (ICONS[n] || "") + "</svg>"; }
+  Array.prototype.forEach.call(root.querySelectorAll("[data-icon]"), function (el) { el.innerHTML = svg(el.getAttribute("data-icon")); });
+
+  /* ---------- bytes / text ---------- */
+  function bytesToBin(u8) { var s = "", i, CH = 0x8000; for (i = 0; i < u8.length; i += CH) s += String.fromCharCode.apply(null, u8.subarray(i, i + CH)); return s; }
+  function binToBytes(s) { var u = new Uint8Array(s.length), i; for (i = 0; i < s.length; i++) u[i] = s.charCodeAt(i) & 255; return u; }
+  function decodeText(bytes, cs) {
+    cs = String(cs || "utf-8").toLowerCase().replace(/^["']|["']$/g, "");
+    try { return new TextDecoder(cs).decode(bytes); } catch (e) { return new TextDecoder("utf-8").decode(bytes); }
+  }
+  function decodeFileText(b) {
+    if (b[0] === 0xEF && b[1] === 0xBB && b[2] === 0xBF) return new TextDecoder("utf-8").decode(b.subarray(3));
+    if (b[0] === 0xFF && b[1] === 0xFE) return new TextDecoder("utf-16le").decode(b.subarray(2));
+    if (b[0] === 0xFE && b[1] === 0xFF) return new TextDecoder("utf-16be").decode(b.subarray(2));
+    try { return new TextDecoder("utf-8", { fatal: true }).decode(b); } catch (e) { return new TextDecoder("windows-1252").decode(b); }
+  }
+  function tryUtf8(bin) {
+    if (!/[\u0080-\u00ff]/.test(bin) || /[^\u0000-\u00ff]/.test(bin)) return bin;
+    try { return new TextDecoder("utf-8", { fatal: true }).decode(binToBytes(bin)); } catch (e) { return bin; }
+  }
+  function readBytes(file) {
+    return new Promise(function (res, rej) {
+      var r = new FileReader();
+      r.onload = function () { res(new Uint8Array(r.result)); };
+      r.onerror = function () { rej(new Error("Could not read \u201c" + file.name + "\u201d")); };
+      r.readAsArrayBuffer(file);
+    });
+  }
+  function qpDecodeBin(s, hdr) {
+    if (hdr) s = s.replace(/_/g, " ");
+    s = s.replace(/=\r?\n/g, "");
+    return s.replace(/=([0-9A-Fa-f]{2})/g, function (m, h) { return String.fromCharCode(parseInt(h, 16)); });
+  }
+  function b64Bin(s) {
+    s = s.replace(/[^A-Za-z0-9+\/]/g, "");
+    if (s.length % 4 === 1) s = s.slice(0, -1);
+    while (s.length % 4) s += "=";
+    return atob(s);
+  }
+
+  /* ---------- CSV ---------- */
+  function detectDelim(text) {
+    var first = "", q = false, i, c;
+    for (i = 0; i < text.length && i < 20000; i++) { c = text[i]; if (c === '"') q = !q; else if (!q && (c === "\n" || c === "\r")) break; first += c; }
+    var best = ",", bc = 0;
+    [",", ";", "\t", "|"].forEach(function (d) {
+      var n = 0, qq = false, k;
+      for (k = 0; k < first.length; k++) { if (first[k] === '"') qq = !qq; else if (!qq && first[k] === d) n++; }
+      if (n > bc) { bc = n; best = d; }
+    });
+    return best;
+  }
+  function parseCSV(text, delim) {
+    var rows = [], row = [], f = "", inQ = false, i = 0, n = text.length, c;
+    if (text.charCodeAt(0) === 0xFEFF) i = 1;
+    for (; i < n; i++) {
+      c = text[i];
+      if (inQ) {
+        if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else inQ = false; } else f += c;
+      } else if (c === '"' && f === "") inQ = true;
+      else if (c === delim) { row.push(f); f = ""; }
+      else if (c === "\n" || c === "\r") { if (c === "\r" && text[i + 1] === "\n") i++; row.push(f); f = ""; rows.push(row); row = []; }
+      else f += c;
+    }
+    if (f !== "" || row.length) { row.push(f); rows.push(row); }
+    return rows.filter(function (r) { return r.some(function (x) { return String(x).trim() !== ""; }); });
+  }
+  function csvCell(v, d) {
+    v = v == null ? "" : String(v);
+    if (/["\r\n]/.test(v) || v.indexOf(d) > -1 || /^\s|\s$/.test(v)) return '"' + v.replace(/"/g, '""') + '"';
+    return v;
+  }
+  function toCSV(rows, d) { return rows.map(function (r) { return r.map(function (v) { return csvCell(v, d); }).join(d); }).join("\r\n") + "\r\n"; }
+
+  /* ---------- vCard / iCalendar line handling ---------- */
+  function splitOutside(str, ch) {
+    var out = [], cur = "", q = false, i;
+    for (i = 0; i < str.length; i++) { if (str[i] === '"') { q = !q; cur += str[i]; } else if (str[i] === ch && !q) { out.push(cur); cur = ""; } else cur += str[i]; }
+    out.push(cur); return out;
+  }
+  function splitUnesc(s, ch) {
+    var out = [], cur = "", i;
+    for (i = 0; i < s.length; i++) { if (s[i] === "\\" && i + 1 < s.length) { cur += s[i] + s[i + 1]; i++; } else if (s[i] === ch) { out.push(cur); cur = ""; } else cur += s[i]; }
+    out.push(cur); return out;
+  }
+  function unescText(s) { return s.replace(/\\([nN,;\\])/g, function (m, c) { return (c === "n" || c === "N") ? "\n" : c; }); }
+  function escText(s) { return String(s == null ? "" : s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r\n|\r|\n/g, "\\n"); }
+  function utf8len(ch) { var cp = ch.codePointAt(0); return cp < 0x80 ? 1 : cp < 0x800 ? 2 : cp < 0x10000 ? 3 : 4; }
+  function fold(line) {
+    var chars = Array.from(line), out = "", n = 0, i, b;
+    for (i = 0; i < chars.length; i++) { b = utf8len(chars[i]); if (n + b > 75) { out += "\r\n "; n = 1; } out += chars[i]; n += b; }
+    return out;
+  }
+  function unfoldLines(text) {
+    var raw = text.replace(/\r\n?/g, "\n").split("\n"), out = [], i, l, prev;
+    for (i = 0; i < raw.length; i++) {
+      l = raw[i]; prev = out.length ? out[out.length - 1] : "";
+      if (prev && /=$/.test(prev) && /QUOTED-PRINTABLE/i.test(prev)) { out[out.length - 1] = prev.slice(0, -1) + l; continue; }
+      if ((l[0] === " " || l[0] === "\t") && out.length) { out[out.length - 1] += l.slice(1); continue; }
+      out.push(l);
+    }
+    return out;
+  }
+  function parseLine(line) {
+    var q = false, idx = -1, i, c;
+    for (i = 0; i < line.length; i++) { c = line[i]; if (c === '"') q = !q; else if (c === ":" && !q) { idx = i; break; } }
+    if (idx < 0) return null;
+    var parts = splitOutside(line.slice(0, idx), ";"), name = parts.shift().toUpperCase(), dot = name.lastIndexOf("."), params = {};
+    if (dot > -1) name = name.slice(dot + 1);
+    parts.forEach(function (p) {
+      var eq = p.indexOf("="), k, v, quoted;
+      if (eq < 0) { k = "TYPE"; v = p; } else { k = p.slice(0, eq).toUpperCase(); v = p.slice(eq + 1); }
+      quoted = /^".*"$/.test(v); v = v.replace(/^"|"$/g, "");
+      (params[k] = params[k] || []);
+      (quoted || k === "TZID" || k === "CN" ? [v] : v.split(",")).forEach(function (x) { params[k].push(x); });
+    });
+    return { name: name, params: params, value: line.slice(idx + 1) };
+  }
+
+  /* ============================================================
+     CONTACTS: VCF parsing and CSV rows
+  ============================================================ */
+  function vcValue(p) {
+    var v = p.value, enc = (p.params.ENCODING || []).join(",").toUpperCase();
+    if (enc.indexOf("QUOTED-PRINTABLE") > -1 || (p.params.TYPE || []).some(function (t) { return /^quoted-printable$/i.test(t); })) {
+      v = decodeText(binToBytes(qpDecodeBin(v)), (p.params.CHARSET || ["utf-8"])[0]);
+    }
+    return v;
+  }
+  function typeLabel(p) {
+    var t = (p.params.TYPE || []).filter(function (x) { return !/^(pref|voice|internet|text|quoted-printable)$/i.test(x); });
+    return t.map(function (x) { x = x.toLowerCase(); return x === "cell" ? "Mobile" : x.charAt(0).toUpperCase() + x.slice(1); }).join(" / ");
+  }
+  function normBdayText(v) {
+    v = v.trim(); var m = /^(\d{4})-?(\d{2})-?(\d{2})(?:T.*)?$/.exec(v);
+    return m ? m[1] + "-" + m[2] + "-" + m[3] : v;
+  }
+  function contactFrom(props) {
+    var c = { full: "", prefix: "", first: "", middle: "", last: "", suffix: "", nick: "", org: "", title: "", emails: [], phones: [], addrs: [], urls: [], bday: "", note: "", cats: "" };
+    props.forEach(function (p) {
+      var v, a;
+      try { v = vcValue(p); } catch (e) { v = p.value; }
+      switch (p.name) {
+        case "FN": c.full = unescText(v).trim(); break;
+        case "N": a = splitUnesc(v, ";").map(unescText); c.last = a[0] || ""; c.first = a[1] || ""; c.middle = (a[2] || "").replace(/,/g, " "); c.prefix = a[3] || ""; c.suffix = a[4] || ""; break;
+        case "NICKNAME": c.nick = unescText(v); break;
+        case "ORG": c.org = splitUnesc(v, ";").map(unescText).filter(Boolean).join(", "); break;
+        case "TITLE": c.title = unescText(v); break;
+        case "EMAIL": if (v.trim()) c.emails.push({ type: typeLabel(p), value: unescText(v).replace(/^mailto:/i, "").trim() }); break;
+        case "TEL": if (v.trim()) c.phones.push({ type: typeLabel(p), value: unescText(v).replace(/^tel:/i, "").trim() }); break;
+        case "ADR": a = splitUnesc(v, ";").map(unescText); c.addrs.push({ type: typeLabel(p), street: [a[0], a[1], a[2]].filter(Boolean).join(" "), city: a[3] || "", region: a[4] || "", zip: a[5] || "", country: a[6] || "" }); break;
+        case "URL": if (v.trim()) c.urls.push(unescText(v).trim()); break;
+        case "BDAY": c.bday = normBdayText(v); break;
+        case "NOTE": c.note = unescText(v); break;
+        case "CATEGORIES": c.cats = splitUnesc(v, ",").map(unescText).join(", "); break;
+      }
+    });
+    if (!c.full) c.full = [c.prefix, c.first, c.middle, c.last, c.suffix].filter(Boolean).join(" ").trim();
+    return c;
+  }
+  function parseVCF(text) {
+    var cards = [], cur = null;
+    unfoldLines(text).forEach(function (line) {
+      if (!line.trim()) return;
+      var p = parseLine(line); if (!p) return;
+      if (p.name === "BEGIN" && /^VCARD$/i.test(p.value.trim())) { cur = []; return; }
+      if (p.name === "END" && /^VCARD$/i.test(p.value.trim())) { if (cur) cards.push(contactFrom(cur)); cur = null; return; }
+      if (cur) cur.push(p);
+    });
+    return cards;
+  }
+  function contactsToRows(cs) {
+    var me = 0, mp = 0, ma = 0, mu = 0, rows = [], head, i;
+    cs.forEach(function (c) { me = Math.max(me, c.emails.length); mp = Math.max(mp, c.phones.length); ma = Math.max(ma, c.addrs.length); mu = Math.max(mu, c.urls.length); });
+    head = ["Full Name", "Name Prefix", "First Name", "Middle Name", "Last Name", "Name Suffix", "Nickname", "Organization", "Job Title", "Birthday", "Notes", "Categories"];
+    for (i = 1; i <= me; i++) head.push("E-mail " + i + " - Label", "E-mail " + i + " - Value");
+    for (i = 1; i <= mp; i++) head.push("Phone " + i + " - Label", "Phone " + i + " - Value");
+    for (i = 1; i <= ma; i++) head.push("Address " + i + " - Label", "Address " + i + " - Street", "Address " + i + " - City", "Address " + i + " - Region", "Address " + i + " - Postal Code", "Address " + i + " - Country");
+    for (i = 1; i <= mu; i++) head.push("Website " + i);
+    rows.push(head);
+    cs.forEach(function (c) {
+      var r = [c.full, c.prefix, c.first, c.middle, c.last, c.suffix, c.nick, c.org, c.title, c.bday, c.note, c.cats], k, e, a;
+      for (k = 0; k < me; k++) { e = c.emails[k]; r.push(e ? e.type : "", e ? e.value : ""); }
+      for (k = 0; k < mp; k++) { e = c.phones[k]; r.push(e ? e.type : "", e ? e.value : ""); }
+      for (k = 0; k < ma; k++) { a = c.addrs[k]; r.push(a ? a.type : "", a ? a.street : "", a ? a.city : "", a ? a.region : "", a ? a.zip : "", a ? a.country : ""); }
+      for (k = 0; k < mu; k++) r.push(c.urls[k] || "");
+      rows.push(r);
+    });
+    return rows;
+  }
+
+  /* ---------- vCard writer ---------- */
+  function vType(label) {
+    var s = String(label || "").toLowerCase();
+    if (!s) return "";
+    if (/mobile|cell/.test(s)) return "CELL";
+    if (/home/.test(s)) return "HOME";
+    if (/work|business|office|company/.test(s)) return "WORK";
+    if (/fax/.test(s)) return "FAX";
+    if (/pager/.test(s)) return "PAGER";
+    return "";
+  }
+  function contactToVCard(c, ver) {
+    var L = ["BEGIN:VCARD", "VERSION:" + ver], v4 = ver === "4.0";
+    var full = c.full || [c.prefix, c.first, c.middle, c.last, c.suffix].filter(Boolean).join(" ") || c.org || (c.emails[0] && c.emails[0].value) || (c.phones[0] && c.phones[0].value) || "";
+    var first = c.first, last = c.last;
+    if (!first && !last && c.full && c.full !== c.org) { var t = c.full.split(/\s+/); last = t.length > 1 ? t.pop() : ""; first = t.join(" "); }
+    L.push("N:" + [last, first, c.middle, c.prefix, c.suffix].map(escText).join(";"));
+    L.push("FN:" + escText(full));
+    if (c.nick) L.push("NICKNAME:" + escText(c.nick));
+    if (c.org) L.push("ORG:" + escText(c.org));
+    if (c.title) L.push("TITLE:" + escText(c.title));
+    c.emails.forEach(function (e) {
+      var t = vType(e.type), p = v4 ? (t === "HOME" || t === "WORK" ? t.toLowerCase() : "") : "INTERNET" + (t === "HOME" || t === "WORK" ? "," + t : "");
+      L.push("EMAIL" + (p ? ";TYPE=" + p : "") + ":" + e.value);
+    });
+    c.phones.forEach(function (e) {
+      var t = vType(e.type);
+      L.push("TEL" + (t ? ";TYPE=" + (v4 ? t.toLowerCase() : t) : "") + ":" + e.value);
+    });
+    c.addrs.forEach(function (a) {
+      var t = vType(a.type); t = (t === "HOME" || t === "WORK") ? t : "";
+      L.push("ADR" + (t ? ";TYPE=" + (v4 ? t.toLowerCase() : t) : "") + ":;;" + [a.street, a.city, a.region, a.zip, a.country].map(escText).join(";"));
+    });
+    c.urls.forEach(function (u) { L.push("URL:" + u); });
+    if (c.bday) L.push("BDAY:" + c.bday);
+    if (c.cats) L.push("CATEGORIES:" + c.cats.split(/\s*,\s*/).filter(Boolean).map(escText).join(","));
+    if (c.note) L.push("NOTE:" + escText(c.note));
+    L.push("END:VCARD");
+    return L.map(fold).join("\r\n");
+  }
+
+  /* ============================================================
+     CALENDAR: ICS parsing and writing
+  ============================================================ */
+  function icsDate(v, params) {
+    var m = /^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2})?(Z)?)?$/i.exec(String(v).trim());
+    if (!m) return null;
+    return { y: +m[1], m: +m[2], d: +m[3], h: +(m[4] || 0), i: +(m[5] || 0), s: +(m[6] || 0), utc: !!m[7], allDay: !m[4], tzid: (params.TZID || [])[0] || "" };
+  }
+  function parseDur(v) {
+    var m = /^([+-])?P(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/i.exec(String(v).trim());
+    if (!m) return null;
+    var ms = ((+m[2] || 0) * 7 * 86400 + (+m[3] || 0) * 86400 + (+m[4] || 0) * 3600 + (+m[5] || 0) * 60 + (+m[6] || 0)) * 1000;
+    return m[1] === "-" ? -ms : ms;
+  }
+  function person(p) {
+    var cn = (p.params.CN || [])[0], mail = p.value.replace(/^mailto:/i, "").trim();
+    return cn ? cn + " <" + mail + ">" : mail;
+  }
+  function eventFrom(props) {
+    var e = { summary: "", start: null, end: null, dur: null, loc: "", desc: "", org: "", att: [], status: "", cats: "", rrule: "", url: "", uid: "" };
+    props.forEach(function (p) {
+      var v = p.value;
+      switch (p.name) {
+        case "SUMMARY": e.summary = unescText(v); break;
+        case "DTSTART": e.start = icsDate(v, p.params); break;
+        case "DTEND": e.end = icsDate(v, p.params); break;
+        case "DURATION": e.dur = parseDur(v); break;
+        case "LOCATION": e.loc = unescText(v); break;
+        case "DESCRIPTION": e.desc = unescText(v); break;
+        case "ORGANIZER": e.org = person(p); break;
+        case "ATTENDEE": e.att.push(person(p)); break;
+        case "STATUS": e.status = v.trim(); break;
+        case "CATEGORIES": e.cats = splitUnesc(v, ",").map(unescText).join(", "); break;
+        case "RRULE": e.rrule = v.trim(); break;
+        case "URL": e.url = v.trim(); break;
+        case "UID": e.uid = v.trim(); break;
+      }
+    });
+    return e;
+  }
+  function parseICS(text) {
+    var stack = [], events = [], cur = null;
+    unfoldLines(text).forEach(function (line) {
+      if (!line.trim()) return;
+      var p = parseLine(line); if (!p) return;
+      if (p.name === "BEGIN") { var t = p.value.trim().toUpperCase(); stack.push(t); if (t === "VEVENT") cur = []; return; }
+      if (p.name === "END") { var u = stack.pop(); if (u === "VEVENT" && cur) { events.push(eventFrom(cur)); cur = null; } return; }
+      if (cur && stack[stack.length - 1] === "VEVENT") cur.push(p);
+    });
+    return events;
+  }
+  function dayShift(p, days) {
+    var d = new Date(Date.UTC(p.y, p.m - 1, p.d + days, p.h || 0, p.i || 0, p.s || 0));
+    return { y: d.getUTCFullYear(), m: d.getUTCMonth() + 1, d: d.getUTCDate(), h: d.getUTCHours(), i: d.getUTCMinutes(), s: d.getUTCSeconds() };
+  }
+  function resolveEnd(e) {
+    var s = e.start; if (!s) return null;
+    if (e.end) return e.end;
+    if (e.dur != null) { var d = new Date(Date.UTC(s.y, s.m - 1, s.d, s.h, s.i, s.s) + e.dur); return { y: d.getUTCFullYear(), m: d.getUTCMonth() + 1, d: d.getUTCDate(), h: d.getUTCHours(), i: d.getUTCMinutes(), s: d.getUTCSeconds(), utc: s.utc, allDay: s.allDay, tzid: s.tzid }; }
+    if (s.allDay) { var n = dayShift(s, 1); n.utc = false; n.allDay = true; n.tzid = ""; return n; }
+    return s;
+  }
+  function dtParts(dt, convert) {
+    if (!dt) return null;
+    if (dt.utc && convert) { var d = new Date(Date.UTC(dt.y, dt.m - 1, dt.d, dt.h, dt.i, dt.s)); return { y: d.getFullYear(), m: d.getMonth() + 1, d: d.getDate(), h: d.getHours(), i: d.getMinutes(), tz: LOCALTZ || "Local" }; }
+    return { y: dt.y, m: dt.m, d: dt.d, h: dt.h, i: dt.i, tz: dt.utc ? "UTC" : dt.tzid };
+  }
+  function fmtD(p, st) {
+    if (st === "us") return pad(p.m) + "/" + pad(p.d) + "/" + p.y;
+    if (st === "eu") return pad(p.d) + "/" + pad(p.m) + "/" + p.y;
+    return p.y + "-" + pad(p.m) + "-" + pad(p.d);
+  }
+  function fmtT(p, st) {
+    if (st === "12") { var h = p.h % 12 || 12; return h + ":" + pad(p.i) + " " + (p.h < 12 ? "AM" : "PM"); }
+    return pad(p.h) + ":" + pad(p.i);
+  }
+  function eventsToRows(events, o) {
+    var rows = [["Subject", "Start Date", "Start Time", "End Date", "End Time", "All Day Event", "Time Zone", "Location", "Description", "Organizer", "Attendees", "Status", "Categories", "Recurrence", "URL", "UID"]];
+    events.forEach(function (e) {
+      var s = dtParts(e.start, o.utc), en = e.start ? resolveEnd(e) : null, allDay = !!(e.start && e.start.allDay), ep;
+      if (en) {
+        if (allDay) { var last = dayShift(en, -1); if (Date.UTC(last.y, last.m - 1, last.d) < Date.UTC(e.start.y, e.start.m - 1, e.start.d)) last = e.start; ep = { y: last.y, m: last.m, d: last.d, h: 0, i: 0 }; } else ep = dtParts(en, o.utc);
+      }
+      rows.push([e.summary, s ? fmtD(s, o.dfmt) : "", s && !allDay ? fmtT(s, o.tfmt) : "", ep ? fmtD(ep, o.dfmt) : "", ep && !allDay ? fmtT(ep, o.tfmt) : "", allDay ? "TRUE" : "FALSE", s && !allDay ? s.tz : "", e.loc, e.desc, e.org, e.att.join("; "), e.status, e.cats, e.rrule, e.url, e.uid]);
+    });
+    return rows;
+  }
+
+  /* ---------- date text parsing for CSV -> ICS ---------- */
+  function daysIn(y, m) { return new Date(y, m, 0).getDate(); }
+  function parseDateStr(s, order) {
+    s = String(s || "").trim(); if (!s) return null;
+    var m, y, mo, d, a, b, rest = "";
+    if ((m = /^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})(.*)$/.exec(s))) { y = +m[1]; mo = +m[2]; d = +m[3]; rest = m[4]; }
+    else if ((m = /^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})(.*)$/.exec(s))) {
+      a = +m[1]; b = +m[2]; y = +m[3]; rest = m[4]; if (y < 100) y += 2000;
+      if (order === "dmy") { d = a; mo = b; } else if (order === "mdy") { mo = a; d = b; } else if (a > 12) { d = a; mo = b; } else { mo = a; d = b; }
+    } else if ((m = /^(\d{4})(\d{2})(\d{2})(?:T?(\d{2})(\d{2})(\d{2})?)?\s*Z?$/.exec(s))) { y = +m[1]; mo = +m[2]; d = +m[3]; rest = m[4] ? m[4] + ":" + m[5] : ""; }
+    else {
+      var dt = new Date(s);
+      if (isNaN(dt.getTime())) return null;
+      y = dt.getFullYear(); mo = dt.getMonth() + 1; d = dt.getDate();
+      if (/\d:\d/.test(s)) rest = dt.getHours() + ":" + pad(dt.getMinutes());
+    }
+    if (mo < 1 || mo > 12 || d < 1 || d > daysIn(y, mo)) return null;
+    return { y: y, m: mo, d: d, rest: String(rest).replace(/^[\sT,]+/, "").trim() };
+  }
+  function parseTimeStr(s) {
+    s = String(s || "").trim(); if (!s) return null;
+    var m = /^(\d{1,2})(?::(\d{2}))?(?::(\d{2}))?(?:\.\d+)?\s*(?:Z|[+-]\d{2}:?\d{2})?\s*([ap]\.?m\.?)?$/i.exec(s);
+    if (!m) return null;
+    var h = +m[1], mi = +(m[2] || 0), se = +(m[3] || 0), ap = m[4];
+    if (ap) { ap = ap.charAt(0).toLowerCase(); if (h < 1 || h > 12) return null; if (ap === "p" && h < 12) h += 12; if (ap === "a" && h === 12) h = 0; }
+    if (h > 23 || mi > 59 || se > 59) return null;
+    return { h: h, mi: mi, se: se };
+  }
+  function icsStamp(y, m, d, h, i, s, z) { return y + pad(m) + pad(d) + "T" + pad(h) + pad(i) + pad(s) + (z ? "Z" : ""); }
+  function icsDay(y, m, d) { return pad(y, 4) + pad(m) + pad(d); }
+
+  /* ============================================================
+     ZIP (store only) and downloads
+  ============================================================ */
+  var CRCT = (function () { var t = [], n, k, c; for (n = 0; n < 256; n++) { c = n; for (k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  function crc32(u8) { var c = 0xFFFFFFFF, i; for (i = 0; i < u8.length; i++) c = CRCT[(c ^ u8[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+  function makeZip(files) {
+    var chunks = [], central = [], offset = 0, enc = new TextEncoder(), now = new Date();
+    var time = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1);
+    var date = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+    files.forEach(function (f) {
+      var nb = enc.encode(f.name), crc = crc32(f.data), len = f.data.length;
+      var lh = new Uint8Array(30 + nb.length), v = new DataView(lh.buffer);
+      v.setUint32(0, 0x04034b50, true); v.setUint16(4, 20, true); v.setUint16(6, 0x0800, true); v.setUint16(8, 0, true); v.setUint16(10, time, true); v.setUint16(12, date, true);
+      v.setUint32(14, crc, true); v.setUint32(18, len, true); v.setUint32(22, len, true); v.setUint16(26, nb.length, true); v.setUint16(28, 0, true); lh.set(nb, 30);
+      chunks.push(lh, f.data);
+      var ch = new Uint8Array(46 + nb.length), c = new DataView(ch.buffer);
+      c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint16(10, 0, true); c.setUint16(12, time, true); c.setUint16(14, date, true);
+      c.setUint32(16, crc, true); c.setUint32(20, len, true); c.setUint32(24, len, true); c.setUint16(28, nb.length, true); c.setUint32(42, offset, true); ch.set(nb, 46);
+      central.push(ch); offset += lh.length + len;
+    });
+    var cdSize = 0; central.forEach(function (c) { cdSize += c.length; });
+    var end = new Uint8Array(22), e = new DataView(end.buffer);
+    e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, cdSize, true); e.setUint32(16, offset, true);
+    return new Blob(chunks.concat(central, [end]), { type: "application/zip" });
+  }
+  function uniqueNames(names) {
+    var seen = {};
+    return names.map(function (n) {
+      var key = n.toLowerCase(), i = 1, out = n, m = /^(.*?)(\.[^.]*)?$/.exec(n);
+      while (seen[out.toLowerCase()]) { i++; out = m[1] + " (" + i + ")" + (m[2] || ""); }
+      seen[out.toLowerCase()] = 1; return out;
+    });
+  }
+
+  /* ============================================================
+     EMAIL: EML parser
+  ============================================================ */
+  function decodeWords(s) {
+    if (s.indexOf("=?") < 0) return s;
+    s = s.replace(/(=\?[^?]+\?[bBqQ]\?[^?]*\?=)\s+(?==\?[^?]+\?[bBqQ]\?)/g, "$1");
+    return s.replace(/=\?([^?]+)\?([bBqQ])\?([^?]*)\?=/g, function (m, cs, enc, t) {
+      try { cs = cs.split("*")[0]; var bin = enc.toLowerCase() === "b" ? b64Bin(t) : qpDecodeBin(t, true); return decodeText(binToBytes(bin), cs); } catch (e) { return m; }
+    });
+  }
+  function headerText(v) { return decodeWords(tryUtf8(v)).replace(/\s+/g, " ").trim(); }
+  function splitHeadBody(s) {
+    var m = /\r?\n\r?\n/.exec(s);
+    if (!m) return [s, ""];
+    return [s.slice(0, m.index), s.slice(m.index + m[0].length)];
+  }
+  function parseHeaders(h) {
+    var out = [];
+    h.replace(/\r?\n[ \t]+/g, " ").split(/\r?\n/).forEach(function (l) {
+      var m = /^([^:\s]+):\s*(.*)$/.exec(l);
+      if (m) out.push({ name: m[1].toLowerCase(), value: m[2] });
+    });
+    return out;
+  }
+  function getH(hs, n) { for (var i = 0; i < hs.length; i++) if (hs[i].name === n) return hs[i].value; return ""; }
+  function parseParams(str) {
+    var parts = splitOutside(str || "", ";"), main = (parts.shift() || "").trim().toLowerCase(), params = {}, cont = {};
+    parts.forEach(function (p) {
+      var eq = p.indexOf("="); if (eq < 0) return;
+      var k = p.slice(0, eq).trim().toLowerCase(), v = p.slice(eq + 1).trim();
+      if (v.charAt(0) === '"' && v.charAt(v.length - 1) === '"') v = v.slice(1, -1).replace(/\\(.)/g, "$1");
+      var m = /^([^*]+)\*(\d+)?(\*)?$/.exec(k);
+      if (m) { (cont[m[1]] = cont[m[1]] || [])[m[2] ? +m[2] : 0] = { v: v, enc: m[3] ? true : !m[2] }; } else params[k] = v;
+    });
+    Object.keys(cont).forEach(function (base) {
+      var arr = cont[base], bin = "", cs = "utf-8";
+      arr.forEach(function (pc, idx) {
+        if (!pc) return;
+        var v = pc.v;
+        if (pc.enc) {
+          if (idx === 0) { var m = /^([^']*)'[^']*'(.*)$/.exec(v); if (m) { cs = m[1] || "utf-8"; v = m[2]; } }
+          v = v.replace(/%([0-9A-Fa-f]{2})/g, function (x, h) { return String.fromCharCode(parseInt(h, 16)); });
+        }
+        bin += v;
+      });
+      params[base] = decodeText(binToBytes(bin), cs);
+    });
+    return { value: main, params: params };
+  }
+  function parseEntity(raw, depth) {
+    var hb = splitHeadBody(raw), hs = parseHeaders(hb[0]);
+    var ent = { headers: hs, rawHead: hb[0], ct: parseParams(getH(hs, "content-type") || "text/plain"), disp: parseParams(getH(hs, "content-disposition")), cte: getH(hs, "content-transfer-encoding"), body: hb[1], parts: null };
+    if (/^multipart\//.test(ent.ct.value) && ent.ct.params.boundary && depth < 10) ent.parts = splitMultipart(hb[1], ent.ct.params.boundary).map(function (p) { return parseEntity(p, depth + 1); });
+    return ent;
+  }
+  function splitMultipart(body, b) {
+    var delim = "--" + b, lines = body.split(/\r?\n/), parts = [], cur = null, i, l;
+    for (i = 0; i < lines.length; i++) {
+      l = lines[i];
+      if (l.indexOf(delim) === 0) {
+        if (cur) parts.push(cur.join("\n"));
+        if (l.slice(delim.length, delim.length + 2) === "--") { cur = null; break; }
+        cur = [];
+      } else if (cur) cur.push(l);
+    }
+    if (cur) parts.push(cur.join("\n"));
+    return parts;
+  }
+  function decodeBody(body, cte) {
+    cte = String(cte || "").toLowerCase().trim();
+    try {
+      if (cte === "base64") return b64Bin(body);
+      if (cte === "quoted-printable") return qpDecodeBin(body, false);
+    } catch (e) { return ""; }
+    return body;
+  }
+  function htmlToText(html) {
+    var doc = new DOMParser().parseFromString(html, "text/html"), out = [];
+    Array.prototype.forEach.call(doc.querySelectorAll("script,style,head,title,noscript,template"), function (n) { n.parentNode && n.parentNode.removeChild(n); });
+    var BLOCK = /^(address|article|aside|blockquote|div|dl|fieldset|figure|footer|form|h[1-6]|header|main|nav|ol|p|section|table|tr|ul|li|dd|dt|caption)$/;
+    function walk(n) {
+      if (n.nodeType === 3) { out.push(n.nodeValue.replace(/\s+/g, " ")); return; }
+      if (n.nodeType !== 1) return;
+      var t = n.tagName.toLowerCase(), b = BLOCK.test(t), i;
+      if (t === "br") { out.push("\n"); return; }
+      if (t === "hr") { out.push("\n----------------------------------------\n"); return; }
+      if (t === "img") { var alt = n.getAttribute("alt"); if (alt) out.push("[" + alt + "]"); return; }
+      if (t === "pre") { out.push("\n" + n.textContent + "\n"); return; }
+      if (b) out.push("\n");
+      if (t === "li") out.push("\u2022 ");
+      for (i = 0; i < n.childNodes.length; i++) walk(n.childNodes[i]);
+      if (t === "td" || t === "th") out.push("   ");
+      if (t === "a") { var href = n.getAttribute("href") || "", txt = n.textContent.trim(); if (/^https?:/i.test(href) && href.replace(/\/$/, "") !== txt.replace(/\/$/, "")) out.push(" (" + href + ")"); }
+      if (b) out.push("\n");
+    }
+    if (doc.body) walk(doc.body);
+    return out.join("").replace(/[ \t]+\n/g, "\n").replace(/\n[ \t]+/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+  }
+  function collectParts(ent, out) {
+    if (ent.parts) { ent.parts.forEach(function (p) { collectParts(p, out); }); return; }
+    var type = ent.ct.value, disp = ent.disp.value, fname = ent.disp.params.filename || ent.ct.params.name || "";
+    if (fname) fname = headerText(fname);
+    if ((type === "text/plain" || type === "text/html") && disp !== "attachment" && !fname) {
+      var txt = decodeText(binToBytes(decodeBody(ent.body, ent.cte)), ent.ct.params.charset);
+      (type === "text/html" ? out.html : out.plain).push(txt);
+      return;
+    }
+    if (/^multipart\//.test(type)) return;
+    var cte = String(ent.cte).toLowerCase().trim(), size = cte === "base64" ? Math.floor(ent.body.replace(/[^A-Za-z0-9+\/]/g, "").length * 3 / 4) : ent.body.length;
+    if (type === "message/rfc822") { out.att.push({ name: fname || "forwarded message.eml", size: size }); return; }
+    if (disp === "inline" && /^image\//.test(type) && !fname) return;
+    out.att.push({ name: fname || ("attachment" + (type.indexOf("/") > 0 ? "." + type.split("/")[1] : "")), size: size });
+  }
+  function parseEML(u8) {
+    var raw = bytesToBin(u8), ent = parseEntity(raw, 0), out = { plain: [], html: [], att: [] };
+    collectParts(ent, out);
+    var hs = ent.headers, body = out.plain.join("\n\n").trim();
+    if (!body && out.html.length) body = htmlToText(out.html.join("\n"));
+    return {
+      subject: headerText(getH(hs, "subject")), from: headerText(getH(hs, "from")), to: headerText(getH(hs, "to")), cc: headerText(getH(hs, "cc")), bcc: headerText(getH(hs, "bcc")),
+      date: headerText(getH(hs, "date")), body: body, attachments: out.att, rawHeaders: ent.rawHead.replace(/\r/g, "")
+    };
+  }
+
+  /* ============================================================
+     EMAIL: Outlook .msg (compound file) parser
+  ============================================================ */
+  function parseCFB(u8) {
+    var dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength), sig = [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1], i, j;
+    if (u8.length < 512) throw new Error("This does not look like a valid Outlook .msg file.");
+    for (i = 0; i < 8; i++) if (u8[i] !== sig[i]) throw new Error("This does not look like a valid Outlook .msg file.");
+    var ss = 1 << dv.getUint16(30, true), ms = 1 << dv.getUint16(32, true);
+    var dirStart = dv.getUint32(48, true), cutoff = dv.getUint32(56, true), mfStart = dv.getUint32(60, true), dfStart = dv.getUint32(68, true), dfCount = dv.getUint32(72, true);
+    var SPECIAL = 0xFFFFFFFA, FREE = 0xFFFFFFFF;
+    function secOff(id) { return (id + 1) * ss; }
+    var difat = [], v, next, off, c;
+    for (i = 0; i < 109; i++) { v = dv.getUint32(76 + i * 4, true); if (v < SPECIAL) difat.push(v); }
+    next = dfStart;
+    for (c = 0; c < dfCount && next < SPECIAL; c++) {
+      off = secOff(next); if (off + ss > u8.length) break;
+      for (j = 0; j < ss / 4 - 1; j++) { v = dv.getUint32(off + j * 4, true); if (v < SPECIAL) difat.push(v); }
+      next = dv.getUint32(off + ss - 4, true);
+    }
+    var fat = [];
+    difat.forEach(function (sid) { var o = secOff(sid), k; if (o + ss > u8.length) return; for (k = 0; k < ss / 4; k++) fat.push(dv.getUint32(o + k * 4, true)); });
+    function chain(start, table) { var out = [], s = start, g = 0; while (s < SPECIAL && g++ <= table.length + 1) { out.push(s); s = table[s]; if (s === undefined) break; } return out; }
+    function readBig(start, size) {
+      var ch = chain(start, fat), out = new Uint8Array(ch.length * ss);
+      ch.forEach(function (sid, k) { var o = secOff(sid); if (o < u8.length) out.set(u8.subarray(o, o + ss), k * ss); });
+      return size == null ? out : out.subarray(0, size);
+    }
+    var dirBytes = readBig(dirStart), n = Math.floor(dirBytes.length / 128), dv2 = new DataView(dirBytes.buffer, dirBytes.byteOffset, dirBytes.byteLength), ents = [], o2, nl;
+    for (i = 0; i < n; i++) {
+      o2 = i * 128; nl = Math.min(dv2.getUint16(o2 + 64, true), 64);
+      ents.push({ name: new TextDecoder("utf-16le").decode(dirBytes.subarray(o2, o2 + Math.max(0, nl - 2))), type: dirBytes[o2 + 66], left: dv2.getUint32(o2 + 68, true), right: dv2.getUint32(o2 + 72, true), child: dv2.getUint32(o2 + 76, true), start: dv2.getUint32(o2 + 116, true), size: dv2.getUint32(o2 + 120, true), path: "" });
+    }
+    if (!ents.length) throw new Error("This .msg file has no readable content.");
+    var mf = [];
+    if (mfStart < SPECIAL) { var mb = readBig(mfStart), mdv = new DataView(mb.buffer, mb.byteOffset, mb.byteLength); for (i = 0; i < Math.floor(mb.length / 4); i++) mf.push(mdv.getUint32(i * 4, true)); }
+    var mini = null;
+    function read(e) {
+      if (e.size < cutoff) {
+        if (!mini) mini = readBig(ents[0].start, ents[0].size);
+        var ch = chain(e.start, mf), out = new Uint8Array(ch.length * ms);
+        ch.forEach(function (sid, k) { out.set(mini.subarray(sid * ms, sid * ms + ms), k * ms); });
+        return out.subarray(0, e.size);
+      }
+      return readBig(e.start, e.size);
+    }
+    var seen = {}, paths = {};
+    function walk(id, parent) {
+      if (id >= ents.length || seen[id]) return; seen[id] = 1;
+      var e = ents[id];
+      walk(e.left, parent);
+      e.path = parent + "/" + e.name; paths[e.path.toLowerCase()] = e;
+      if (e.type !== 2 && e.child !== FREE) walk(e.child, e.path);
+      walk(e.right, parent);
+    }
+    walk(ents[0].child, "");
+    return { find: function (p) { return paths[p.toLowerCase()] || null; }, read: read, ents: ents };
+  }
+  function parseMSG(u8) {
+    var cfb = parseCFB(u8);
+    function stream(p) { var e = cfb.find(p); return e ? cfb.read(e) : null; }
+    function hex4(id) { return ("0000" + id.toString(16)).slice(-4).toUpperCase(); }
+    function str(prefix, id) {
+      var s = stream(prefix + "/__substg1.0_" + hex4(id) + "001F");
+      if (s) return new TextDecoder("utf-16le").decode(s).replace(/\u0000+$/, "");
+      s = stream(prefix + "/__substg1.0_" + hex4(id) + "001E");
+      if (s) return decodeText(s, "windows-1252").replace(/\u0000+$/, "");
+      return "";
+    }
+    function bin(prefix, id) { return stream(prefix + "/__substg1.0_" + hex4(id) + "0102"); }
+    var subject = str("", 0x0037);
+    if (subject.charCodeAt(0) === 1) subject = subject.slice(2);
+    var body = str("", 0x1000);
+    if (!body.trim()) {
+      var hb = bin("", 0x1013), html = "";
+      if (hb) { try { html = new TextDecoder("utf-8", { fatal: true }).decode(hb); } catch (e) { html = new TextDecoder("windows-1252").decode(hb); } } else html = str("", 0x1013);
+      if (html) body = htmlToText(html);
+    }
+    function addr(name, mail) {
+      if (mail && /^\/o=/i.test(mail)) mail = "";
+      if (name && mail && name.toLowerCase() !== mail.toLowerCase()) return name + " <" + mail + ">";
+      return name || mail || "";
+    }
+    var from = addr(str("", 0x0C1A) || str("", 0x0042), str("", 0x5D01) || str("", 0x0065) || str("", 0x0C1F));
+    var headers = str("", 0x007D), date = "";
+    if (headers) { var dm = /^date:\s*(.+)$/im.exec(headers); if (dm) date = dm[1].trim(); }
+    if (!date) {
+      var ps = stream("/__properties_version1.0");
+      if (ps) {
+        var pdv = new DataView(ps.buffer, ps.byteOffset, ps.byteLength), k, tag, ms = {}, i;
+        for (i = 32; i + 16 <= ps.length; i += 16) {
+          tag = pdv.getUint32(i, true);
+          if ((tag & 0xFFFF) === 0x40) ms[tag >>> 16] = (pdv.getUint32(i + 8, true) + pdv.getUint32(i + 12, true) * 4294967296) / 10000 - 11644473600000;
+        }
+        k = ms[0x0039] || ms[0x0E06] || ms[0x3007];
+        if (k) { var d = new Date(k); try { date = d.toLocaleString(undefined, { dateStyle: "full", timeStyle: "long" }); } catch (e2) { date = d.toString(); } }
+      }
+    }
+    var att = [];
+    cfb.ents.forEach(function (e) {
+      if (e.type === 1 && /^\/__attach_version1\.0_#[0-9a-f]+$/i.test(e.path)) {
+        var name = str(e.path, 0x3707) || str(e.path, 0x3704) || str(e.path, 0x3001) || "attachment";
+        var d = cfb.find(e.path + "/__substg1.0_37010102");
+        att.push({ name: name, size: d ? d.size : 0 });
+      }
+    });
+    return { subject: subject, from: from, to: str("", 0x0E04), cc: str("", 0x0E03), bcc: str("", 0x0E02), date: date, body: body.replace(/\r\n?/g, "\n").trim(), attachments: att, rawHeaders: headers.replace(/\r/g, "") };
+  }
+
+  /* ============================================================
+     PDF writer (own implementation, no libraries)
+  ============================================================ */
+  var HW = {
+    R: [278, 278, 355, 556, 556, 889, 667, 191, 333, 333, 389, 584, 278, 333, 278, 278, 556, 556, 556, 556, 556, 556, 556, 556, 556, 556, 278, 278, 584, 584, 584, 556, 1015, 667, 667, 722, 722, 667, 611, 778, 722, 278, 500, 667, 556, 833, 722, 778, 667, 778, 722, 667, 611, 722, 667, 944, 667, 667, 611, 278, 278, 278, 469, 556, 333, 556, 556, 500, 556, 556, 278, 556, 556, 222, 222, 500, 222, 833, 556, 556, 556, 556, 333, 500, 278, 556, 500, 722, 500, 500, 500, 334, 260, 334, 584],
+    B: [278, 333, 474, 556, 556, 889, 722, 238, 333, 333, 389, 584, 278, 333, 278, 278, 556, 556, 556, 556, 556, 556, 556, 556, 556, 556, 333, 333, 584, 584, 584, 611, 975, 722, 722, 722, 722, 667, 611, 778, 722, 278, 556, 722, 611, 833, 722, 778, 667, 778, 722, 667, 611, 722, 667, 944, 667, 667, 611, 333, 278, 333, 584, 556, 333, 556, 611, 556, 611, 556, 333, 611, 611, 278, 278, 556, 278, 889, 611, 611, 611, 611, 389, 556, 333, 611, 556, 778, 556, 556, 500, 389, 280, 389, 584]
+  };
+  var SPEC_W = { 0x2022: 350, 0x2013: 556, 0x2014: 1000, 0x2018: 222, 0x2019: 222, 0x201C: 333, 0x201D: 333, 0x2026: 1000, 0x20AC: 556, 0x2122: 1000, 0xA9: 737, 0xAE: 737, 0xB0: 400, 0xD7: 584, 0xF7: 584, 0xB7: 278, 0xAB: 556, 0xBB: 556, 0xBF: 611, 0xA1: 333, 0x2020: 556, 0x2021: 556, 0x2030: 1000 };
+  var CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
+  function pdfByte(cp) { if (cp === 10) return 32; if (cp >= 32 && cp <= 126) return cp; if (cp >= 0xA0 && cp <= 0xFF) return cp; return CP1252[cp]; }
+  function charW(ch, font) {
+    if (font === "M") return 600;
+    var cp = ch.codePointAt(0), t = HW[font === "B" ? "B" : "R"];
+    if (cp >= 32 && cp <= 126) return t[cp - 32];
+    if (SPEC_W[cp]) return SPEC_W[cp];
+    var b = ch.normalize("NFD").charCodeAt(0);
+    if (b >= 32 && b <= 126) return t[b - 32];
+    return 556;
+  }
+  function pdfMeasure(text, font, size) { var w = 0, i, a = Array.from(text); for (i = 0; i < a.length; i++) w += charW(a[i], font); return w * size / 1000; }
+  function sanitize(s) {
+    return String(s == null ? "" : s).replace(/\r\n?/g, "\n").replace(/\u2028|\u2029/g, "\n").replace(/\t/g, "    ")
+      .replace(/[\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]/g, " ").replace(/[\u2010-\u2012\u2212\u2011]/g, "-")
+      .replace(/[\u200B-\u200F\u202A-\u202E\u2060-\u2064\uFEFF\u00AD]/g, "").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, "");
+  }
+  function needsUnicode(str) { var a = Array.from(str), i, cp; for (i = 0; i < a.length; i++) { cp = a[i].codePointAt(0); if (cp !== 10 && pdfByte(cp) === undefined) return true; } return false; }
+  function pdfStr(s) {
+    var out = "", a = Array.from(s), i, b, ch;
+    for (i = 0; i < a.length; i++) {
+      b = pdfByte(a[i].codePointAt(0)); if (b === undefined) b = 63; ch = String.fromCharCode(b);
+      if (b === 40 || b === 41 || b === 92) out += "\\" + ch; else if (b < 32 || b > 126) out += "\\" + ("00" + b.toString(8)).slice(-3); else out += ch;
+    }
+    return out;
+  }
+  function f2(n) { return (Math.round(n * 100) / 100).toString(); }
+  var COL = { dark: [0.06, 0.09, 0.16], text: [0.2, 0.25, 0.33], muted: [0.4, 0.45, 0.53], line: [0.8, 0.84, 0.89], acc: [0.26, 0.22, 0.79] };
+
+  function wrapText(text, font, size, width, measure) {
+    var out = [];
+    text.split("\n").forEach(function (para) {
+      if (para === "") { out.push(""); return; }
+      var words = para.split(" "), line = "", lw = 0, n = 0, sp = measure(" ", font, size);
+      words.forEach(function (w) {
+        var ww = measure(w, font, size), cand = n === 0 ? ww : lw + sp + ww;
+        if (n > 0 && cand > width) { out.push(line); line = ""; lw = 0; n = 0; cand = ww; }
+        if (ww > width) {
+          var chunk = "", cw = 0;
+          Array.from(w).forEach(function (ch) { var c = measure(ch, font, size); if (cw + c > width && chunk !== "") { out.push(chunk); chunk = ""; cw = 0; } chunk += ch; cw += c; });
+          line = chunk; lw = cw; n = 1; return;
+        }
+        line = n === 0 ? w : line + " " + w; lw = cand; n++;
+      });
+      out.push(line);
+    });
+    return out;
+  }
+  function layoutDoc(items, pw, ph, measure) {
+    var margin = 54, bottom = ph - margin - 8, usableW = pw - 2 * margin, pages = [{ ops: [] }], y = margin;
+    function cur() { return pages[pages.length - 1]; }
+    function newPage() { pages.push({ ops: [] }); y = margin; }
+    items.forEach(function (it) {
+      if (it.pageBreak) { if (cur().ops.length) newPage(); return; }
+      if (it.rule) { y += 4; if (y > bottom) newPage(); cur().ops.push({ rule: true, x1: margin, x2: pw - margin, y: y, color: COL.line }); y += 10; return; }
+      var size = it.size, lh = size * (it.font === "M" ? 1.25 : 1.4), lw = it.labelW || 0, lines = wrapText(it.text, it.font, size, usableW - lw, measure);
+      y += it.before || 0;
+      lines.forEach(function (ln, i) {
+        if (y + lh > bottom) newPage();
+        if (i === 0 && it.label) cur().ops.push({ x: margin, y: y + size * 0.92, text: it.label, font: "B", size: size, color: COL.muted });
+        if (ln !== "") cur().ops.push({ x: margin + lw, y: y + size * 0.92, text: ln, font: it.font, size: size, color: it.color });
+        y += lh;
+      });
+      y += it.after || 0;
+    });
+    var total = pages.length;
+    pages.forEach(function (pg, i) {
+      var t = "Page " + (i + 1) + " of " + total;
+      pg.ops.push({ rect: true, x: 0, y: 0, w: pw, h: 6, color: COL.acc });
+      pg.ops.push({ x: (pw - measure(t, "R", 9)) / 2, y: ph - 30, text: t, font: "R", size: 9, color: COL.muted });
+    });
+    return pages;
+  }
+  function pageContent(pg, ph) {
+    var s = "";
+    pg.ops.forEach(function (op) {
+      var c = op.color;
+      if (op.rule) s += c.join(" ") + " RG 0.7 w " + f2(op.x1) + " " + f2(ph - op.y) + " m " + f2(op.x2) + " " + f2(ph - op.y) + " l S\n";
+      else if (op.rect) s += c.join(" ") + " rg " + f2(op.x) + " " + f2(ph - op.y - op.h) + " " + f2(op.w) + " " + f2(op.h) + " re f\n";
+      else s += "BT /" + (op.font === "B" ? "F2" : op.font === "M" ? "F3" : "F1") + " " + f2(op.size) + " Tf " + c.join(" ") + " rg 1 0 0 1 " + f2(op.x) + " " + f2(ph - op.y) + " Tm (" + pdfStr(op.text) + ") Tj ET\n";
+    });
+    return s;
+  }
+  var CANVAS_FONT = '"Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Noto Sans CJK SC", "Noto Sans Arabic", "PingFang SC", "Microsoft YaHei", sans-serif';
+  function canvasFont(font, size) { return font === "M" ? size + 'px "Courier New", Consolas, monospace' : (font === "B" ? "bold " : "") + size + "px " + CANVAS_FONT; }
+  function rgbCss(c) { return "rgb(" + Math.round(c[0] * 255) + "," + Math.round(c[1] * 255) + "," + Math.round(c[2] * 255) + ")"; }
+  function pageToJpeg(pg, pw, ph, scale) {
+    var cv = document.createElement("canvas"); cv.width = Math.round(pw * scale); cv.height = Math.round(ph * scale);
+    var x = cv.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, cv.width, cv.height); x.scale(scale, scale); x.textBaseline = "alphabetic";
+    pg.ops.forEach(function (op) {
+      if (op.rule) { x.strokeStyle = rgbCss(op.color); x.lineWidth = 0.7; x.beginPath(); x.moveTo(op.x1, op.y); x.lineTo(op.x2, op.y); x.stroke(); }
+      else if (op.rect) { x.fillStyle = rgbCss(op.color); x.fillRect(op.x, op.y, op.w, op.h); }
+      else { x.font = canvasFont(op.font, op.size); x.fillStyle = rgbCss(op.color); x.fillText(op.text, op.x, op.y); }
+    });
+    return { bin: atob(cv.toDataURL("image/jpeg", 0.92).split(",")[1]), w: cv.width, h: cv.height };
+  }
+  function buildPDF(pages, pw, ph, title, imageMode) {
+    var objs = [null, null];
+    function add(s) { objs.push(s); return objs.length; }
+    var fR = add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>");
+    var fB = add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>");
+    var fM = add("<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>");
+    var kids = [];
+    pages.forEach(function (pg) {
+      var content, res;
+      if (imageMode) {
+        var img = pg.jpeg, io = add("<< /Type /XObject /Subtype /Image /Width " + img.w + " /Height " + img.h + " /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length " + img.bin.length + " >>\nstream\n" + img.bin + "\nendstream");
+        content = "q " + f2(pw) + " 0 0 " + f2(ph) + " 0 0 cm /Im0 Do Q"; res = "/XObject << /Im0 " + io + " 0 R >>";
+      } else { content = pageContent(pg, ph); res = "/Font << /F1 " + fR + " 0 R /F2 " + fB + " 0 R /F3 " + fM + " 0 R >>"; }
+      var c = add("<< /Length " + content.length + " >>\nstream\n" + content + "\nendstream");
+      var p = add("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 " + f2(pw) + " " + f2(ph) + "] /Resources << " + res + " >> /Contents " + c + " 0 R >>");
+      kids.push(p + " 0 R");
+    });
+    objs[0] = "<< /Type /Catalog /Pages 2 0 R >>";
+    objs[1] = "<< /Type /Pages /Kids [ " + kids.join(" ") + " ] /Count " + kids.length + " >>";
+    var hex = "FEFF", t = Array.from(String(title || "Email").slice(0, 120)), i, k;
+    for (i = 0; i < t.length; i++) { var cp = t[i].codePointAt(0); if (cp > 0xFFFF) { cp -= 0x10000; hex += ("000" + (0xD800 + (cp >> 10)).toString(16)).slice(-4) + ("000" + (0xDC00 + (cp & 0x3FF)).toString(16)).slice(-4); } else hex += ("000" + cp.toString(16)).slice(-4); }
+    var d = new Date(), stamp = "D:" + d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + pad(d.getUTCSeconds()) + "Z";
+    var info = add("<< /Title <" + hex + "> /Producer (Email Contact Calendar Converter) /CreationDate (" + stamp + ") >>");
+    var out = "%PDF-1.4\n%\xE2\xE3\xCF\xD3\n", offsets = [];
+    for (k = 0; k < objs.length; k++) { offsets.push(out.length); out += (k + 1) + " 0 obj\n" + objs[k] + "\nendobj\n"; }
+    var xr = out.length;
+    out += "xref\n0 " + (objs.length + 1) + "\n0000000000 65535 f \n";
+    offsets.forEach(function (o) { out += ("0000000000" + o).slice(-10) + " 00000 n \n"; });
+    out += "trailer\n<< /Size " + (objs.length + 1) + " /Root 1 0 R /Info " + info + " 0 R >>\nstartxref\n" + xr + "\n%%EOF";
+    return new Blob([binToBytes(out)], { type: "application/pdf" });
+  }
+  function messageItems(msg, o) {
+    var base = o.size, it = [{ pageBreak: true }], clip = function (s) { s = sanitize(s); return s.length > 250000 ? s.slice(0, 250000) + "\n\n[... message shortened because it is very long ...]" : s; };
+    it.push({ text: sanitize(msg.subject) || "(No subject)", font: "B", size: base + 7, color: COL.dark, after: 6 });
+    it.push({ rule: true });
+    [["From", msg.from], ["To", msg.to], ["Cc", msg.cc], ["Bcc", msg.bcc], ["Date", msg.date]].forEach(function (r) {
+      if (r[1]) it.push({ label: r[0], labelW: 80, text: sanitize(r[1]), font: "R", size: base, color: COL.text, after: 3 });
+    });
+    if (o.attach && msg.attachments.length) it.push({ label: "Attachments", labelW: 80, text: msg.attachments.map(function (a) { return sanitize(a.name) + (a.size ? " (" + fmtSize(a.size) + ")" : ""); }).join("\n"), font: "R", size: base, color: COL.text, after: 3 });
+    it.push({ rule: true });
+    it.push({ text: clip(msg.body) || "(This message has no readable text.)", font: "R", size: base, color: COL.text });
+    if (o.raw && msg.rawHeaders) {
+      it.push({ rule: true });
+      it.push({ text: "Full message headers", font: "B", size: base, color: COL.dark, after: 4 });
+      it.push({ text: clip(msg.rawHeaders), font: "M", size: Math.max(7, base - 3), color: COL.muted });
+    }
+    return it;
+  }
+  function messagesToPdf(msgs, o) {
+    var pw = o.page === "letter" ? 612 : 595.28, ph = o.page === "letter" ? 792 : 841.89, items = [], all = "";
+    msgs.forEach(function (m) { items = items.concat(messageItems(m, o)); });
+    items.forEach(function (it) { if (it.text) all += it.text; if (it.label) all += it.label; });
+    var imageMode = needsUnicode(all), title = msgs.length === 1 ? msgs[0].subject : "Converted emails", pages;
+    if (imageMode) {
+      var cx = document.createElement("canvas").getContext("2d");
+      pages = layoutDoc(items, pw, ph, function (t, f, s) { cx.font = canvasFont(f, s); return cx.measureText(t).width; });
+      pages.forEach(function (pg) { pg.jpeg = pageToJpeg(pg, pw, ph, 2); });
+    } else pages = layoutDoc(items, pw, ph, pdfMeasure);
+    return { blob: buildPDF(pages, pw, ph, title, imageMode), pages: pages.length, imageMode: imageMode };
+  }
+
+  /* ============================================================
+     Column auto-matching for CSV -> VCF / ICS
+  ============================================================ */
+  function normH(h) { return String(h == null ? "" : h).toLowerCase().replace(/[_\-\u2013\u2014:.\/]+/g, " ").replace(/\s+/g, " ").trim(); }
+  function guessMap(headers, singles, multiFn) {
+    var norm = headers.map(normH), used = {}, map = {};
+    function take(k, i) { map[k] = i; used[i] = 1; }
+    if (multiFn) multiFn(norm, take);
+    Object.keys(singles).forEach(function (k) {
+      var i;
+      for (i = 0; i < norm.length; i++) if (!used[i] && singles[k].test(norm[i])) { take(k, i); break; }
+    });
+    return map;
+  }
+  var VSINGLE = {
+    full: /^(full name|name|display name|file as|contact name|fn|formatted name)$/,
+    first: /^(first name|given name|firstname|fname|forename|first)$/,
+    middle: /^(middle name|additional name|middle)$/,
+    last: /^(last name|family name|surname|lastname|lname|last)$/,
+    prefix: /^(name prefix|prefix|honorific prefix)$/,
+    suffix: /^(name suffix|suffix|honorific suffix)$/,
+    nick: /^(nickname|nick name|nick)$/,
+    org: /^(organization|organisation|organization name|organisation name|company|company name|org|employer|business)$/,
+    title: /^(job title|organization title|organisation title|position|role|title|occupation|designation)$/,
+    country: /\bcountry\b/,
+    city: /\bcity\b/,
+    region: /\b(state|region|province)\b/,
+    zip: /\b(zip|postal|postcode)\b/,
+    street: /street|^address( 1)?$|^(home|business|work) address$/,
+    url: /^(website|web page|webpage|homepage|url|web|website 1|website 1 value)$/,
+    bday: /^(birthday|birth date|date of birth|bday|dob|birthdate)$/,
+    note: /^(notes?|comments?|description|memo)$/,
+    cats: /^(categories|category|labels?|groups?|group membership)$/
+  };
+  function vMulti(norm, take) {
+    var ev = [], el = [], pv = [], pl = [];
+    norm.forEach(function (h, i) {
+      var lab = /\b(label|type)\b/.test(h);
+      if (/\be ?mail\b/.test(h) && !/display name/.test(h)) (lab ? el : ev).push(i);
+      else if (/(phone|mobile|cell|telephone|\btel\b|\bfax\b)/.test(h) && !/(phonetic|country|extension|\bext\b)/.test(h)) (lab ? pl : pv).push(i);
+    });
+    ev.slice(0, 3).forEach(function (i, n) { take("e" + (n + 1), i); });
+    el.slice(0, 3).forEach(function (i, n) { take("e" + (n + 1) + "t", i); });
+    pv.slice(0, 4).forEach(function (i, n) { take("p" + (n + 1), i); });
+    pl.slice(0, 4).forEach(function (i, n) { take("p" + (n + 1) + "t", i); });
+  }
+  var ISINGLE = {
+    subject: /^(subject|title|summary|event|event name|name|event title|event subject)$/,
+    startDate: /^(start date|start|begin|date|start day|dtstart|from date|when|begin date)$/,
+    startTime: /^(start time|time|begin time|from time)$/,
+    endDate: /^(end date|end|finish|end day|dtend|to date|finish date)$/,
+    endTime: /^(end time|finish time|to time)$/,
+    allDay: /^(all day event|all day|allday|is all day|all day\?)$/,
+    location: /^(location|place|venue|where|address)$/,
+    description: /^(description|notes?|details|body|memo)$/,
+    cats: /^(categories|category|labels?)$/,
+    url: /^(url|link|website)$/
+  };
+  function specList() {
+    var L = [];
+    [["full", "Full name"], ["first", "First name"], ["middle", "Middle name"], ["last", "Last name"], ["prefix", "Prefix (Mr, Dr)"], ["suffix", "Suffix (Jr)"], ["nick", "Nickname"]].forEach(function (x) { L.push({ k: x[0], l: x[1], g: "Name" }); });
+    L.push({ k: "org", l: "Company", g: "Work" }, { k: "title", l: "Job title", g: "Work" });
+    var n;
+    for (n = 1; n <= 3; n++) L.push({ k: "e" + n, l: "Email " + n, g: "Email" }, { k: "e" + n + "t", l: "Email " + n + " label", g: "Email" });
+    for (n = 1; n <= 4; n++) L.push({ k: "p" + n, l: "Phone " + n, g: "Phone" }, { k: "p" + n + "t", l: "Phone " + n + " label", g: "Phone" });
+    [["street", "Street"], ["city", "City"], ["region", "State / region"], ["zip", "Postal code"], ["country", "Country"]].forEach(function (x) { L.push({ k: x[0], l: x[1], g: "Address" }); });
+    [["url", "Website"], ["bday", "Birthday"], ["note", "Notes"], ["cats", "Categories / groups"]].forEach(function (x) { L.push({ k: x[0], l: x[1], g: "More" }); });
+    return L;
+  }
+  var VSPECS = specList();
+  var ISPECS = [
+    { k: "subject", l: "Event title", g: "Required" }, { k: "startDate", l: "Start date", g: "Required" },
+    { k: "startTime", l: "Start time", g: "When" }, { k: "endDate", l: "End date", g: "When" }, { k: "endTime", l: "End time", g: "When" }, { k: "allDay", l: "All-day (TRUE / FALSE)", g: "When" },
+    { k: "location", l: "Location", g: "Details" }, { k: "description", l: "Description", g: "Details" }, { k: "cats", l: "Categories", g: "Details" }, { k: "url", l: "Link (URL)", g: "Details" }
+  ];
+
+  /* ============================================================
+     Tool definitions
+  ============================================================ */
+  var DELIMS = { comma: ",", semi: ";", tab: "\t" };
+  var PDF_OPTS = [
+    { k: "page", t: "select", l: "Page size", o: [["a4", "A4"], ["letter", "US Letter"]], d: "a4" },
+    { k: "size", t: "select", l: "Text size", o: [["10", "Small"], ["11", "Medium"], ["12", "Large"]], d: "11" },
+    { k: "attach", t: "check", l: "List attachment names", d: true },
+    { k: "raw", t: "check", l: "Include full technical headers", d: false },
+    { k: "combine", t: "check", l: "Combine all emails into one PDF", d: false }
+  ];
+  var CSV_IN = [
+    { k: "indelim", t: "select", l: "Column separator in your file", o: [["auto", "Detect automatically"], ["comma", "Comma ( , )"], ["semi", "Semicolon ( ; )"], ["tab", "Tab"]], d: "auto", reparse: true },
+    { k: "header", t: "check", l: "First row contains column names", d: true, reparse: true }
+  ];
+  var TOOLS = [
+    { id: "eml-pdf", group: "email", name: "EML \u2192 PDF", sub: "Email file to PDF document", icon: "mail", accept: ["eml"], multi: true, opts: PDF_OPTS, title: "EML to PDF", desc: "Turn saved .eml emails into tidy PDF documents.", drop: "Drop .eml files here", run: function () { return runPdf("eml"); } },
+    { id: "msg-pdf", group: "email", name: "MSG \u2192 PDF", sub: "Outlook message to PDF", icon: "mail", accept: ["msg"], multi: true, opts: PDF_OPTS, title: "MSG to PDF", desc: "Turn Outlook .msg messages into tidy PDF documents.", drop: "Drop .msg files here", run: function () { return runPdf("msg"); } },
+    { id: "vcf-csv", group: "contacts", name: "VCF \u2192 CSV", sub: "Contacts to a spreadsheet", icon: "user", accept: ["vcf", "vcard"], multi: true, title: "VCF to CSV", desc: "Convert vCard contact files into a CSV spreadsheet.", drop: "Drop .vcf files here", run: runVcfCsv,
+      opts: [{ k: "delim", t: "select", l: "Column separator", o: [["comma", "Comma ( , )"], ["semi", "Semicolon ( ; )"], ["tab", "Tab"]], d: "comma" }, { k: "merge", t: "check", l: "Merge all files into one CSV", d: true }, { k: "bom", t: "check", l: "Excel-friendly (UTF-8 with BOM)", d: true }] },
+    { id: "csv-vcf", group: "contacts", name: "CSV \u2192 VCF", sub: "Spreadsheet to contact cards", icon: "user", accept: ["csv", "tsv", "txt"], multi: false, csv: true, specs: VSPECS, single: VSINGLE, multiFn: vMulti, title: "CSV to VCF", desc: "Turn a contact spreadsheet into a vCard (.vcf) file.", drop: "Drop a .csv file here", run: runCsvVcf,
+      opts: CSV_IN.concat([{ k: "ver", t: "select", l: "vCard version", o: [["3.0", "3.0 (most compatible)"], ["4.0", "4.0"]], d: "3.0" }, { k: "split", t: "check", l: "One .vcf file per contact (ZIP)", d: false }]) },
+    { id: "ics-csv", group: "calendar", name: "ICS \u2192 CSV", sub: "Calendar events to a spreadsheet", icon: "calendar", accept: ["ics", "ical", "ifb"], multi: true, title: "ICS to CSV", desc: "Convert calendar (.ics) events into a CSV spreadsheet.", drop: "Drop .ics files here", run: runIcsCsv,
+      opts: [{ k: "dfmt", t: "select", l: "Date format", o: [["iso", "2025-03-28 (year first)"], ["us", "03/28/2025 (month first)"], ["eu", "28/03/2025 (day first)"]], d: "iso" }, { k: "tfmt", t: "select", l: "Time format", o: [["24", "24-hour (14:30)"], ["12", "12-hour (2:30 PM)"]], d: "24" }, { k: "utc", t: "select", l: "Times saved in UTC (Z)", o: [["keep", "Keep as UTC"], ["local", "Convert to my time zone"]], d: "keep" }, { k: "delim", t: "select", l: "Column separator", o: [["comma", "Comma ( , )"], ["semi", "Semicolon ( ; )"], ["tab", "Tab"]], d: "comma" }, { k: "merge", t: "check", l: "Merge all files into one CSV", d: true }, { k: "bom", t: "check", l: "Excel-friendly (UTF-8 with BOM)", d: true }] },
+    { id: "csv-ics", group: "calendar", name: "CSV \u2192 ICS", sub: "Spreadsheet to calendar file", icon: "calendar", accept: ["csv", "tsv", "txt"], multi: false, csv: true, specs: ISPECS, single: ISINGLE, title: "CSV to ICS", desc: "Turn a spreadsheet of events into a calendar (.ics) file.", drop: "Drop a .csv file here", run: runCsvIcs,
+      opts: CSV_IN.concat([{ k: "order", t: "select", l: "Date order (e.g. 03/04/2025)", o: [["auto", "Detect automatically"], ["mdy", "Month / Day / Year"], ["dmy", "Day / Month / Year"]], d: "auto" }, { k: "tz", t: "select", l: "Time zone handling", o: [["float", "Floating (same clock time anywhere)"], ["utc", "Convert from my time zone to UTC"]], d: "float" }, { k: "rem", t: "select", l: "Reminder", o: [["0", "None"], ["10", "10 minutes before"], ["30", "30 minutes before"], ["60", "1 hour before"], ["1440", "1 day before"]], d: "0" }]) }
+  ];
+  var GROUPS = [{ id: "email", name: "Email", icon: "mail" }, { id: "contacts", name: "Contacts", icon: "user" }, { id: "calendar", name: "Calendar", icon: "calendar" }];
+
+  /* ============================================================
+     Sample data for "Try an example"
+  ============================================================ */
+  var SAMPLES = {
+    "eml-pdf": { name: "sample-email.eml", text: [
+      'From: "Alex Morgan" <alex@example.com>', "To: Jamie Lee <jamie@example.org>, sam@example.org", "Cc: team@example.com",
+      "Subject: =?UTF-8?Q?Project_update_=E2=80=93_caf=C3=A9_meeting?=", "Date: Mon, 15 Jan 2024 09:30:00 +0000", "MIME-Version: 1.0", 'Content-Type: multipart/mixed; boundary="b1"', "",
+      "--b1", 'Content-Type: multipart/alternative; boundary="b2"', "", "--b2", "Content-Type: text/plain; charset=utf-8", "Content-Transfer-Encoding: quoted-printable", "",
+      "Hi Jamie,", "", "Quick update =E2=80=94 the caf=C3=A9 meeting has moved to Thursday at 10:00.", "", "Agenda:", "  - Budget review", "  - Launch checklist", "  - Open questions", "", "Thanks,", "Alex", "--b2--",
+      "--b1", 'Content-Type: application/pdf; name="agenda.pdf"', 'Content-Disposition: attachment; filename="agenda.pdf"', "Content-Transfer-Encoding: base64", "", "JVBERi0xLjQKJSBzYW1wbGUK", "--b1--", ""].join("\r\n") },
+    "vcf-csv": { name: "sample-contacts.vcf", text: [
+      "BEGIN:VCARD", "VERSION:3.0", "N:Morgan;Alex;;Dr.;", "FN:Dr. Alex Morgan", "ORG:Northwind Traders", "TITLE:Operations Manager", "EMAIL;TYPE=INTERNET,WORK:alex@northwind.example", "TEL;TYPE=CELL:+1 555 0100", "TEL;TYPE=WORK:+1 555 0111", "ADR;TYPE=WORK:;;12 Harbor Street;Portland;OR;97201;USA", "URL:https://northwind.example", "BDAY:1985-04-12", "NOTE:Met at the 2024 trade show.", "END:VCARD",
+      "BEGIN:VCARD", "VERSION:3.0", "N:Lee;Jamie;;;", "FN:Jamie Lee", "EMAIL;TYPE=HOME:jamie@example.org", "TEL;TYPE=HOME:+44 20 7946 0000", "END:VCARD",
+      "BEGIN:VCARD", "VERSION:3.0", "N:M\u00fcller;Z\u00e9a;;;", "FN:Z\u00e9a M\u00fcller", "ORG:Caf\u00e9 Central", "EMAIL:zea@example.net", "END:VCARD", ""].join("\r\n") },
+    "csv-vcf": { name: "sample-contacts.csv", text: [
+      "First Name,Last Name,Company,Job Title,Email,Mobile Phone,Work Phone,City,Country,Birthday",
+      "Alex,Morgan,Northwind Traders,Operations Manager,alex@northwind.example,+1 555 0100,+1 555 0111,Portland,USA,1985-04-12",
+      "Jamie,Lee,,,jamie@example.org,+44 20 7946 0000,,London,United Kingdom,",
+      "Z\u00e9a,M\u00fcller,Caf\u00e9 Central,Owner,zea@example.net,,,Berlin,Germany,1990-11-02", ""].join("\r\n") },
+    "ics-csv": { name: "sample-calendar.ics", text: [
+      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Sample//EN",
+      "BEGIN:VEVENT", "UID:evt-1@example.com", "DTSTART:20250310T140000Z", "DTEND:20250310T150000Z", "SUMMARY:Team stand-up", "LOCATION:Room 4\\, Main Office", "DESCRIPTION:Daily sync.\\nBring updates.", "ORGANIZER;CN=Alex Morgan:mailto:alex@example.com", "ATTENDEE;CN=Jamie Lee:mailto:jamie@example.org", "STATUS:CONFIRMED", "BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:Reminder", "TRIGGER:-PT10M", "END:VALARM", "END:VEVENT",
+      "BEGIN:VEVENT", "UID:evt-2@example.com", "DTSTART;VALUE=DATE:20250315", "DTEND;VALUE=DATE:20250318", "SUMMARY:Company retreat", "RRULE:FREQ=YEARLY", "END:VEVENT",
+      "BEGIN:VEVENT", "UID:evt-3@example.com", "DTSTART;TZID=America/New_York:20250402T093000", "DURATION:PT90M", "SUMMARY:Client call", "END:VEVENT", "END:VCALENDAR", ""].join("\r\n") },
+    "csv-ics": { name: "sample-events.csv", text: [
+      "Subject,Start Date,Start Time,End Date,End Time,All Day Event,Location,Description",
+      "Team stand-up,2025-03-10,09:00,2025-03-10,09:30,FALSE,Room 4,Daily sync",
+      "Company retreat,2025-03-15,,2025-03-17,,TRUE,Lake House,Bring hiking boots",
+      "Dentist,03/25/2025,2:30 PM,03/25/2025,3:15 PM,FALSE,\"12 Main St, Suite 5\",", ""].join("\r\n") }
+  };
+
+  /* ============================================================
+     State
+  ============================================================ */
+  var state = { tool: "eml-pdf", files: [], csv: null, map: {}, results: [], opts: {}, busy: false, nextId: 1 };
+  function cur() { for (var i = 0; i < TOOLS.length; i++) if (TOOLS[i].id === state.tool) return TOOLS[i]; return TOOLS[0]; }
+  function getOpt(k) {
+    var t = cur(), s = state.opts[t.id] = state.opts[t.id] || {};
+    if (s[k] === undefined) { t.opts.forEach(function (o) { if (o.k === k) s[k] = o.d; }); }
+    return s[k];
+  }
+  function setOpt(k, v) { var t = cur(); (state.opts[t.id] = state.opts[t.id] || {})[k] = v; }
+
+  /* ============================================================
+     Rendering
+  ============================================================ */
+  function renderGroups() {
+    var h = "";
+    GROUPS.forEach(function (g) {
+      h += '<div class="ecc-group ecc-g-' + g.id + '"><div class="ecc-group-h"><span class="ecc-gi">' + svg(g.icon) + "</span>" + esc(g.name) + "</div>";
+      TOOLS.filter(function (t) { return t.group === g.id; }).forEach(function (t) {
+        h += '<button type="button" class="ecc-tile" data-tool="' + t.id + '" aria-pressed="' + (t.id === state.tool) + '"><span class="ecc-tile-ic">' + svg(t.icon) + '</span><span class="ecc-tile-main"><span class="ecc-tile-t">' + esc(t.name) + '</span><span class="ecc-tile-s">' + esc(t.sub) + '</span></span><span class="ecc-tile-ck">' + svg("check") + "</span></button>";
+      });
+      h += "</div>";
+    });
+    $("#ecc-groups").innerHTML = h;
+  }
+  function renderHead() {
+    var t = cur(), panel = $("#ecc-panel");
+    panel.className = "ecc-panel ecc-g-" + t.group;
+    $("#ecc-phead").innerHTML = '<span class="ecc-phead-ic">' + svg(t.icon) + '</span><div class="ecc-phead-t"><h3 class="ecc-h2">' + esc(t.title) + "</h3><p>" + esc(t.desc) + "</p></div>" +
+      (SAMPLES[t.id] ? '<button type="button" class="ecc-btn ecc-btn-ghost ecc-btn-sm ecc-ex" id="ecc-ex">' + svg("spark") + "Try an example</button>" : "");
+    var inp = $("#ecc-file");
+    inp.setAttribute("accept", t.accept.map(function (e) { return "." + e; }).join(","));
+    if (t.multi) inp.setAttribute("multiple", ""); else inp.removeAttribute("multiple");
+    $(".ecc-drop-t").textContent = "Drag & drop " + (t.multi ? "your files" : "your file") + " here";
+    $("#ecc-drop-s").innerHTML = "or <u>tap / click to browse</u><br>Accepted: " + esc(t.accept.map(function (e) { return "." + e; }).join(", "));
+  }
+  function renderOpts() {
+    var t = cur(), h = "";
+    t.opts.forEach(function (o) {
+      var v = getOpt(o.k);
+      if (o.t === "select") h += '<label class="ecc-field"><span class="ecc-lab">' + esc(o.l) + '</span><select class="ecc-sel" data-opt="' + o.k + '">' + o.o.map(function (x) { return '<option value="' + esc(x[0]) + '"' + (String(x[0]) === String(v) ? " selected" : "") + ">" + esc(x[1]) + "</option>"; }).join("") + "</select></label>";
+      else h += '<label class="ecc-check"><input type="checkbox" data-opt="' + o.k + '"' + (v ? " checked" : "") + "><span>" + esc(o.l) + "</span></label>";
+    });
+    $("#ecc-opts").innerHTML = h;
+  }
+  function renderFiles() {
+    var h = "";
+    state.files.forEach(function (f) {
+      h += '<li class="ecc-file">' + svg("file") + '<div class="ecc-file-n"><b>' + esc(f.file.name) + "</b><span>" + fmtSize(f.file.size) + "</span></div>" +
+        '<button type="button" class="ecc-x" data-rm="' + f.id + '" aria-label="Remove ' + esc(f.file.name) + '">' + svg("x") + "</button></li>";
+    });
+    $("#ecc-files").innerHTML = h;
+    updateGo();
+  }
+  function updateGo() {
+    var t = cur(), ok = state.files.length > 0 && !state.busy && (!t.csv || (state.csv && dataRows().length > 0));
+    var b = $("#ecc-go"); b.disabled = !ok;
+    b.innerHTML = state.busy ? "Converting\u2026" : svg("bolt") + "Convert " + esc(t.name);
+  }
+  function setMsg(type, html) {
+    var box = $("#ecc-msg");
+    if (!html) { box.innerHTML = ""; return; }
+    box.innerHTML = '<div class="ecc-alert ecc-alert-' + type + '">' + svg(type === "err" || type === "warn" ? "alert" : type === "ok" ? "check" : "info") + "<div>" + html + "</div></div>";
+  }
+  function renderResults() {
+    var box = $("#ecc-res"), prev = $("#ecc-prev");
+    if (!state.results.length) { box.innerHTML = ""; prev.innerHTML = ""; return; }
+    var good = state.results.filter(function (r) { return !r.error; }), h = '<div class="ecc-res-wrap"><div class="ecc-res-head"><h4 class="ecc-h4"><span class="ecc-step">3</span>Your results</h4>';
+    if (good.length > 1) h += '<button type="button" class="ecc-btn ecc-btn-ghost ecc-btn-sm" data-zip="1">' + svg("download") + "Download all (ZIP)</button>";
+    h += '</div><div class="ecc-res-list">';
+    state.results.forEach(function (r, i) {
+      if (r.error) { h += '<div class="ecc-res is-err"><span class="ecc-res-ic">' + svg("alert") + '</span><div class="ecc-res-main"><b>' + esc(r.name) + "</b><span>" + esc(r.error) + "</span></div></div>"; return; }
+      h += '<div class="ecc-res"><span class="ecc-res-ic">' + svg("check") + '</span><div class="ecc-res-main"><b>' + esc(r.name) + "</b><span>" + esc(r.info) + " \u00b7 " + fmtSize(r.blob.size) + "</span></div><div class=\"ecc-res-act\">" +
+        (r.open ? '<a class="ecc-btn ecc-btn-ghost ecc-btn-sm" href="' + r.url + '" target="_blank" rel="noopener">' + svg("ext") + "Open</a>" : "") +
+        '<a class="ecc-btn ecc-btn-primary ecc-btn-sm" href="' + r.url + '" download="' + esc(r.name) + '">' + svg("download") + "Download</a></div></div>";
+    });
+    box.innerHTML = h + "</div></div>";
+    var first = good.filter(function (r) { return r.preview; })[0];
+    if (!first) { prev.innerHTML = ""; return; }
+    var p = first.preview, ph = '<div class="ecc-prev"><h4 class="ecc-h4">Preview' + (good.length > 1 ? " of " + esc(first.name) : "") + "</h4>";
+    if (p.type === "table") {
+      ph += '<div class="ecc-tablewrap"><table class="ecc-table"><thead><tr>' + p.head.map(function (c) { return "<th>" + esc(c) + "</th>"; }).join("") + "</tr></thead><tbody>" +
+        p.rows.map(function (r) { return "<tr>" + p.head.map(function (c, i) { return "<td>" + esc(String(r[i] == null ? "" : r[i]).replace(/\s+/g, " ")) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>";
+      ph += '<p class="ecc-cap">Showing ' + p.rows.length + " of " + p.total + " rows.</p>";
+    } else ph += '<pre class="ecc-pre">' + esc(p.text) + '</pre><p class="ecc-cap">Showing the beginning of the file.</p>';
+    prev.innerHTML = ph + "</div>";
+  }
+  function dataRows() { return state.csv ? state.csv.rows.slice(getOpt("header") ? 1 : 0) : []; }
+  function csvHeaders() {
+    var c = state.csv, first = c.rows[0] || [], n = 0, hdr = [];
+    c.rows.slice(0, 200).forEach(function (r) { n = Math.max(n, r.length); });
+    for (var i = 0; i < n; i++) { var t = getOpt("header") ? String(first[i] == null ? "" : first[i]).trim() : ""; hdr.push(t || "Column " + (i + 1)); }
+    return hdr;
+  }
+  function renderMap() {
+    var box = $("#ecc-map"), t = cur();
+    if (!t.csv || !state.csv) { box.innerHTML = ""; return; }
+    var headers = csvHeaders(), rows = dataRows(), matched = t.specs.filter(function (s) { return state.map[s.k] >= 0; }).length;
+    var h = '<div class="ecc-map"><h4 class="ecc-h4">Match your columns</h4><p>We found <b>' + plural(rows.length, "row", "rows") + "</b> and <b>" + plural(headers.length, "column", "columns") + "</b>, and matched <b>" + matched + "</b> field" + (matched === 1 ? "" : "s") +
+      " automatically. Check each box below and change it if needed. Leave a box on &ldquo;Not used&rdquo; to skip it.</p>";
+    h += '<div class="ecc-tablewrap"><table class="ecc-table"><thead><tr>' + headers.map(function (c) { return "<th>" + esc(c) + "</th>"; }).join("") + "</tr></thead><tbody>" +
+      rows.slice(0, 3).map(function (r) { return "<tr>" + headers.map(function (c, i) { return "<td>" + esc(r[i] == null ? "" : r[i]) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>";
+    var seen = [];
+    t.specs.forEach(function (s) { if (seen.indexOf(s.g) < 0) seen.push(s.g); });
+    seen.forEach(function (g) {
+      h += '<div class="ecc-mapgroup"><h5>' + esc(g) + '</h5><div class="ecc-mapgrid">';
+      t.specs.filter(function (s) { return s.g === g; }).forEach(function (s) {
+        var v = state.map[s.k] == null ? -1 : state.map[s.k];
+        h += '<label class="ecc-field"><span class="ecc-lab">' + esc(s.l) + '</span><select class="ecc-sel' + (v >= 0 ? " is-set" : "") + '" data-map="' + s.k + '"><option value="-1">\u2014 Not used \u2014</option>' +
+          headers.map(function (c, i) { return '<option value="' + i + '"' + (i === v ? " selected" : "") + ">" + esc(c) + "</option>"; }).join("") + "</select></label>";
+      });
+      h += "</div></div>";
+    });
+    box.innerHTML = h + "</div>";
+  }
+  function clearResults() {
+    state.results.forEach(function (r) { if (r.url) try { URL.revokeObjectURL(r.url); } catch (e) { } });
+    state.results = [];
+  }
+  function renderAll() { renderGroups(); renderHead(); renderOpts(); renderFiles(); renderMap(); setMsg("", ""); renderResults(); }
+
+  /* ============================================================
+     Actions
+  ============================================================ */
+  function selectTool(id) {
+    if (id !== state.tool) { clearResults(); state.files = []; state.csv = null; state.map = {}; state.tool = id; renderAll(); if (window.innerWidth < 900) { try { $("#ecc-panel").scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) { } } }
+  }
+  function acceptFiles(list) {
+    var t = cur(), arr = Array.prototype.slice.call(list || []), bad = [], ok = [];
+    if (!arr.length) return;
+    arr.forEach(function (f) { (t.accept.indexOf(extOf(f.name)) >= 0 ? ok : bad).push(f); });
+    clearResults(); renderResults();
+    if (!ok.length) {
+      var x = bad[0] ? extOf(bad[0].name) : "";
+      setMsg("err", "<b>That file type is not supported here.</b> This converter accepts " + esc(t.accept.map(function (e) { return "." + e; }).join(", ")) + "." + (/^xlsx?$/.test(x) ? " For Excel files, use File \u2192 Save As \u2192 CSV first." : ""));
+      return;
+    }
+    if (!t.multi) { state.files = []; state.csv = null; state.map = {}; ok = [ok[0]]; }
+    ok.forEach(function (f) { state.files.push({ id: state.nextId++, file: f }); });
+    renderFiles();
+    var skipNote = bad.length ? "Skipped " + plural(bad.length, "file", "files") + " with an unsupported type: " + esc(bad.map(function (f) { return f.name; }).join(", ")) + ".<br>" : "";
+    if (t.csv) loadCSV(ok[0], skipNote);
+    else setMsg(bad.length ? "warn" : "info", skipNote + "Ready. Press <b>Convert</b> when you are happy with the options.");
+  }
+  async function loadCSV(file, skipNote) {
+    try {
+      var bytes = await readBytes(file), text = decodeFileText(bytes);
+      state.csv = { text: text, rows: [] };
+      reparseCSV();
+      var rows = state.csv.rows;
+      if (!rows.length) { state.csv = null; renderMap(); updateGo(); setMsg("err", "<b>That CSV file looks empty.</b>"); return; }
+      remap(); renderMap(); updateGo();
+      setMsg(skipNote ? "warn" : "info", (skipNote || "") + "Your file was read. Check the column matching above, then press <b>Convert</b>.");
+    } catch (e) { state.csv = null; renderMap(); updateGo(); setMsg("err", "<b>Could not read that file.</b> " + esc(e.message)); }
+  }
+  function reparseCSV() {
+    if (!state.csv) return;
+    var d = getOpt("indelim"), delim = d === "auto" ? detectDelim(state.csv.text) : DELIMS[d] || ",";
+    state.csv.rows = parseCSV(state.csv.text, delim); state.csv.delim = delim;
+  }
+  function remap() {
+    var t = cur(); if (!t.csv || !state.csv) return;
+    state.map = guessMap(csvHeaders(), t.single, t.multiFn);
+  }
+  function addResult(name, blob, info, extra) {
+    var r = { name: name, blob: blob, info: info, url: URL.createObjectURL(blob), open: false, preview: null };
+    if (extra) for (var k in extra) r[k] = extra[k];
+    state.results.push(r); return r;
+  }
+  function addError(name, msg) { state.results.push({ name: name, error: msg }); }
+
+  async function runConvert() {
+    if (state.busy) return;
+    state.busy = true; clearResults(); renderResults(); setMsg("info", "Working on it\u2026"); updateGo();
+    await tick();
+    try { await cur().run(); } catch (e) { setMsg("err", "<b>Something went wrong.</b> " + esc(e && e.message ? e.message : e)); }
+    state.busy = false; updateGo(); renderResults();
+    var good = state.results.filter(function (r) { return !r.error; }).length, bad = state.results.length - good;
+    if (good && !bad) setMsg("ok", "<b>Done!</b> Your " + (good === 1 ? "file is" : good + " files are") + " ready to download below.");
+    else if (good) setMsg("warn", "<b>Finished with some problems.</b> " + good + " converted, " + bad + " could not be converted. See details below.");
+    else if (state.results.length) setMsg("err", "<b>Nothing could be converted.</b> See the details below.");
+    if (state.results.length) { try { $("#ecc-res").scrollIntoView({ behavior: "smooth", block: "nearest" }); } catch (e) { } }
+  }
+
+  /* ---------- converters ---------- */
+  async function runPdf(kind) {
+    var o = { page: getOpt("page"), size: +getOpt("size"), attach: getOpt("attach"), raw: getOpt("raw") }, msgs = [], i, f;
+    for (i = 0; i < state.files.length; i++) {
+      f = state.files[i].file;
+      try {
+        var bytes = await readBytes(f), m = kind === "eml" ? parseEML(bytes) : parseMSG(bytes);
+        msgs.push({ name: f.name, msg: m });
+      } catch (e) { addError(f.name, e.message || "Could not read this file."); }
+      await tick();
+    }
+    if (!msgs.length) return;
+    if (getOpt("combine") && msgs.length > 1) {
+      var r = messagesToPdf(msgs.map(function (x) { return x.msg; }), o);
+      addResult("combined-emails.pdf", r.blob, plural(msgs.length, "email", "emails") + ", " + plural(r.pages, "page", "pages") + (r.imageMode ? " (image-based for special characters)" : ""), { open: true });
+      return;
+    }
+    var names = uniqueNames(msgs.map(function (x) { return safeName(baseName(x.name), "email") + ".pdf"; }));
+    for (i = 0; i < msgs.length; i++) {
+      try {
+        var res = messagesToPdf([msgs[i].msg], o);
+        addResult(names[i], res.blob, plural(res.pages, "page", "pages") + (res.imageMode ? " (image-based for special characters)" : ""), { open: true });
+      } catch (e) { addError(msgs[i].name, "Could not create the PDF: " + (e.message || e)); }
+      await tick();
+    }
+  }
+  async function runVcfCsv() {
+    var delim = DELIMS[getOpt("delim")] || ",", bom = getOpt("bom") ? "\uFEFF" : "", merge = getOpt("merge"), all = [], per = [], i, f;
+    for (i = 0; i < state.files.length; i++) {
+      f = state.files[i].file;
+      try {
+        var cs = parseVCF(decodeFileText(await readBytes(f)));
+        if (!cs.length) { addError(f.name, "No contacts were found in this file."); continue; }
+        all = all.concat(cs); per.push({ name: f.name, cards: cs });
+      } catch (e) { addError(f.name, e.message || "Could not read this file."); }
+      await tick();
+    }
+    function emit(name, cards, label) {
+      var rows = contactsToRows(cards), r = addResult(name, new Blob([bom + toCSV(rows, delim)], { type: "text/csv;charset=utf-8" }), plural(cards.length, "contact", "contacts") + label);
+      r.preview = { type: "table", head: rows[0], rows: rows.slice(1, 9), total: rows.length - 1 };
+    }
+    if (!per.length) return;
+    if (merge && per.length > 1) emit("contacts-merged.csv", all, " from " + plural(per.length, "file", "files"));
+    else { var names = uniqueNames(per.map(function (p) { return safeName(baseName(p.name), "contacts") + ".csv"; })); per.forEach(function (p, k) { emit(names[k], p.cards, ""); }); }
+  }
+  function mapGet(r, k) { var i = state.map[k]; return i != null && i >= 0 && r[i] != null ? String(r[i]).trim() : ""; }
+  async function runCsvVcf() {
+    var rows = dataRows(), headers = csvHeaders(), ver = getOpt("ver"), cards = [], skipped = 0, n;
+    var any = VSPECS.some(function (s) { return state.map[s.k] >= 0; });
+    if (!any) throw new Error("No columns are matched yet. Choose at least a name or an email column in the matching boxes.");
+    rows.forEach(function (r) {
+      var c = { full: mapGet(r, "full"), prefix: mapGet(r, "prefix"), first: mapGet(r, "first"), middle: mapGet(r, "middle"), last: mapGet(r, "last"), suffix: mapGet(r, "suffix"), nick: mapGet(r, "nick"), org: mapGet(r, "org"), title: mapGet(r, "title"), emails: [], phones: [], addrs: [], urls: [], bday: "", note: mapGet(r, "note"), cats: mapGet(r, "cats") };
+      for (n = 1; n <= 3; n++) { var ev = mapGet(r, "e" + n); if (ev) c.emails.push({ type: mapGet(r, "e" + n + "t") || headers[state.map["e" + n]] || "", value: ev }); }
+      for (n = 1; n <= 4; n++) { var pv = mapGet(r, "p" + n); if (pv) c.phones.push({ type: mapGet(r, "p" + n + "t") || headers[state.map["p" + n]] || "", value: pv }); }
+      var a = { type: headers[state.map.street] || "", street: mapGet(r, "street"), city: mapGet(r, "city"), region: mapGet(r, "region"), zip: mapGet(r, "zip"), country: mapGet(r, "country") };
+      if (a.street || a.city || a.region || a.zip || a.country) c.addrs.push(a);
+      var u = mapGet(r, "url"); if (u) c.urls.push(u);
+      var b = mapGet(r, "bday"); if (b) { var pd = parseDateStr(b, "auto"); c.bday = pd ? pd.y + "-" + pad(pd.m) + "-" + pad(pd.d) : b; }
+      if (!(c.full || c.first || c.last || c.org || c.emails.length || c.phones.length)) { skipped++; return; }
+      cards.push(c);
+    });
+    if (!cards.length) throw new Error("No usable contacts were found. Each row needs at least a name, company, email or phone.");
+    var base = safeName(baseName(state.files[0].file.name), "contacts"), note = skipped ? " (" + plural(skipped, "empty row", "empty rows") + " skipped)" : "", pv;
+    if (getOpt("split")) {
+      var names = uniqueNames(cards.map(function (c, i) { return safeName(c.full || [c.first, c.last].filter(Boolean).join(" ") || c.org || "contact " + (i + 1), "contact") + ".vcf"; })), enc = new TextEncoder();
+      var blob = makeZip(cards.map(function (c, i) { return { name: names[i], data: enc.encode(contactToVCard(c, ver) + "\r\n") }; }));
+      addResult(base + "-contacts.zip", blob, plural(cards.length, "contact file", "contact files") + " in a ZIP" + note);
+      pv = contactToVCard(cards[0], ver);
+    } else {
+      var text = cards.map(function (c) { return contactToVCard(c, ver); }).join("\r\n") + "\r\n";
+      addResult(base + ".vcf", new Blob([text], { type: "text/vcard;charset=utf-8" }), plural(cards.length, "contact", "contacts") + ", vCard " + ver + note);
+      pv = text.slice(0, 1800);
+    }
+    state.results[state.results.length - 1].preview = { type: "text", text: pv.replace(/\r\n/g, "\n") };
+  }
+  async function runIcsCsv() {
+    var o = { dfmt: getOpt("dfmt"), tfmt: getOpt("tfmt"), utc: getOpt("utc") === "local" }, delim = DELIMS[getOpt("delim")] || ",", bom = getOpt("bom") ? "\uFEFF" : "", merge = getOpt("merge"), all = [], per = [], i, f;
+    for (i = 0; i < state.files.length; i++) {
+      f = state.files[i].file;
+      try {
+        var ev = parseICS(decodeFileText(await readBytes(f)));
+        if (!ev.length) { addError(f.name, "No calendar events were found in this file."); continue; }
+        all = all.concat(ev); per.push({ name: f.name, events: ev });
+      } catch (e) { addError(f.name, e.message || "Could not read this file."); }
+      await tick();
+    }
+    function emit(name, events, label) {
+      var rows = eventsToRows(events, o), r = addResult(name, new Blob([bom + toCSV(rows, delim)], { type: "text/csv;charset=utf-8" }), plural(events.length, "event", "events") + label);
+      r.preview = { type: "table", head: rows[0], rows: rows.slice(1, 9), total: rows.length - 1 };
+    }
+    if (!per.length) return;
+    if (merge && per.length > 1) emit("events-merged.csv", all, " from " + plural(per.length, "file", "files"));
+    else { var names = uniqueNames(per.map(function (p) { return safeName(baseName(p.name), "events") + ".csv"; })); per.forEach(function (p, k) { emit(names[k], p.events, ""); }); }
+  }
+  async function runCsvIcs() {
+    var rows = dataRows(), order = getOpt("order"), tz = getOpt("tz"), rem = +getOpt("rem"), hdr = getOpt("header") ? 2 : 1;
+    if (!(state.map.subject >= 0) && !(state.map.startDate >= 0)) throw new Error("Please choose the column that holds the start date (and ideally the event title).");
+    if (!(state.map.startDate >= 0)) throw new Error("Please choose the column that holds the start date.");
+    var out = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Email Contact Calendar Converter//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH"], good = 0, bad = [], now = new Date();
+    var stampNow = icsStamp(now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), true);
+    rows.forEach(function (r, ri) {
+      var sd = parseDateStr(mapGet(r, "startDate"), order);
+      if (!sd) { bad.push(ri + hdr); return; }
+      var st = parseTimeStr(mapGet(r, "startTime")) || parseTimeStr(sd.rest), ad = /^(true|yes|y|1|x|all.?day)$/i.test(mapGet(r, "allDay")), allDay = ad || !st;
+      var ed = parseDateStr(mapGet(r, "endDate"), order) || sd, et = parseTimeStr(mapGet(r, "endTime")) || (ed !== sd ? parseTimeStr(ed.rest) : null);
+      var L = ["BEGIN:VEVENT", "UID:" + Date.now().toString(36) + "-" + ri + "-" + Math.random().toString(36).slice(2, 10) + "@converter", "DTSTAMP:" + stampNow];
+      if (allDay) {
+        var last = ed; if (Date.UTC(ed.y, ed.m - 1, ed.d) < Date.UTC(sd.y, sd.m - 1, sd.d)) last = sd;
+        var nx = dayShift(last, 1);
+        L.push("DTSTART;VALUE=DATE:" + icsDay(sd.y, sd.m, sd.d), "DTEND;VALUE=DATE:" + icsDay(nx.y, nx.m, nx.d));
+      } else {
+        var s0 = new Date(sd.y, sd.m - 1, sd.d, st.h, st.mi, st.se), e0;
+        if (et) e0 = new Date(ed.y, ed.m - 1, ed.d, et.h, et.mi, et.se); else e0 = new Date(s0.getTime() + 3600000);
+        if (e0 < s0) e0 = new Date(s0.getTime() + 3600000);
+        if (tz === "utc") L.push("DTSTART:" + icsStamp(s0.getUTCFullYear(), s0.getUTCMonth() + 1, s0.getUTCDate(), s0.getUTCHours(), s0.getUTCMinutes(), s0.getUTCSeconds(), true), "DTEND:" + icsStamp(e0.getUTCFullYear(), e0.getUTCMonth() + 1, e0.getUTCDate(), e0.getUTCHours(), e0.getUTCMinutes(), e0.getUTCSeconds(), true));
+        else L.push("DTSTART:" + icsStamp(s0.getFullYear(), s0.getMonth() + 1, s0.getDate(), s0.getHours(), s0.getMinutes(), s0.getSeconds(), false), "DTEND:" + icsStamp(e0.getFullYear(), e0.getMonth() + 1, e0.getDate(), e0.getHours(), e0.getMinutes(), e0.getSeconds(), false));
+      }
+      L.push("SUMMARY:" + escText(mapGet(r, "subject") || "(No title)"));
+      var loc = mapGet(r, "location"), de = mapGet(r, "description"), ca = mapGet(r, "cats"), ur = mapGet(r, "url");
+      if (loc) L.push("LOCATION:" + escText(loc));
+      if (de) L.push("DESCRIPTION:" + escText(de));
+      if (ca) L.push("CATEGORIES:" + ca.split(/\s*,\s*/).filter(Boolean).map(escText).join(","));
+      if (ur) L.push("URL:" + ur);
+      if (rem > 0) L.push("BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:Reminder", "TRIGGER:-" + (rem >= 1440 ? "P" + (rem / 1440) + "D" : rem >= 60 ? "PT" + (rem / 60) + "H" : "PT" + rem + "M"), "END:VALARM");
+      L.push("END:VEVENT");
+      out = out.concat(L); good++;
+    });
+    out.push("END:VCALENDAR");
+    if (!good) throw new Error("No events could be created. The start dates were not recognised. Try changing the \u201cDate order\u201d option or check the start date column.");
+    var text = out.map(fold).join("\r\n") + "\r\n", note = bad.length ? " (" + plural(bad.length, "row", "rows") + " skipped: unreadable date, e.g. row " + bad[0] + ")" : "";
+    var r2 = addResult(safeName(baseName(state.files[0].file.name), "events") + ".ics", new Blob([text], { type: "text/calendar;charset=utf-8" }), plural(good, "event", "events") + note);
+    r2.preview = { type: "text", text: text.slice(0, 1800).replace(/\r\n/g, "\n") };
+  }
+
+  /* ============================================================
+     Events
+  ============================================================ */
+  root.addEventListener("click", function (e) {
+    var el = e.target.closest ? e.target.closest("[data-tool],[data-rm],[data-zip],#ecc-go,#ecc-clear,#ecc-ex") : null;
+    if (!el || !root.contains(el)) return;
+    if (el.hasAttribute("data-tool")) { selectTool(el.getAttribute("data-tool")); return; }
+    if (el.hasAttribute("data-rm")) {
+      var id = +el.getAttribute("data-rm");
+      state.files = state.files.filter(function (f) { return f.id !== id; });
+      if (cur().csv) { state.csv = null; state.map = {}; renderMap(); }
+      clearResults(); renderResults(); setMsg("", ""); renderFiles(); return;
+    }
+    if (el.hasAttribute("data-zip")) {
+      var enc = new TextEncoder(), good = state.results.filter(function (r) { return !r.error; }), names = uniqueNames(good.map(function (r) { return r.name; }));
+      Promise.all(good.map(function (r) { return r.blob.arrayBuffer ? r.blob.arrayBuffer() : new Promise(function (res) { var fr = new FileReader(); fr.onload = function () { res(fr.result); }; fr.readAsArrayBuffer(r.blob); }); })).then(function (bufs) {
+        var z = makeZip(bufs.map(function (b, i) { return { name: names[i], data: new Uint8Array(b) }; })), a = document.createElement("a");
+        a.href = URL.createObjectURL(z); a.download = "converted-files.zip"; root.appendChild(a); a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); if (a.parentNode) a.parentNode.removeChild(a); }, 1500);
+      });
+      return;
+    }
+    if (el.id === "ecc-go") { runConvert(); return; }
+    if (el.id === "ecc-clear") { clearResults(); state.files = []; state.csv = null; state.map = {}; renderMap(); renderFiles(); renderResults(); setMsg("", ""); return; }
+    if (el.id === "ecc-ex") {
+      var s = SAMPLES[state.tool]; if (!s) return;
+      var file; try { file = new File([s.text], s.name, { type: "text/plain" }); } catch (err) { file = new Blob([s.text]); file.name = s.name; }
+      acceptFiles([file]);
+    }
+  });
+  root.addEventListener("change", function (e) {
+    var t = e.target;
+    if (t.id === "ecc-file") { var list = Array.prototype.slice.call(t.files || []); t.value = ""; acceptFiles(list); return; }
+    if (t.hasAttribute && t.hasAttribute("data-opt")) {
+      var k = t.getAttribute("data-opt"), v = t.type === "checkbox" ? t.checked : t.value;
+      setOpt(k, v);
+      var spec = cur().opts.filter(function (o) { return o.k === k; })[0];
+      if (spec && spec.reparse && state.csv) { reparseCSV(); remap(); renderMap(); updateGo(); }
+      return;
+    }
+    if (t.hasAttribute && t.hasAttribute("data-map")) {
+      state.map[t.getAttribute("data-map")] = +t.value;
+      if (+t.value >= 0) t.classList.add("is-set"); else t.classList.remove("is-set");
+    }
+  });
+  var drop = $("#ecc-drop");
+  ["dragenter", "dragover"].forEach(function (n) { drop.addEventListener(n, function (e) { e.preventDefault(); drop.classList.add("is-over"); }); });
+  ["dragleave", "dragend"].forEach(function (n) { drop.addEventListener(n, function () { drop.classList.remove("is-over"); }); });
+  drop.addEventListener("drop", function (e) { e.preventDefault(); drop.classList.remove("is-over"); acceptFiles(e.dataTransfer && e.dataTransfer.files); });
+
+  renderAll();
+})();
+</script>
